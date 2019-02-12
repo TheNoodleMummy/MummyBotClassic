@@ -62,7 +62,7 @@
 //                 channelUsers
 //                    .Where(x => string.Equals(value, x.Username, StringComparison.OrdinalIgnoreCase))
 //                    .ForEach(channelUser => AddResult(results, channelUser as T, channelUser.Username == value ? 0.65f : 0.55f))
-//                    ;
+//                    ; 
 
 //                foreach (var guildUser in guildUsers.Where(x => string.Equals(value, x.Username, StringComparison.OrdinalIgnoreCase)))
 //                    AddResult(results, guildUser as T, guildUser.Username == value ? 0.60f : 0.50f);
