@@ -225,6 +225,22 @@ namespace Mummybot.Commands.Modules
             }
             else
             {
+                if (r > 256)
+                {
+                    await Messages.SendMessageAsync(Context, $"The value of R ({r}) was invalid");
+                    return;
+                }
+                if (g > 256)
+                {
+                    await Messages.SendMessageAsync(Context, $"The value of G ({g}) was invalid");
+                    return;
+                }
+                if (b > 256)
+                {
+                    await Messages.SendMessageAsync(Context, $"The value of B ({b}) was invalid");
+                    return;
+                }
+
                 var color = new Color(r, g, b);
 
                 await Role.ModifyAsync(R => R.Color = color);
@@ -451,6 +467,23 @@ namespace Mummybot.Commands.Modules
 
                 Console.WriteLine(ex.StackTrace);
             }
+        }
+
+
+        [Command("checkid")]
+        public async Task test(ulong id = 0)
+        {
+            var datetime = DateTimeOffset.FromUnixTimeMilliseconds((long)(id >> 22) + 1420070400000);
+            var workerid = (id & 0x3E0000) >> 17;
+            var processid = (id & 0x1F000) >> 12;
+            var increment = id & 0xFFF;
+            var emb = new EmbedBuilder()
+                .AddField("created", datetime, true)
+                .AddField("Worker ID", workerid, true)
+                .AddField("process ID", processid, true)
+                .AddField("increment", increment, true);
+
+            await ReplyAsync(embed: emb.Build());
         }
 
         //[Command("haters")]

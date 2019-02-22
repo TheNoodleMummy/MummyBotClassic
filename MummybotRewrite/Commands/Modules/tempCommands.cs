@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Qmmands;
+using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -11,6 +13,9 @@ namespace Mummybot.Commands.Modules
     [Name("Temp Commands"), Description("holds some commands that will go away again after time or commands that are in test phase")]
     public class TempCommands : MummyBase
     {
+       
+
+
         [Command("ulong")]
         public async Task getulong(long nr= 0)
         {
