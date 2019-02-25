@@ -213,7 +213,7 @@ namespace Mummybot.Commands.Modules
             {
                 Role = (Context.User as SocketGuildUser).Roles.FirstOrDefault(x => x.IsHoisted);
             }
-            else if (!(Context.User as SocketGuildUser).Roles.Any(x => x.Permissions.Administrator))
+            else if (!(Context.User as SocketGuildUser).Roles.Any(x => x.Permissions.ManageRoles))
             {
                 Role = (Context.User as SocketGuildUser).Roles.FirstOrDefault(x => x.IsHoisted);
             }
@@ -259,7 +259,7 @@ namespace Mummybot.Commands.Modules
             {
                 Role = (Context.User as SocketGuildUser).Roles.FirstOrDefault(x => x.IsHoisted);
             }
-            else if (!(Context.User as SocketGuildUser).Roles.Any(x => x.Permissions.Administrator))
+            else if (!(Context.User as SocketGuildUser).Roles.Any(x => x.Permissions.ManageRoles))
             {
                 Role = (Context.User as SocketGuildUser).Roles.FirstOrDefault(x => x.IsHoisted);
             }
