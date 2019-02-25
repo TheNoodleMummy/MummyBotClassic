@@ -158,7 +158,7 @@ namespace Mummybot.Commands.Modules
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await ReplyAsync($"im an idiot and failed to quote that.(Message ID {id}");
                 //Log(LogSeverity.Critical, LogSource.TextCommands, ex.Message, true, ex);

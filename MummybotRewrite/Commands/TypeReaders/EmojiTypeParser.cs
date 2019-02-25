@@ -9,7 +9,7 @@ namespace Mummybot.Commands.TypeReaders
 {
     class EmojiTypeParser : TypeParser<Emoji>
     {
-        public override Task<TypeParserResult<Emoji>> ParseAsync(string value, ICommandContext context, IServiceProvider provider)
+        public override Task<TypeParserResult<Emoji>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
             Emoji emoji = null;
             try

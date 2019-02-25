@@ -1,5 +1,4 @@
-﻿using Discord.Commands;
-using Qmmands;
+﻿using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,8 +27,8 @@ namespace Mummybot.Commands.TypeReaders
             "%s's'",                //      1s
         };
 
-        public override Task<TypeParserResult<TimeSpan>> ParseAsync(string value, Qmmands.ICommandContext context, IServiceProvider provider)
-       
+        public override Task<TypeParserResult<TimeSpan>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
+
         {
             return (TimeSpan.TryParseExact(value.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
                 ? Task.FromResult(new TypeParserResult<TimeSpan>(timeSpan))

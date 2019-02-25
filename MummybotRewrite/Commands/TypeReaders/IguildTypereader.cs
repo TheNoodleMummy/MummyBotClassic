@@ -12,7 +12,7 @@ namespace Mummybot.Commands.TypeReaders
 {
     class IGuildTypeReader : TypeParser<IGuild>
     {
-        public override Task<TypeParserResult<IGuild>> ParseAsync(string value, ICommandContext context, IServiceProvider provider)
+        public override Task<TypeParserResult<IGuild>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
             var client = provider.GetService<DiscordSocketClient>();
             SocketGuild guild;

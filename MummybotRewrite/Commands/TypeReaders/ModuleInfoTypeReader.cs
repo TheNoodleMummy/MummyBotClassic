@@ -10,7 +10,7 @@ namespace Mummybot.Commands.TypeReaders
 {
     public class ModuleTypeReader : TypeParser<Module>
     {
-        public override Task<TypeParserResult<Module>> ParseAsync(string value, ICommandContext context, IServiceProvider provider)
+        public override Task<TypeParserResult<Module>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
             CommandService commandService = provider.GetService<CommandService>();
             var module = commandService.GetAllModules().FirstOrDefault(m => m.Name.ToLower().Contains(value.ToLower()));

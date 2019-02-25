@@ -11,7 +11,7 @@ namespace Mummybot.Commands.TypeReaders
     public class CommandTypeReader : TypeParser<Command>
     {  
 
-        public override Task<TypeParserResult<Command>> ParseAsync(string value, ICommandContext context, IServiceProvider provider)
+        public override Task<TypeParserResult<Command>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
 
             var commands = provider.GetService<CommandService>().GetAllCommands().Where(c => c.Name.ToLower().Contains(value.ToLower()));
