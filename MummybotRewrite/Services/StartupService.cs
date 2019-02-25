@@ -45,6 +45,7 @@ namespace Mummybot.Services
             var asembly = _services.GetService<Assembly>();
             _commands.AddModules(asembly);
             _commands.AddTypeParsers(asembly);
+            _commands.AddTypeParser(new UserTypeparser<SocketGuildUser>());
         }
 
         public async Task StartClientAsync()

@@ -135,7 +135,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("bday"), Description("Register your Bday by Mummybot"), RequireActiveBdayService]
         [RunMode(RunMode.Parallel)]
-        public async Task Bday(IUser user = null)
+        public async Task Bday(SocketGuildUser user = null)
         {
             user = user ?? Context.User;
             var bdays = GuildConfig.Birthdays;

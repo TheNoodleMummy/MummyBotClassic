@@ -8,7 +8,8 @@ using Qmmands;
 
 namespace Mummybot.Commands.TypeReaders
 {
-    public sealed class UserTypeparser<TUser> : TypeParser<TUser> where TUser : SocketUser
+    [DoNotAutoAdd]
+     class UserTypeparser<TUser> : TypeParser<TUser> where TUser : SocketGuildUser
     {
         public override Task<TypeParserResult<TUser>> ParseAsync(Parameter param, string value, ICommandContext context, IServiceProvider provider)
         {
