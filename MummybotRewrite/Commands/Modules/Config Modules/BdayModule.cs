@@ -141,7 +141,7 @@ namespace Mummybot.Commands.Modules
             var bdays = GuildConfig.Birthdays;
             if (bdays.Any(x => x.UserID == user.Id))
             {
-                await ReplyAsync("mate i already that bday, pls remove it first if its wrong or if you wanne unsub from bdays");
+                await ReplyAsync("mate i already know that bday, pls remove it first if its wrong or if you wanne unsub from bdays");
             }
 
             DateTime bday = new DateTime();
@@ -188,6 +188,7 @@ namespace Mummybot.Commands.Modules
             };
             GuildConfig.Birthdays.Add(Bday);
             var msg = await ReplyAsync($"Registered Birthday of {user.Username} on {Bday.Bday.ToString("dd/MM/yyyy")} (dmy).");
+            await Task.Delay(5000);
             await Messages.DeleteMessageAsync(Context, msg);
         }
 
