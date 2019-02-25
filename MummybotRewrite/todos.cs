@@ -8,6 +8,5 @@ namespace Mummybot
     {
          
          //TODO fix !bdays
-         //TODO just to test github webhook
     }
 }

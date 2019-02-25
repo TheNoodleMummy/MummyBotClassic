@@ -67,6 +67,11 @@ namespace Mummybot.Commands.Modules
             var bdays = GuildConfig.Birthdays.ToList();
             StringBuilder sb = new StringBuilder();
             var dict = new Dictionary<int, Birthday>();
+            if (bdays.Count == 0)
+            {
+                await ReplyAsync("currently no birthdays registered yet");
+                return;
+            }
             foreach (var Bday in bdays)
             {
 
