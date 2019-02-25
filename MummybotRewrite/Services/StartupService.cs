@@ -35,15 +35,15 @@ namespace Mummybot.Services
         public async Task StartAsync()
         {
             _eventService.HookEvents();
-             await InstallCommandAsync();
+            InstallCommandAsync();
             await StartClientAsync();
             await Task.Delay(-1);
         }
 
-        public async Task InstallCommandAsync()
+        public void InstallCommandAsync()
         {
             var asembly = _services.GetService<Assembly>();
-            await _commands.AddModulesAsync(asembly);
+            _commands.AddModules(asembly);
             _commands.AddTypeParsers(asembly);
         }
 
