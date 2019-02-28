@@ -1,7 +1,0 @@
-language: csharp
-mono: none
-os: windows
-dotnet: 2.2.103
-script:
-- dotnet build -c Release
-- dotnet test
