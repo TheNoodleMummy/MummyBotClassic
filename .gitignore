@@ -275,7 +275,7 @@ sounds/
 *.mp3
 *.mp4
 Lavalink/
-DatabaseDetails.cs
 bin/
 todo.cs
 /MummybotRewrite/todos.cs
+database.json
