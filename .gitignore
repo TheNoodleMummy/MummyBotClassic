@@ -9,14 +9,8 @@
 *.pubxml
 
 
-*.db
-sounds/
-*.mp3
-*.mp4
-Lavalink/
-DatabaseDetails.cs
-bin/
-todo.cs
+
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -271,4 +265,18 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+
+
+
+#custom user filters
+*.db
+sounds/
+*.mp3
+*.mp4
+Lavalink/
+DatabaseDetails.cs
+bin/
+todo.cs
 /MummybotRewrite/todos.cs
+![oO]bj/project.assets.json
