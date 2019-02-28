@@ -5,9 +5,16 @@
 *.suo
 *.user
 *.userosscache
-*.sln
 *.sln.docstates
 *.pubxml
+*.sln
+*.db
+*.json
+/sounds
+*.mp3
+/Lavalink
+DatabaseDetails.cs
+/bin
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
