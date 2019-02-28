@@ -8,8 +8,8 @@
 *.sln.docstates
 *.pubxml
 
+
 *.db
-*.json
 sounds/
 *.mp3
 *.mp4
