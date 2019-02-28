@@ -17,6 +17,7 @@ sounds/
 Lavalink/
 DatabaseDetails.cs
 bin/
+todo.cs
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
