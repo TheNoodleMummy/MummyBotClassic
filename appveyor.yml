@@ -27,4 +27,6 @@ test_script:
    
 on_finish :
   # any cleanup in here
-deploy: off
+deploy: 
+- provider: Environment
+name: MummyBot
