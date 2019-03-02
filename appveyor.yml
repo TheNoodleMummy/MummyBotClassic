@@ -25,8 +25,7 @@ artifacts:
 clone_depth: 1
 test_script:
    
-on_finish :
-  # any cleanup in here
+
 deploy: 
 - provider: Environment
   name: DeployMummyBot
