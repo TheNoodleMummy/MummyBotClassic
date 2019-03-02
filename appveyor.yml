@@ -19,7 +19,7 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: '\MummybotRewrite\bin\Debug\netcoreapp2.2\publish'
+ - path: '\MummybotRewrite\bin\release\netcoreapp2.2\publish'
    name: MummyBot
    type: WebDeployPackage
 clone_depth: 1
@@ -31,3 +31,13 @@ deploy:
 - provider: Environment
   name: DeployMummyBot
   
+on_success:
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/BuildSuccess
+
+# on build failure
+on_failure:
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
+
+# after build failure or success
+on_finish:
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
