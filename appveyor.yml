@@ -15,7 +15,7 @@ before_build:
   - cmd: dotnet restore ./MummybotRewrite/Mummybot.csproj --verbosity m
 build_script:
   # output will be in ./src/bin/debug/netcoreapp1.1/publish
-  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj
+  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -C Release
 after_build:
   # For once the build has completed
 artifacts:
