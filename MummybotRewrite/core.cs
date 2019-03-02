@@ -51,7 +51,7 @@ namespace Mummybot
             await mummybot.StartAsync();
 
 
-
+            Console.ReadKey();
         }
     }
 }
