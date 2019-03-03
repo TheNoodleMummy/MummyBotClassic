@@ -13,13 +13,7 @@ namespace Mummybot.Commands.Modules
     [Name("Temp Commands"), Description("holds some commands that will go away again after time or commands that are in test phase")]
     public class TempCommands : MummyBase
     {
-        [Command("temp")]
-        public async Task temp(long nr = 0)
-        {
-
-
-            await ReplyAsync("just a simple test cmd to test auto deployment");
-        }
+        
 
         [Command("ulong")]
         public async Task getulong(long nr= 0)
