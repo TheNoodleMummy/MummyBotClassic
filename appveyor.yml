@@ -31,12 +31,12 @@ deploy:
   name: DeployMummyBot
   
 on_success:
-  - ps Core Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/BuildSuccess
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/BuildSuccess
 
 # on build failure
 on_failure:
-  - ps Core Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
 
 # after build failure or success
 on_finish:
-  - ps CoreInvoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
+  - ps Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
