@@ -19,7 +19,7 @@ namespace Mummybot.Commands.Modules
 
 
             await ReplyAsync("just a simple test cmd to test auto deployment");
-
+        }
 
         [Command("ulong")]
         public async Task getulong(long nr= 0)
