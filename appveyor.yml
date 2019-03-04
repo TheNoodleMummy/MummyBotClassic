@@ -38,5 +38,5 @@ on_failure:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
 
 # after build failure or success
-on_finish:
+after_deploy:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
