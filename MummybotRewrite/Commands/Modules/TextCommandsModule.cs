@@ -471,7 +471,7 @@ namespace Mummybot.Commands.Modules
 
 
         [Command("checkid")]
-        public async Task test(ulong id = 0)
+        public async Task CheckIDAsync(ulong id = 0)
         {
             var datetime = DateTimeOffset.FromUnixTimeMilliseconds((long)(id >> 22) + 1420070400000);
             var workerid = (id & 0x3E0000) >> 17;
