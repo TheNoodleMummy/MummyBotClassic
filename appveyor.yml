@@ -14,7 +14,7 @@ before_build:
   # Display minimal restore text
   - cmd: dotnet restore ./MummybotRewrite/Mummybot.csproj --verbosity m
 build_script:
-  # output will be in ./src/bin/debug/netcoreapp1.1/publish
+  # output will be in ./src/bin/release/netcoreapp2.2/publish
   - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release
 after_build:
   # For once the build has completed
@@ -37,6 +37,6 @@ on_success:
 on_failure:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
 
-# after build failure or success
+  
 after_deploy:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy

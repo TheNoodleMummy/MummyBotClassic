@@ -150,34 +150,48 @@ namespace Mummybot.Commands.Modules
             var response1 = await InteractiveService.NextMessageAsync(Context, timeout: TimeSpan.FromMinutes(2));
             if (response1.Content != "" && response1.Content.ToLower() == "dmy")
             {
-                TryAgain:
-                try
+                var success = false;
+                int trys = 0;
+                do
                 {
-                    await ReplyAsync("ok tell me the date");
-                    var response2 = await InteractiveService.NextMessageAsync(Context, timeout: TimeSpan.FromMinutes(2));
-                    bday = DateTime.ParseExact(response2.Content, "dd/MM/yyyy", CultureInfo.InvariantCulture.DateTimeFormat);
-                }
-                catch (FormatException)
-                {
-                    await ReplyAsync("Parsing failed please try again (dmy format)");
-                    goto TryAgain;
-                }
+                    if (trys >= 3)
+                        return;
+                    try
+                    {
+                        await ReplyAsync("ok tell me the date");
+                        var response2 = await InteractiveService.NextMessageAsync(Context, timeout: TimeSpan.FromMinutes(2));
+                        bday = DateTime.ParseExact(response2.Content, "dd/MM/yyyy", CultureInfo.InvariantCulture.DateTimeFormat);
+                    }
+                    catch (FormatException)
+                    {
+                        await ReplyAsync("Parsing failed please try again (dmy format)");
+                        trys++;
+                    }
+                } while (!success);
+                
 
             }
             else if (response1.Content != "" && response1.Content.ToLower() == "mdy")
             {
-                TryAgain:
-                try
+                var success = false;
+                int trys = 0;
+                do
                 {
-                    await ReplyAsync("ok tell me the date");
-                    var response2 = await InteractiveService.NextMessageAsync(Context, timeout: TimeSpan.FromMinutes(2));
-                    bday = DateTime.ParseExact(response2.Content, "MM/dd/yyyy", CultureInfo.InvariantCulture.DateTimeFormat);
-                }
-                catch (FormatException)
-                {
-                    await ReplyAsync("Parsing failed please try again (mdy)");
-                    goto TryAgain;
-                }
+                    if (trys >= 3)
+                        return; 
+
+                    try
+                    {
+                        await ReplyAsync("ok tell me the date");
+                        var response2 = await InteractiveService.NextMessageAsync(Context, timeout: TimeSpan.FromMinutes(2));
+                        bday = DateTime.ParseExact(response2.Content, "MM/dd/yyyy", CultureInfo.InvariantCulture.DateTimeFormat);
+                    }
+                    catch (FormatException)
+                    {
+                        await ReplyAsync("Parsing failed please try again (mdy)");
+                        trys++;
+                    }
+                } while (!success);
 
             }
 
