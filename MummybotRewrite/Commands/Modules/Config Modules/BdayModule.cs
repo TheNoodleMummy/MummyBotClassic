@@ -151,10 +151,10 @@ namespace Mummybot.Commands.Modules
             if (response1.Content != "" && response1.Content.ToLower() == "dmy")
             {
                 var success = false;
-                int trys = 0;
+                int tries = 0;
                 do
                 {
-                    if (trys >= 3)
+                    if (tries >= 3)
                         return;
                     try
                     {
@@ -165,7 +165,7 @@ namespace Mummybot.Commands.Modules
                     catch (FormatException)
                     {
                         await ReplyAsync("Parsing failed please try again (dmy format)");
-                        trys++;
+                        tries++;
                     }
                 } while (!success);
                 
@@ -174,10 +174,10 @@ namespace Mummybot.Commands.Modules
             else if (response1.Content != "" && response1.Content.ToLower() == "mdy")
             {
                 var success = false;
-                int trys = 0;
+                int tries = 0;
                 do
                 {
-                    if (trys >= 3)
+                    if (tries >= 3)
                         return; 
 
                     try
@@ -189,7 +189,7 @@ namespace Mummybot.Commands.Modules
                     catch (FormatException)
                     {
                         await ReplyAsync("Parsing failed please try again (mdy)");
-                        trys++;
+                        tries++;
                     }
                 } while (!success);
 
