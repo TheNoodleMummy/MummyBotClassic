@@ -1,10 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Qmmands;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
+﻿using Qmmands;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,10 +7,8 @@ namespace Mummybot.Commands.Modules
     [Name("Temp Commands"), Description("holds some commands that will go away again after time or commands that are in test phase")]
     public class TempCommands : MummyBase
     {
-        
-
         [Command("ulong")]
-        public async Task getulong(long nr= 0)
+        public async Task getulong(long nr = 0)
         {
 
             ulong result;
@@ -26,7 +18,7 @@ namespace Mummybot.Commands.Modules
             }
             await ReplyAsync(result.ToString());
         }
-       
+
 
         [Command("emotes")]
         public async Task Emotes()
@@ -42,6 +34,5 @@ namespace Mummybot.Commands.Modules
             }
             await ReplyAsync(sb.ToString());
         }
-
     }
 }

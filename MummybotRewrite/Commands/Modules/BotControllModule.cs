@@ -37,7 +37,7 @@ namespace Mummybot.Commands.Modules
         }
 
 
-       
+
 
 
         [Command("game")]
@@ -96,21 +96,21 @@ namespace Mummybot.Commands.Modules
             await m.ModifyAsync(x =>
             {
                 x.Content = $"heartbeat: {latency}ms, init: {init}ms, rtt: Calculating";
-                x.Embed= emb.Build();
+                x.Embed = emb.Build();
             });
             s.Stop();
             await m.ModifyAsync(x =>
             {
                 x.Content = $"heartbeat: {latency}ms, init: {init}ms, rtt: {s.ElapsedMilliseconds}ms";
-                x.Embed= emb.Build();
+                x.Embed = emb.Build();
             });
 
 
-           
+
 
         }
 
-       
+
     }
 
 }

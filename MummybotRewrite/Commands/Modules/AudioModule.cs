@@ -47,6 +47,6 @@ namespace Mummybot.Commands.Modules
 
         [Command("Volume")]
         public async Task Volume(int volume)
-            =>await  ReplyAsync(await Audio.VolumeAsync(Context.Guild.Id, volume));
+            => await ReplyAsync(await Audio.VolumeAsync(Context.Guild.Id, volume));
     }
 }

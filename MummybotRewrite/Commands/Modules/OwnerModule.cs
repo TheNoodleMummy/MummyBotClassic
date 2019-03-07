@@ -24,7 +24,7 @@ namespace Mummybot.Commands.Modules
             var sb = new StringBuilder();
             foreach (var item in TimerService.Queue)
             {
-                sb.AppendLine($"{item} in {item.When-DateTime.Now}");
+                sb.AppendLine($"{item} in {item.When - DateTime.Now}");
             }
             await ReplyAsync(sb.ToString());
         }

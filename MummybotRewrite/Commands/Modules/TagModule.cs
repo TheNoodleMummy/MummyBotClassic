@@ -1,14 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
-using Qmmands;
+﻿using Discord;
 using Discord.WebSocket;
-using System.IO;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Linq;
-using Mummybot.Database.Models;
 using Mummybot.Attributes;
+using Mummybot.Database.Models;
+using Qmmands;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
@@ -33,7 +31,7 @@ namespace Mummybot.Commands.Modules
 
         }
 
-        [Command("global"), Description("makes a tag non guild specific"),RequireUserPermission(GuildPermission.ManageChannels)]
+        [Command("global"), Description("makes a tag non guild specific"), RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task MakeTagGlobal([Remainder]string tag)
         {
             ulong botownerid = (await Context.Client.GetApplicationInfoAsync()).Owner.Id;
@@ -45,7 +43,7 @@ namespace Mummybot.Commands.Modules
             }
             else
             {
-                
+
                 await ReplyAsync($"{ (await Context.Client.GetApplicationInfoAsync()).Owner.Mention} {Context.User.Mention} wants you to make {tag} global.");
             }
         }
@@ -105,13 +103,13 @@ namespace Mummybot.Commands.Modules
                     await ReplyAsync("a tag already exist with this key");
 
                 }
-                Logs.LogError("it broke",Enums.LogSource.Tags, ex);
+                Logs.LogError("it broke", Enums.LogSource.Tags, ex);
             }
 
         }
 
         [Command("remove")]
-        [Description("remove a tag only the tag owner can remove he's own tag (admins can to)"), ]
+        [Description("remove a tag only the tag owner can remove he's own tag (admins can to)"),]
         public async Task Tagremove([Remainder]string tag)
         {
 
@@ -182,7 +180,7 @@ namespace Mummybot.Commands.Modules
 
 
         [Command("reset")]
-        [ RunMode(RunMode.Parallel)]
+        [RunMode(RunMode.Parallel)]
         [Description("Reset all tags"), RequireOwner]
         public async Task Tagreset()
         {
@@ -288,7 +286,7 @@ namespace Mummybot.Commands.Modules
                 x.Name = "Require NSFW";
                 x.Value = tagy.Req_NSFW ? " Yes" : " No";
             });
-            await ReplyAsync(embed:emb.Build());
+            await ReplyAsync(embed: emb.Build());
         }
     }
 
