@@ -85,12 +85,13 @@ namespace Mummybot.Commands.Modules
         {
             var emb = new EmbedBuilder();
             if (PingService.HasBeenoneHour)
-                emb.AddField("Average Heartbeat in the last hour", PingService.PingInLastHour.Select(t => t.Value).Average(), true);
+                emb.AddField("Average Heartbeat in the last hour", PingService.PingInLastHour.Select(t => t.Value).Average().ToString("##.##"), false);
 
-            emb.AddField("Average Heartbeat in my current life", PingService.AveragePing.Average(), true);
+            emb.AddField("Average Heartbeat in my current life", PingService.AveragePing.Average().ToString("##.##"), false);
 
             var latency = Context.Client.Latency;
             var s = Stopwatch.StartNew();
+
             var m = await ReplyAsync($"heartbeat: {latency}ms, init: ---, rtt: ---", embed: emb.Build());
             var init = s.ElapsedMilliseconds;
             await m.ModifyAsync(x =>
