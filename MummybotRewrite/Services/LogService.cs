@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(LogService))]
+    [Service("Log Service",typeof(LogService))]
     public class LogService
 
 

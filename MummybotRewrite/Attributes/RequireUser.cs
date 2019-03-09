@@ -1,7 +1,5 @@
 ﻿using Qmmands;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mummybot.Commands.TypeReaders
@@ -22,16 +20,5 @@ namespace Mummybot.Commands.TypeReaders
             else
                 return Task.FromResult(new CheckResult($"you are not allowed to use this command only {user.Username} can."));
         }
-
-        //public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
-        //{
-        //    var user = await context.Client.GetUserAsync(Userid);
-        //    if (Userid == context.User.Id)
-        //        return PreconditionResult.FromSuccess();
-        //    else
-        //        return PreconditionResult.FromError($"you are not allowed to use this command only {user.Username} can.");
-
-        //}
-
     }
 }

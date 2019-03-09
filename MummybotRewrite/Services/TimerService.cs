@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(TimerService))]
+    [Service("Timer Service",typeof(TimerService))]
     public class TimerService
     {
         private readonly Timer _timer;

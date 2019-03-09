@@ -1,9 +1,7 @@
 ﻿using Discord;
-using Qmmands;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Qmmands;
+using System.Net.Http;
 
 namespace Mummybot.Commands
 {
@@ -15,9 +13,11 @@ namespace Mummybot.Commands
         public SocketTextChannel Channel { get; }
         public SocketGuildUser User { get; }
         public SocketUserMessage Message { get; }
+        public HttpClient HttpClient { get; }
 
-        public MummyContext(DiscordSocketClient client, IUserMessage msg)
+        public MummyContext(DiscordSocketClient client, IUserMessage msg,HttpClient httpClient)
         {
+            HttpClient = httpClient;
             Client = client;
             Guild = (msg.Channel as SocketGuildChannel)?.Guild;
             GuildChannel = msg.Channel as SocketGuildChannel;

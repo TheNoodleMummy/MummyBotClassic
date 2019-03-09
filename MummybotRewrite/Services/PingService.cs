@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(PingService))]
+    [Service("Ping Service",typeof(PingService))]
     public class PingService
     {
         [Inject]

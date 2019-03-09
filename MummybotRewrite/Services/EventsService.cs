@@ -1,17 +1,15 @@
-﻿using Qmmands;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using Mummybot.Attributes;
+using Qmmands;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Victoria;
-using System.Linq;
-using System.Diagnostics;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(EventsService))]
+    [Service("Event Service",typeof(EventsService))]
     public class EventsService
     {
         [Inject]
@@ -43,7 +41,7 @@ namespace Mummybot.Services
         {
             Client.Log += Logs.LogEventAsync;
             Lava.Log += Logs.LogLavalink;
-            
+
             Client.ReactionAdded += StarBoardService.OnReactionAddedAsync;
             Client.ReactionRemoved += StarBoardService.Client_ReactionRemoved;
             Client.Ready += Client_Ready;
@@ -51,12 +49,12 @@ namespace Mummybot.Services
 
             Client.MessageReceived += Message.HandleMessageAsync;
             Client.MessageUpdated += (_, msg, __) => Message.HandleMessageAsync(msg);
-            
+
         }
 
         private async Task Client_Ready()
         {
-            
+
             var node = await Lava.AddNodeAsync(Client, new Configuration
             {
 #if DEBUG
@@ -83,17 +81,19 @@ namespace Mummybot.Services
 #endif
 
             });
+
             var guilds = DBService.GetAllGuilds();
             foreach (var guild in Client.Guilds)
             {
                 if (guilds.Any(x => x.GuildID == guild.Id)) continue;
                 await GuildService.NewGuildAsync(guild.Id);
             }
+
             AudioService.Initialize(node);
             BirthdayService.CheckBDays(null);
             await ReminderService.InitializeAsync();
             Stopwatch.Stop();
-            Logs.LogInformation($"Took {Stopwatch.ElapsedMilliseconds / 1000}second from start to ready.",Enums.LogSource.eventService);
+            Logs.LogInformation($"Took {Stopwatch.Elapsed.Seconds},{Stopwatch.Elapsed.Milliseconds}second from start to ready.", Enums.LogSource.eventService);
         }
     }
 

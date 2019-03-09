@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(EvalService))]
+    [Service("Eval Service",typeof(EvalService))]
     public class EvalService
     {
         private readonly MessagesService _message;

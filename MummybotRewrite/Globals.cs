@@ -1,9 +1,6 @@
 ﻿using Discord;
 using Mummybot.Commands;
 using Mummybot.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mummybot

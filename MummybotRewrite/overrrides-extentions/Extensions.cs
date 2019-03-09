@@ -1,6 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes;
 using Mummybot.Commands.TypeReaders;
 using Mummybot.Exceptions;
@@ -9,11 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Mummybot.Extentions
 {
-   public static class Extensions
+    public static class Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection collection, Assembly assembly)
         {
@@ -106,7 +103,7 @@ namespace Mummybot.Extentions
         {
             return assembly.GetTypes().Where(x => x.GetCustomAttributes(typeof(T), true).Length > 0);
         }
-        
+
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
             var typeParserInterface = commands.GetType().Assembly.GetTypes()
@@ -115,7 +112,7 @@ namespace Mummybot.Extentions
             if (typeParserInterface is null)
                 throw new QuahuRenamedException("ITypeParser");
 
-            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x)&&x.GetCustomAttribute<DoNotAutoAddAttribute>()== null);
+            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x) && x.GetCustomAttribute<DoNotAutoAddAttribute>() == null);
 
             var internalAddParser = commands.GetType().GetMethod("AddParserInternal",
                 BindingFlags.NonPublic | BindingFlags.Instance);
@@ -125,7 +122,7 @@ namespace Mummybot.Extentions
 
             foreach (var parser in parsers)
             {
-                
+
                 var targetType = parser.BaseType.GetGenericArguments().First();
 
                 internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), true });
@@ -135,6 +132,6 @@ namespace Mummybot.Extentions
         }
 
 
-       
+
     }
 }

@@ -11,14 +11,14 @@ namespace Mummybot.Database.Models
         public int Stars { get; set; }
 
 
-        public ulong StaredMessageChannelID{get;set;}
+        public ulong StaredMessageChannelID { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-       
-        public ulong StaredMessageId{ get; set; }
+
+        public ulong StaredMessageId { get; set; }
 
 
-        public ulong StartboardMessageId{ get; set; }
+        public ulong StartboardMessageId { get; set; }
     }
 }

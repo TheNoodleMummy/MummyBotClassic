@@ -1,19 +1,17 @@
-﻿using Mummybot.Exceptions;
-using System;
+﻿using System;
 
 namespace Mummybot.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class ServiceAttribute : Attribute
     {
-        public Type Target { get; }
+        public string ServiceName { get; }
+        public Type Target { get; internal set; }
 
-        public ServiceAttribute(Type target)
+        public ServiceAttribute(string serviceName,Type target)
         {
-            if(!target.IsInterface)
-                //throw new NotInterfaceException($"{target} must be an interface");
-
             Target = target;
+            ServiceName = serviceName;
         }
     }
 }

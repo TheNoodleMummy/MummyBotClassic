@@ -6,7 +6,7 @@ using LiteDB;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(DBService))]
+    [Service("Database Service",typeof(DBService))]
     public class DBService
     {
         [Inject]

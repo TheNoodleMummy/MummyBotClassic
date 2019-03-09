@@ -8,12 +8,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 
 namespace Mummybot.Services
 {
-    [Service(typeof(MessagesService))]
+    [Service("Message Service",typeof(MessagesService))]
     public class MessagesService
     {
         [Inject]
@@ -28,6 +29,8 @@ namespace Mummybot.Services
         private IServiceProvider _services;
         [Inject]
         private LogService _logs;
+        [Inject]
+        HttpClient _httpClient;
 
 
 
@@ -39,32 +42,32 @@ namespace Mummybot.Services
             try
             {
 
-            
-            //if (msg is null)
-            //    return;
 
-            if (msg.Author.IsBot ||
-                string.IsNullOrEmpty(msg.Content) ||
-                !(msg.Channel is SocketGuildChannel channel) ||
-                !(msg is SocketUserMessage message))
-                return;
+                //if (msg is null)
+                //    return;
 
-            var guildconfig = _database.GetGuildUncached(channel.Guild);
-
-            if (CommandUtilities.HasPrefix(message.Content, $"<@{_client.CurrentUser.Id}>", StringComparison.Ordinal, out var leftover) ||
-                CommandUtilities.HasPrefix(message.Content, $"<@!{_client.CurrentUser.Id}>", StringComparison.Ordinal, out leftover) ||
-                guildconfig.Prefixes.Any(x => CommandUtilities.HasPrefix(message.Content, x, StringComparison.OrdinalIgnoreCase, out leftover)))
-            {
-
-                if (guildconfig.BlackList.Any(x => x.UserID == message.Author.Id) && !guildconfig.IsBlackListed)
-                {
-                    _logs.LogInformation($"Dumped Message from Blacklisted user/guild {message.Author}/{message.Author.Id} in {channel.Guild}/{channel.Guild.Id}", Enums.LogSource.MessageService);
-
+                if (msg.Author.IsBot ||
+                    string.IsNullOrEmpty(msg.Content) ||
+                    !(msg.Channel is SocketGuildChannel channel) ||
+                    !(msg is SocketUserMessage message))
                     return;
+
+                var guildconfig = _database.GetGuildUncached(channel.Guild);
+
+                if (CommandUtilities.HasPrefix(message.Content, $"<@{_client.CurrentUser.Id}>", StringComparison.Ordinal, out var leftover) ||
+                    CommandUtilities.HasPrefix(message.Content, $"<@!{_client.CurrentUser.Id}>", StringComparison.Ordinal, out leftover) ||
+                    guildconfig.Prefixes.Any(x => CommandUtilities.HasPrefix(message.Content, x, StringComparison.OrdinalIgnoreCase, out leftover)))
+                {
+
+                    if (guildconfig.BlackList.Any(x => x.UserID == message.Author.Id) && !guildconfig.IsBlackListed)
+                    {
+                        _logs.LogInformation($"Dumped Message from Blacklisted user/guild {message.Author}/{message.Author.Id} in {channel.Guild}/{channel.Guild.Id}", Enums.LogSource.MessageService);
+
+                        return;
+                    }
+                    var context = new MummyContext(_client, message, _httpClient);
+                    await HandleCommandAsync(context, leftover);
                 }
-                var context = new MummyContext(_client, message);
-                await HandleCommandAsync(context, leftover);
-            }
             }
             catch (Exception ex)
             {
