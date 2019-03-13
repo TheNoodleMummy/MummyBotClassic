@@ -4,11 +4,11 @@ namespace Mummybot.Attributes
 {
     public class PropNameAttribute : Attribute
     {
-        public string name;
+        public string Name;
 
-        public PropNameAttribute(string Name)
+        public PropNameAttribute(string name)
         {
-            name = Name;
+            Name = name;
         }
     }
 }
