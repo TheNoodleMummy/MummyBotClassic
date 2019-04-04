@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Mummybot.Attributes;
 using Qmmands;
 using System;
@@ -52,6 +53,8 @@ namespace Mummybot.Services
 
         }
 
+        
+
         private async Task Client_Ready()
         {
 
@@ -88,7 +91,7 @@ namespace Mummybot.Services
                 if (guilds.Any(x => x.GuildID == guild.Id)) continue;
                 await GuildService.NewGuildAsync(guild.Id);
             }
-
+            
             AudioService.Initialize(node);
             BirthdayService.CheckBDays(null);
             await ReminderService.InitializeAsync();

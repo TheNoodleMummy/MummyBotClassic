@@ -155,7 +155,7 @@ namespace Mummybot.Database.Models
                 {
                     count = outobj.Count;
                 }
-                var descattrib = property.GetCustomAttribute<PropNameAttribute>().name;
+                var descattrib = property.GetCustomAttribute<PropNameAttribute>().Name;
                 sb.AppendLine($"{count} {descattrib}");
             }
 
@@ -169,7 +169,7 @@ namespace Mummybot.Database.Models
             var sb = new StringBuilder();
             foreach (var property in properties)
             {
-                var descattrib = property.GetCustomAttribute<PropNameAttribute>().name;
+                var descattrib = property.GetCustomAttribute<PropNameAttribute>().Name;
                 var get = property.GetGetMethod();
                 var value = (bool)get.Invoke(this, null);
 
