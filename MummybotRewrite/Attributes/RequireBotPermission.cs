@@ -13,36 +13,18 @@ namespace Mummybot.Attributes
         public GuildPermission? GuildPermission { get; }
         public ChannelPermission? ChannelPermission { get; }
 
-        /// <summary>
-        /// Require that the bot account has a specified GuildPermission
-        /// </summary>
-        /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        
         public RequireBotPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
-        }
-        /// <summary>
-        /// Require that the bot account has a specified ChannelPermission.
-        /// </summary>
-        /// <param name="permission">The ChannelPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
-        /// <example>
-        /// <code language="c#">
-        ///     [Command("permission")]
-        ///     [RequireBotPermission(ChannelPermission.ManageMessages)]
-        ///     public async Task Purge()
-        ///     {
-        ///     }
-        /// </code>
-        /// </example>
+        }        
+
         public RequireBotPermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;
         }
-
-
 
         public override async Task<CheckResult> CheckAsync(ICommandContext ctx, IServiceProvider provider)
         {

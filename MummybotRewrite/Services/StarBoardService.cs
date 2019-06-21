@@ -9,7 +9,7 @@ using Mummybot.Attributes;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(StarBoardService))]
+    [Service("Starboard Service",typeof(StarBoardService))]
     public class StarBoardService
     {
         [Inject]

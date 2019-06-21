@@ -15,7 +15,7 @@ using Mummybot.Attributes;
 namespace Mummybot.Services
 {
     //TODO remake this so it works with the timer service
-    [Service(typeof(BirthdayService))]
+    [Service("Birthday Service",typeof(BirthdayService))]
     public class BirthdayService
     {
         private Timer T = null;

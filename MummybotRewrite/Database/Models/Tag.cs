@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Mummybot.Database.Models
 
 {
@@ -24,10 +24,10 @@ namespace Mummybot.Database.Models
         public int Id { get; set; }
 
 
-        public ulong UserID{ get; set; }
+        public ulong UserID { get; set; }
 
 
-        public ulong GuildID{ get; set; }
+        public ulong GuildID { get; set; }
 
         public string Name { get; set; }
         public string Value { get; set; }

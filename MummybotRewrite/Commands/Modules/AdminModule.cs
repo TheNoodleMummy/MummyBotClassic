@@ -11,9 +11,6 @@ namespace Mummybot.Commands.Modules
     [Name("Admin Module"), Description("Contains commands for admins to easy do admin related things")]
     public class AdminModule : MummyBase
     {
-
-
-
         [Command("config")]
         public async Task Showconfig()
         {

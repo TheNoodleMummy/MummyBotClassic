@@ -9,7 +9,7 @@ using Mummybot.Commands;
 
 namespace Discord.Addons.Interactive
 {
-    [Service(typeof(InteractiveService))]
+    [Service("Interactive Service",typeof(InteractiveService))]
     public class InteractiveService : IDisposable
     {
         public DiscordSocketClient Discord { get; }

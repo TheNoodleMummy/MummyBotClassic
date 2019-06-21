@@ -1,6 +1,6 @@
 ﻿namespace Mummybot.Enums
 {
-    public  enum LogSource
+    public enum LogSource
     {
         TimerService,
         LogService,

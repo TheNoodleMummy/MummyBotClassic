@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
-using Qmmands;
+﻿using Discord;
 using Discord.WebSocket;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
-using Mummybot.Attributes;
 using Mummybot.Commands.TypeReaders;
 using Mummybot.Database.Models;
-using Victoria;
 using Mummybot.Extentions;
-using System.Diagnostics;
+using Qmmands;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
@@ -49,7 +43,7 @@ namespace Mummybot.Services
         }
 
         public async Task StartClientAsync()
-        {            
+        {
             var db = new LiteDatabase(new DatabaseDetails().LoadDetials().TokenDB);
 #if DEBUG
             await _client.LoginAsync(TokenType.Bot, (db.GetCollection<TokenData>("Tokens").FindOne(x => x.Name.ToLower() == "dev")).Token);

@@ -14,7 +14,7 @@ namespace Mummybot.Commands.Modules
     [RequireOwner]
     public class OwnerModule : MummyBase
     {
-        public EvalService evalService { get; set; }
+        public EvalService EvalService { get; set; }
         public TimerService TimerService { get; set; }
 
 
@@ -24,7 +24,7 @@ namespace Mummybot.Commands.Modules
             var sb = new StringBuilder();
             foreach (var item in TimerService.Queue)
             {
-                sb.AppendLine($"{item} in {item.When - DateTime.Now}");
+                sb.AppendLine($"{item} in {item.When - DateTime.UtcNow}");
             }
             await ReplyAsync(sb.ToString());
         }
@@ -40,7 +40,6 @@ namespace Mummybot.Commands.Modules
                     await Messages.SendMessageAsync(Context, "This guild is already blacklisted");
                 else
                 {
-
                     guildconfig.IsBlackListed = true;
                     await GuildService.UpdateGuildAsync(guildconfig);
                     Logs.LogInformation($"{guild} blacklisted in {Context.Guild}/{Context.Guild.Id} ", LogSource.BlackList);
@@ -52,19 +51,19 @@ namespace Mummybot.Commands.Modules
             public async Task Remove(IGuild guild)
             {
                 var guildconfig = Database.GetGuildUncached(guild.Id);
+
                 if (guildconfig.IsBlackListed)
                 {
-
                     guildconfig.IsBlackListed = false;
                     await GuildService.UpdateGuildAsync(guildconfig);
                     Logs.LogInformation($"{guild} removed from blacklist in {Context.Guild}/{Context.Guild.Id} ", LogSource.BlackList);
                     await Context.Message.AddReactionAsync(new Emoji("✅"));
                 }
                 else
-                    await Messages.SendMessageAsync(Context, "this guild is not blacklisted");
+                    await ReplyAsync("this guild is not blacklisted");
             }
 
-            [Command, Description("list all guilds that have been blacklist and why")]
+            [Command, Description("list all guildIds that have been blacklist")]
             public async Task Listblacklists()
             {
                 StringBuilder sb = new StringBuilder();
@@ -89,44 +88,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("eval")]
         [RunMode(RunMode.Parallel)]
-        [RequireOwner]
-        public Task EvalCodeAsync([Remainder] string script)
-        => evalService.EvaluateAsync(Context, Database, script);
-
-        //    try
-        //    {
-        //        foreach (var type in Assembly.GetEntryAssembly().GetTypes())
-        //        {
-
-        //        }
-        //        var namespaces = Assembly.GetEntryAssembly().GetTypes().Select(x => x.Namespace).Distinct();
-        //        var idk = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Distinct();
-        //        namespaces = namespaces.Where(x => x != null);
-
-        //        var options = ScriptOptions.Default;
-        //        options = options.WithImports(string.Join(',', namespaces));
-        //        options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)));
-
-        //        var result = await CSharpScript.EvaluateAsync(SanitizeCode(script), options, new Globals { Context = Context, Db = Database ,Messages = Messages});
-
-        //        if (!(result is null))
-        //        {
-        //            await ReplyAsync($"```cs\n{result.ToString()}\n```").ConfigureAwait(false);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //         Logs.LogError("Eval Failed", Enums.LogSource.OwnerModule, ex);
-        //    }
-
-        //    string SanitizeCode(string s)
-        //    {
-        //        var cleanCode = s.Replace("```csharp", string.Empty).Replace("```cs", string.Empty).Replace("```", string.Empty);
-        //        return Regex.Replace(cleanCode.Trim(), "^`|`$", string.Empty); //strip out the ` characters from the beginning and end of the string
-        //   }
-
-
-
+        public Task EvalCodeAsync([Remainder] string script) => EvalService.EvaluateAsync(Context, Database, script);
 
     }
 }

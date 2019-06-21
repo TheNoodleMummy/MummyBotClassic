@@ -1,6 +1,8 @@
 ﻿
 using Discord;
 using Discord.WebSocket;
+using Mummybot.Attributes;
+using Mummybot.Enums;
 //using Humanizer;
 using Mummybot.overrrides_extentions;
 using Qmmands;
@@ -20,30 +22,7 @@ namespace Mummybot.Commands.Modules
         public Random Random { get; set; }
 
         [Command("bs", "bullshit")]
-        public async Task Bullshit()
-        {
-
-            var seed = (int)(Context.Channel.Id - Context.Message.Id);
-
-
-            await ReplyAsync($"i call {Random.Next(100)}% bullshit");
-        }
-
-
-        [Command("pin")]
-        public async Task Pin()
-        {
-            var pins = await Context.Channel.GetPinnedMessagesAsync();
-            var reply = pins.First();
-            if (reply.Content == "" && reply.Attachments.Count() > 0)
-            {
-                await ReplyAsync(reply.Attachments.First().Url);
-            }
-            else
-            {
-                await ReplyAsync(reply.Content);
-            }
-        }
+        public Task Bullshit() => ReplyAsync($"i call {Random.Next(100)}% bullshit");
 
         //[Command("ohsnap")]
         //[Alias("osnap", "snap", "osnap")]
@@ -52,10 +31,58 @@ namespace Mummybot.Commands.Modules
         //    => await Context.Channel.SendFileAsync(@"gifs/ohsnap.gif");
 
 
+        //[Command("triggered")]
+        //[Description("triggered.gif")]
+        //public async Task Triggered()
+        //    => await Context.Channel.SendFileAsync(@"gifs/TRIGGERD.gif");
+
         //[Command("imdone")]
         //[Description("imdone.gif")]
         //public async Task Imdone()
         //    => await Context.Channel.SendFileAsync(@"gifs/imdone.gif");
+
+        //[Command("yolo")]
+        //[Description("yolo.png")]
+        //public async Task Yolo()
+        //    => await Context.Channel.SendFileAsync(@"pics\causeyolo.png");
+
+
+        //[Command("deeznuts")]
+        //[Description("dezznuts.png")]
+        //public async Task Deeznuts()
+        //    => await Context.Channel.SendFileAsync(@"pics\deeznuts.jpg");
+
+        //[Command("boom")]
+        //[Description("boom.gif")]
+        //[Alias("kaboom")]
+        //public async Task Boom()
+        //        => await Context.Channel.SendFileAsync(@"gifs/boom.gif");
+
+        //[Command("fuckyou")]
+        //[Description("fuckyou.gif")]
+        //[Alias("fu")]
+        //public async Task Fuckyou()
+        //    => await Context.Channel.SendFileAsync(@"gifs/fuckyou.gif");
+
+        //[Command("run")]
+        //[Description("run cats are taking over the world")]
+        //public async Task Cats()
+        //{
+        //    string path = @"pics\runfromcat";
+        //    path += Random.Next(1, 4);
+        //    path += ".png";
+        //    await Context.Channel.SendFileAsync(path);
+        //}
+
+        //[Command("haters")]
+        //[Description("hate me already?")]
+        //public async Task Haters()
+        //    => await Context.Channel.SendFileAsync(@"pics\hatersgonnehate.jpg");
+
+        //[Command("lag")]
+        //[Description("lag whats that?")]
+        //public async Task Lag()
+        //    => await Context.Channel.SendFileAsync(@"gifs\lag.gif");
 
 
         //[Command("toggles")]
@@ -90,23 +117,9 @@ namespace Mummybot.Commands.Modules
         //    }
         //}
 
-        //[Command("mention", RunMode = RunMode.Async)]
-        //[Description("mentions the mentioned user a set amount of times, you can give it a message to")]
-        //public async Task Mention(IGuildUser user, int amount, [Remainder]string message = null)
-        //{
-        //    if (amount > 20)
-        //    {
-        //        await ReplyAsync("yo dont you think that's a bit much?");
-        //        return;
-        //    }
-        //    for (int i = 0; i < amount; i++)
-        //    {
-        //        _MessagesService.AddTomentionlist(await ReplyAsync($"{user.Mention} {message}"));
-        //        await Task.Delay(1000);
 
-        //    }
-        //    _ = Task.Delay(10000).ContinueWith(async x => await _MessagesService.DeleteMentions());
-        //}
+
+
 
         [Command("quote")]
         [Description("quote a message by ID")]
@@ -127,7 +140,7 @@ namespace Mummybot.Commands.Modules
                         EmbedAuthorBuilder embauth = new EmbedAuthorBuilder()
                         {
                             Name = message.Author.Username,
-                            IconUrl = (message.Author as IGuildUser).GetAvatarUrl()
+                            IconUrl = message.Author.GetAvatarUrl()
                         };
                         ;
                         emb.WithAuthor(embauth);
@@ -140,7 +153,7 @@ namespace Mummybot.Commands.Modules
                         EmbedAuthorBuilder embauth = new EmbedAuthorBuilder()
                         {
                             Name = message.Author.Username,
-                            IconUrl = (message.Author as IGuildUser).GetAvatarUrl()
+                            IconUrl = message.Author.GetAvatarUrl()
                         };
                         ;
                         emb.WithAuthor(embauth);
@@ -158,55 +171,17 @@ namespace Mummybot.Commands.Modules
 
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await ReplyAsync($"im an idiot and failed to quote that.(Message ID {id}");
-                //Log(LogSeverity.Critical, LogSource.TextCommands, ex.Message, true, ex);
+                Logs.LogError("I failed to quote a message with a exception", LogSource.Commands, ex);
             }
         }
 
-        //[Command("triggered")]
-        //[Description("triggered.gif")]
-        //public async Task Triggered()
-        //    => await Context.Channel.SendFileAsync(@"gifs/TRIGGERD.gif");
-
-
-        [Command("wave")]
-        [Description("makes me wave to everyone")]
-        public async Task Wave()
-        {
-
-            int wait = 1050;
-            var msg = await ReplyAsync("``` ¯\\_(ツ)_\\¯ ```");
-            for (int i = 0; i < 3; i++)
-            {
-
-                await Task.Delay(wait);
-                await msg.ModifyAsync(x => { x.Content = "``` ¯|_(ツ)_|¯ ```"; });
-                await Task.Delay(wait);
-                await msg.ModifyAsync(x => { x.Content = "``` ¯/_(ツ)_ /¯ ```"; });
-                await Task.Delay(wait);
-                await msg.ModifyAsync(x => { x.Content = "``` ¯|_(ツ)_|¯ ```"; });
-                await Task.Delay(wait);
-                await msg.ModifyAsync(x => { x.Content = "``` ¯\\_(ツ)_\\¯ ```"; });
-            }
-
-        }
-
-        //[Command("boom")]
-        //[Description("boom.gif")]
-        //[Alias("kaboom")]
-        //public async Task Boom()
-        //        => await Context.Channel.SendFileAsync(@"gifs/boom.gif");
-
-        //[Command("fuckyou")]
-        //[Description("fuckyou.gif")]
-        //[Alias("fu")]
-        //public async Task Fuckyou()
-        //    => await Context.Channel.SendFileAsync(@"gifs/fuckyou.gif");
 
         [Command("color", "colour")]
         [Description("sets the color of the mentioned role")]
+        [RequireBotPermission(GuildPermission.ManageRoles)]
         public async Task ColorRGB([Description("Red")]int r, [Description("Green")]int g, [Description("Blue")]int b, [Description("the role")]IRole Role = null)
         {
             if (Role == null)
@@ -253,6 +228,7 @@ namespace Mummybot.Commands.Modules
         }
         [Command("color", "colour")]
         [Description("sets the color of the mentioned role")]
+        [RequireBotPermission(GuildPermission.ManageRoles)]
         public async Task ColorHEX([Description("Hexadecimal Value")]string Hex, [Description("the role")]IRole Role = null)
         {
             if (Role == null)
@@ -293,77 +269,48 @@ namespace Mummybot.Commands.Modules
             }
         }
 
-        //[Command("yolo")]
-        //[Description("yolo.png")]
-        //public async Task Yolo()
-        //    => await Context.Channel.SendFileAsync(@"pics\causeyolo.png");
 
 
-        //[Command("deeznuts")]
-        //[Description("dezznuts.png")]
-        //public async Task Deeznuts()
-        //    => await Context.Channel.SendFileAsync(@"pics\deeznuts.jpg");
+        [Command("botinfo")]
+        [Description("displays various info about mummy bot")]
+        public async Task Botstats()
+        {
+            _thisbot.Refresh();
 
+            var uptime = DateTime.Now - _thisbot.StartTime;
+            var hour = uptime.Hours;
+            var min = uptime.Minutes;
+            var day = uptime.Days;
 
-        //[Command("run")]
-        //[Description("run cats are taking over the world")]
-        //public async Task Cats()
-        //{
-        //    string path = @"pics\runfromcat";
-        //    path += Random.Next(1, 4);
-        //    path += ".png";
-        //    await Context.Channel.SendFileAsync(path);
-        //}
+            EmbedBuilder emb = new EmbedBuilder();
+            emb.AddField(x =>
+            {
+                x.Name = "BotName";
+                x.Value = Context.Client.CurrentUser.Username;
+            });
+            emb.AddField(x =>
+            {
+                x.Name = "Memory:";
+                x.Value = GC.GetTotalMemory(false);
+            });
+            emb.AddField(x =>
+            {
+                x.Name = "Uptime:";
+                x.Value = $"{day} Days, {hour} Hours, {min} Mins";
+            });
+            emb.AddField(x =>
+            {
+                x.Name = "Opperating system";
+                x.Value = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+            });
+            emb.AddField(x =>
+            {
+                x.Name = $"Build with ";
+                x.Value = $"Discord.net {DiscordConfig.Version}";
 
-        //[Command("botinfo")]
-        //[Description("displays various info about mummy bot")]
-        //public async Task Botstats()
-        //{
-
-
-        //    string subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
-        //    RegistryKey key = Registry.LocalMachine;
-        //    RegistryKey skey = key.OpenSubKey(subKey);
-
-        //    var uptime = DateTime.UtcNow.ToLocalTime() - _thisbot.StartTime.ToLocalTime();
-        //    var hour = uptime.Hours;
-        //    var min = uptime.Minutes;
-        //    var day = uptime.Days;
-
-        //    EmbedBuilder emb = new EmbedBuilder();
-        //    emb.AddField(x =>
-        //    {
-        //        x.Name = "BotName";
-        //        x.Value = Context.Client.CurrentUser.Username;
-        //    });
-        //    emb.AddField(x =>
-        //    {
-        //        _thisbot.Refresh();
-        //        x.Name = "Memory:";
-        //        x.Value = _thisbot.WorkingSet64.Bytes().ToString("#");
-        //    });
-        //    emb.AddField(x =>
-        //    {
-        //        x.Name = "Uptime:";
-        //        x.Value = $"{day} Days, {hour} Hours, {min} Mins";
-        //    });
-        //    emb.AddField(x =>
-        //    {
-        //        x.Name = "Opperating system";
-        //        x.Value = skey.GetValue("ProductName");
-        //    });
-        //    emb.AddField(x =>
-        //    {
-        //        x.Name = $"Build with ";
-        //        x.Value = $"Discord.net {DiscordConfig.Version}";
-
-        //    });
-
-
-
-
-        //    await SendEmbedAsync(emb);
-        //}
+            });
+            await ReplyAsync(embed: emb.Build());
+        }
 
         [Command("unix")]
         [Description("displays the current time in unix format")]
@@ -380,26 +327,18 @@ namespace Mummybot.Commands.Modules
         {
             try
             {
-
-
-                var userInfo = user ?? Context.Message.Author;
-                SocketGuildUser guilduser;
-
-
-                guilduser = userInfo as SocketGuildUser;
-
-
-                IRole role = null;
-                EmbedBuilder emb = new EmbedBuilder();
+                var userInfo = user ?? Context.User;
+                var guilduser = userInfo as SocketGuildUser;
+                var role = guilduser.Roles.FirstOrDefault(x => x.IsHoisted);
+                var emb = new EmbedBuilder();
 
                 EmbedAuthorBuilder embauth = new EmbedAuthorBuilder()
                 {
                     Name = userInfo.Username,
                     IconUrl = userInfo.GetAvatarUrl()
                 };
-                role = guilduser.Roles.FirstOrDefault(x => x.IsHoisted);
 
-                emb.Color = role?.Color;
+                emb.Color = role?.Color ?? Color.Blue;
                 emb.WithAuthor(embauth);
                 emb.AddField(x =>
                 {
@@ -444,8 +383,7 @@ namespace Mummybot.Commands.Modules
                         x.IsInline = true;
                     });
                 }
-                var invites = await Context.Guild.GetInvitesAsync();
-                var used = invites.FirstOrDefault().Uses;
+
                 emb.AddField(x =>
                 {
                     x.Name = "Roles";
@@ -459,13 +397,12 @@ namespace Mummybot.Commands.Modules
                     x.Value = userInfo.GetAvatarUrl();
                 });
                 emb.WithImageUrl(userInfo.GetAvatarUrl());
-                Embed embedded = emb.Build();
-                await ReplyAsync("", embed: embedded);
+                await ReplyAsync("", embed: emb.Build());
             }
             catch (Exception ex)
             {
 
-                Console.WriteLine(ex.StackTrace);
+                Logs.LogError("Failed to get the info of a user", LogSource.Commands, ex);
             }
         }
 
@@ -485,17 +422,5 @@ namespace Mummybot.Commands.Modules
 
             await ReplyAsync(embed: emb.Build());
         }
-
-        //[Command("haters")]
-        //[Description("hate me already?")]
-        //public async Task Haters()
-        //    => await Context.Channel.SendFileAsync(@"pics\hatersgonnehate.jpg");
-
-        //[Command("lag")]
-        //[Description("lag whats that?")]
-        //public async Task Lag()
-        //    => await Context.Channel.SendFileAsync(@"gifs\lag.gif");
-
-
     }
 }

@@ -4,9 +4,7 @@ using Mummybot.Services;
 using Qmmands;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
@@ -36,10 +34,6 @@ namespace Mummybot.Commands.Modules
             Environment.Exit(1);
         }
 
-
-
-
-
         [Command("game")]
         [RequireOwner()]
         public Task Setgame(ActivityType activity, [Remainder()]string game = null)
@@ -58,23 +52,9 @@ namespace Mummybot.Commands.Modules
         public async Task SetBotavatar(string url = null)
         {
             url = url ?? Context.Message.Attachments.First().Url.ToString();
-            HttpWebRequest lxRequest = (HttpWebRequest)WebRequest.Create(url);
+            var stream = await Context.HttpClient.GetStreamAsync(url);
 
-            // returned values are returned as a stream, then read into a string
-            String lsResponse = string.Empty;
-            using (HttpWebResponse lxResponse = (HttpWebResponse)await lxRequest.GetResponseAsync())
-            using (BinaryReader reader = new BinaryReader(lxResponse.GetResponseStream()))
-            {
-                Byte[] lnByte = reader.ReadBytes(1 * 1024 * 1024 * 10);
-                using (FileStream lxFS = new FileStream("configs/Avatar.png", FileMode.Create))
-                {
-                    lxFS.Write(lnByte, 0, lnByte.Length);
-                }
-            }
-
-            await Task.Delay(1500);
-
-            await Context.Client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(@"configs/avatar.png"));
+            await Context.Client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(stream));
         }
 
         [Command("latency", "ping", "pong", "rtt")]

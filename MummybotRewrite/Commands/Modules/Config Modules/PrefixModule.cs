@@ -22,26 +22,20 @@ namespace Mummybot.Commands.Modules
             {
                 GuildConfig.Prefixes.Add(prefix);
                 await Context.Message.AddReactionAsync(new Emoji("✅"));
-
             }
-
         }
 
         [Command("remove")]
         public async Task RemovePrefixAsync([Remainder]string prefix)
         {
-
             if (GuildConfig.Prefixes.Any(p => p == prefix))
             {
                 GuildConfig.Prefixes.Remove(prefix);
                 await Context.Message.AddReactionAsync(new Emoji("✅"));
-
             }
             else
-            {
                 await ReplyAsync($"This guild doesnt have the ``{prefix}`` prefix.");
 
-            }
         }
 
         [Command]

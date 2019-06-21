@@ -1,5 +1,4 @@
 ﻿using Qmmands;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
@@ -17,22 +16,6 @@ namespace Mummybot.Commands.Modules
                 result = (ulong)(nr + long.MaxValue);
             }
             await ReplyAsync(result.ToString());
-        }
-
-
-        [Command("emotes")]
-        public async Task Emotes()
-        {
-
-            var sb = new StringBuilder();
-            foreach (var guild in Context.Client.Guilds)
-            {
-                foreach (var emote in guild.Emotes)
-                {
-                    sb.Append($"<:{emote.Name}:{emote.Id}>");
-                }
-            }
-            await ReplyAsync(sb.ToString());
         }
     }
 }

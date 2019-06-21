@@ -20,7 +20,7 @@ namespace Mummybot.Commands.Modules
 
             bool hasdays = false;
             bool hashours = false;
-            var remind = await ReminderS.NewReminderAsync(userid: Context.User.Id, message: message, channelid: Context.Channel.Id, guildid: Context.Guild.Id, expiresat: DateTime.Now.Add(time), jumpurl: Context.Message.GetJumpUrl());
+            var remind = await ReminderS.NewReminderAsync(userid: Context.User.Id, message: message, channelid: Context.Channel.Id, guildid: Context.Guild.Id, expiresat: DateTime.UtcNow.Add(time), jumpurl: Context.Message.GetJumpUrl());
             Logs.LogInformation($"current time {DateTime.Now} reminder set in {time} at {remind.When}", Enums.LogSource.ReminderService);
 
             StringBuilder sb = new StringBuilder();
@@ -36,8 +36,6 @@ namespace Mummybot.Commands.Modules
                     sb.Append("Days, ");
             }
 
-
-
             if (time.Hours != 0)
             {
                 hashours = true;
@@ -51,6 +49,7 @@ namespace Mummybot.Commands.Modules
                 else
                     sb.Append("Hours, ");
             }
+
             if (time.Minutes != 0)
             {
                 if (hashours)
@@ -86,7 +85,7 @@ namespace Mummybot.Commands.Modules
             }
             foreach (var reminder in reminders)
             {
-                sb.AppendLine($"{reminder.Message} - {reminder.When} UTC+1");
+                sb.AppendLine($"{reminder.Message} - {reminder.When} UTC");
             }
             await ReplyAsync(sb.ToString());
         }

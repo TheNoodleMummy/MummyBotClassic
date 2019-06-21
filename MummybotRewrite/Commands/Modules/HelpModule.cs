@@ -121,11 +121,6 @@ namespace Mummybot.Commands.Modules
             }
 
             await Messages.SendMessageAsync(Context, embed: builder.Build());
-
-
-
         }
-
     }
-
 }

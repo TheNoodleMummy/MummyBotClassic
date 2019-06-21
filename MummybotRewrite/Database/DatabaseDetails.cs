@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 
 public class DatabaseDetails
@@ -18,7 +15,7 @@ public class DatabaseDetails
 
     internal DatabaseDetails LoadDetials()
         => JsonConvert.DeserializeObject<DatabaseDetails>(File.ReadAllText(@"database.json"));
-    
+
 
 
     public string GetRuntimeDB()

@@ -9,7 +9,7 @@ namespace Mummybot.Database.Models
 
         public BlackList() { }
 
-        public BlackList(ulong userid,string reason)
+        public BlackList(ulong userid, string reason)
         {
             UserID = userid;
             Reason = reason;
@@ -20,8 +20,8 @@ namespace Mummybot.Database.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ID { get; set; }        
-        
+        public int ID { get; set; }
+
 
         public DateTime DateBlocked { get; set; }
 

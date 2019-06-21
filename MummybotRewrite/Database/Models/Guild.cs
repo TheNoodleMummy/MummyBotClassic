@@ -21,7 +21,7 @@ namespace Mummybot.Database.Models
         {
             _service = service;
         }
-        public Guild(Guild guild,IRemoveableService service)
+        public Guild(Guild guild, IRemoveableService service)
         {
             GuildID = guild.GuildID;
             Prefixes = guild.Prefixes;
@@ -46,56 +46,78 @@ namespace Mummybot.Database.Models
             UnknownCommands = guild.UnknownCommands;
             AdvancedCommandErrors = guild.AdvancedCommandErrors;
             When = guild.When;
-        _service = service;
+            _service = service;
         }
-        
+
         #region properties
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong GuildID { get; set; }
-        [GetCountList, PropDescription("Prefixes")]
+
+        [GetCountList, PropName("Prefixes")]
         public List<string> Prefixes { get; set; } = new List<string>() { "!" };
-        [GetCountList, PropDescription("Stared Messages")]
+
+        [GetCountList, PropName("Stared Messages")]
         public List<Star> Stars { get; set; } = new List<Star>();
-        [GetCountList, PropDescription("Reminders")]
+
+        [GetCountList, PropName("Reminders")]
         public List<Reminder> Reminders { get; set; } = new List<Reminder>();
-        [GetCountList, PropDescription("User Tags")]
+
+        [GetCountList, PropName("User Tags")]
         public List<Tag> Tags { get; set; } = new List<Tag>();
-        [GetCountList, PropDescription("Registered Birthdays")]
+
+        [GetCountList, PropName("Registered Birthdays")]
         public List<Birthday> Birthdays { get; set; } = new List<Birthday>();
-        [GetCountList, PropDescription("Users Blacklisted")]
+
+        [GetCountList, PropName("Users Blacklisted")]
         public List<BlackList> BlackList { get; set; } = new List<BlackList>();
+
 
         public List<RoleBackup> RoleBackups { get; set; } = new List<RoleBackup>();
 
-        [OnOffBool,PropDescription("Is BlackListed")]
+
+        [OnOffBool, PropName("Is BlackListed")]
         public bool IsBlackListed { get; set; } = false;
-        [OnOffBool, PropDescription("uses UserBlacklist")]
+
+        [OnOffBool, PropName("uses UserBlacklist")]
         public bool UsesBlackList { get; set; } = false;
-        [OnOffBool,PropDescription("Uses Starboard")]
+
+        [OnOffBool, PropName("Uses Starboard")]
         public bool UsesStarboard { get; set; } = false;
 
+
         public ulong StarBoardChannelID { get; set; } = 0;
-        [OnOffBool, PropDescription("Reminders")]
+
+        [OnOffBool, PropName("Reminders")]
         public bool UsesReminders { get; set; } = false;
-        [OnOffBool, PropDescription("Birthday Announcements")]
+
+        [OnOffBool, PropName("Birthday Announcements")]
         public bool UsesBirthdays { get; set; } = false;
+
 
         public ulong BdaychannelID { get; set; } = 0;
 
+
         public ulong BdayroleID { get; set; } = 0;
-        [OnOffBool, PropDescription("none playlist related voice commands")]
+
+        [OnOffBool, PropName("none playlist related voice commands")]
         public bool UsesVoiceTrolls { get; set; } = false;
-        [OnOffBool,PropDescription("User Tags")]
+
+        [OnOffBool, PropName("User Tags")]
         public bool UsesTags { get; set; } = false;
-        [OnOffBool,PropDescription("Hangman (the game)")]
+
+        [OnOffBool, PropName("Hangman (the game)")]
         public bool CanPlayHangman { get; set; } = false;
 
+
         public ulong HangmanChannelid { get; set; } = 0;
-        [OnOffBool,PropDescription("recieves unknown command reply")]
+
+        [OnOffBool, PropName("get unknown command reply")]
         public bool UnknownCommands { get; set; } = false;
-        [OnOffBool,PropDescription("recieves detialed errors (non program errors)")]
+
+        [OnOffBool, PropName("get detailed errors (non program errors)")]
         public bool AdvancedCommandErrors { get; set; } = false;
+
         #endregion  
         public int Identifier { get; set; }/*memory shizzle id*/
 
@@ -103,11 +125,11 @@ namespace Mummybot.Database.Models
         public DateTime When { get; set; }/*when removed from cache (memory shizzle)*/
 
         public Task RemoveAsync()
-       =>_service.RemoveAsync(this);
+       => _service.RemoveAsync(this);
 
         public string GetConfig()
         {
-          
+
             var sb = new StringBuilder();
             sb.AppendLine("this guild has:");
             sb.Append(GetCounters());
@@ -117,8 +139,8 @@ namespace Mummybot.Database.Models
             return sb.ToString();
         }
         public string GetCounters()
-      {
-            var properties = GetType().GetProperties().Where(x => x.GetCustomAttributes(typeof(GetCountListAttribute), true).Length>0).ToList();
+        {
+            var properties = GetType().GetProperties().Where(x => x.GetCustomAttributes(typeof(GetCountListAttribute), true).Length > 0).ToList();
             var sb = new StringBuilder();
             foreach (var property in properties)
             {
@@ -133,21 +155,21 @@ namespace Mummybot.Database.Models
                 {
                     count = outobj.Count;
                 }
-                var descattrib = property.GetCustomAttribute<PropDescriptionAttribute>().Description;
+                var descattrib = property.GetCustomAttribute<PropNameAttribute>().Name;
                 sb.AppendLine($"{count} {descattrib}");
             }
-            
-            
+
+
             return sb.ToString();
-      }
+        }
         public string Getbools()
         {
             var properties = GetType().GetProperties().Where(x => x.GetCustomAttributes(typeof(OnOffBoolAttribute), true).Length > 0).ToList();
-            
+
             var sb = new StringBuilder();
             foreach (var property in properties)
             {
-                var descattrib = property.GetCustomAttribute<PropDescriptionAttribute>().Description;
+                var descattrib = property.GetCustomAttribute<PropNameAttribute>().Name;
                 var get = property.GetGetMethod();
                 var value = (bool)get.Invoke(this, null);
 

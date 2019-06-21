@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using Discord;
 using Qmmands;
-using Discord.WebSocket;
-using Discord;
-using System.Collections.Generic;
-using System.Linq;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Mummybot.Commands.TypeReaders
@@ -33,21 +31,5 @@ namespace Mummybot.Commands.TypeReaders
             else
                 return Task.FromResult(new CheckResult($"please only use this command in {(_channel as ITextChannel)?.Mention}"));
         }
-
-        //public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
-        //{
-        //    ITextChannel _channel;
-        //    if (!string.IsNullOrEmpty(_channelName))
-        //        _channel = (await context.Guild.GetTextChannelsAsync()).FirstOrDefault(x => x.Name.ToLower() == _channelName.ToLower());
-        //    else
-        //        _channel = (await context.Guild.GetTextChannelsAsync()).FirstOrDefault(x => x.Id == _ChannelId);
-
-
-        //    if (_channel != null)
-        //        return PreconditionResult.FromSuccess();
-        //    else
-        //        return PreconditionResult.FromError($"please only use this command in {(_channel as ITextChannel)?.Mention}");
-        //}
-
     }
 }

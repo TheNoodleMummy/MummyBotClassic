@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(ReminderService))]
+    [Service("Reminder Service",typeof(ReminderService))]
     public class ReminderService : IRemoveableService
     {
         [Inject]

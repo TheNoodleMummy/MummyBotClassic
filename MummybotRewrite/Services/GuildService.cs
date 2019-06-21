@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(GuildService))]
+    [Service("Guild Service",typeof(GuildService))]
     public class GuildService : IRemoveableService
     {
         [Inject]

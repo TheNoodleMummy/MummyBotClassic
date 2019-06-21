@@ -31,7 +31,7 @@ namespace Mummybot.Commands.Modules
 
         }
 
-        [Command("global"), Description("makes a tag non guild specific"), RequireUserPermission(GuildPermission.ManageChannels)]
+        [Command("global"), Description("makes a tag non guild specific")]
         public async Task MakeTagGlobal([Remainder]string tag)
         {
             ulong botownerid = (await Context.Client.GetApplicationInfoAsync()).Owner.Id;
@@ -57,32 +57,32 @@ namespace Mummybot.Commands.Modules
             {
                 if (Context.Message.Author.Id != botownerid)
                 {
-                    GuildConfig.Tags.FirstOrDefault(x => x.Key == tag).Req_NSFW = true;
+                    GuildConfig.Tags.FirstOrDefault(x => x.Key.ToLower() == tag.ToLower()).Req_NSFW = true;
                     await Context.Message.AddReactionAsync(new Emoji("✅"));
                 }
 
             }
             catch (KeyNotFoundException)
             {
-
-                await ReplyAsync(":no_entry: Key not found! :no_entry: ");
+                await ReplyAsync("Couldnt find that tag!");
             }
-            if (Context.Message.Author.Id == botownerid)
+
+            if (Context.Message.Author.Id == botownerid || Context.User.GuildPermissions.ManageGuild)
             {
                 try
                 {
-                    GuildConfig.Tags.FirstOrDefault(x => x.Key == tag).Req_NSFW = Bool;
+                    GuildConfig.Tags.FirstOrDefault(x => x.Key.ToLower() == tag.ToLower()).Req_NSFW = Bool;
                     await Context.Message.AddReactionAsync(new Emoji("✅"));
                 }
                 catch (KeyNotFoundException)
                 {
 
-                    await ReplyAsync(":no_entry: Key not found! :no_entry: ");
+                    await ReplyAsync("Couldnt find that tag!");
                 }
             }
-            else if (GuildConfig.Tags.FirstOrDefault(x => x.Key == tag).Req_NSFW)
+            else if (GuildConfig.Tags.FirstOrDefault(x => x.Key.ToLower() == tag.ToLower()).Req_NSFW)
             {
-                await ReplyAsync($"The tag is already NSFW only {(await Context.Client.GetApplicationInfoAsync()).Owner.Mention} can undo this");
+                await ReplyAsync($"The tag is already NSFW only {(await Context.Client.GetApplicationInfoAsync()).Owner} can undo this (or a user with ManageGuild permissions");
             }
         }
 
@@ -113,14 +113,16 @@ namespace Mummybot.Commands.Modules
         public async Task Tagremove([Remainder]string tag)
         {
 
-            if (Context.User.Id == GuildConfig.Tags.FirstOrDefault(x => x.Key == tag).UserID || (Context.User as IGuildUser).GuildPermissions.ManageGuild)
+            if (Context.User.Id == GuildConfig.Tags.FirstOrDefault(x => x.Key == tag).UserID ||
+                (Context.User as IGuildUser).GuildPermissions.ManageGuild ||
+                Context.User.Id == (await Context.Client.GetApplicationInfoAsync()).Owner.Id)
             {
                 GuildConfig.Tags.Remove(GuildConfig.Tags.FirstOrDefault(x => x.Key == tag));
                 await Context.Message.AddReactionAsync(new Emoji("✅"));
             }
             else
             {
-                await ReplyAsync(":no_entry: you dont own this tag or have insufficient admin rights to do this :no_entry:");
+                await ReplyAsync(":no_entry: You dont own this tag or have insufficient admin rights Remove this tag. :no_entry:");
                 await Context.Message.AddReactionAsync(new Emoji("⛔"));
             }
         }
@@ -149,7 +151,7 @@ namespace Mummybot.Commands.Modules
             else
             {
                 await Context.Message.AddReactionAsync(new Emoji("⛔"));
-                await ReplyAsync(":no_entry: you dont own this tag or have insufficient admin rights to do this :no_entry:");
+                await ReplyAsync(":no_entry: You dont own this tag or have insufficient admin rights to edit the key. :no_entry:");
             }
 
         }
@@ -174,7 +176,7 @@ namespace Mummybot.Commands.Modules
             }
             else
             {
-                await ReplyAsync(":no_entry: you dont own this tag or have insufficient admin rights to do this :no_entry:");
+                await ReplyAsync(":no_entry: You dont own this tag or have insufficient admin rights to edit the value. :no_entry:");
             }
         }
 
@@ -184,8 +186,6 @@ namespace Mummybot.Commands.Modules
         [Description("Reset all tags"), RequireOwner]
         public async Task Tagreset()
         {
-
-
             GuildConfig.Tags = new List<Tag>();
             await Context.Message.AddReactionAsync(new Emoji("✅"));
         }
@@ -238,7 +238,7 @@ namespace Mummybot.Commands.Modules
             }
             catch (Exception)
             {
-                await ReplyAsync(":no_entry: Key not found! :no_entry: ");
+                await ReplyAsync(":no_entry: Tag not found! :no_entry: ");
             }
             IUser user = Context.Client.GetUser(tagy.UserID);
             emb.WithAuthor(x =>
@@ -274,7 +274,7 @@ namespace Mummybot.Commands.Modules
             emb.AddField(x =>
             {
                 x.Name = "uses";
-                x.Value = tagy.Uses.ToString(); ;
+                x.Value = tagy.Uses.ToString();
             });
             emb.AddField(x =>
             {

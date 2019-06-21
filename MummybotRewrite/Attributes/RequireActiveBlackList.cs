@@ -12,14 +12,6 @@ namespace Mummybot.Attributes
 {
     class RequireActiveBlackList : CheckBaseAttribute
     {
-        //public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
-        //{
-        //    var guildconfig = services.GetService<DBService>().GetGuild(context.Guild);
-        //    if (guildconfig.UsesBlackList)          
-        //        return PreconditionResult.FromSuccess();
-        //    else
-        //        return PreconditionResult.FromError($"This command can only be used when the blacklist is activated.");
-        //}
         public override async Task<CheckResult> CheckAsync(ICommandContext ctx, IServiceProvider provider)
         {
             var context = ctx as MummyContext;

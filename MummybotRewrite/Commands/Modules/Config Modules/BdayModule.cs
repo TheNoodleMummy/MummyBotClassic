@@ -168,7 +168,7 @@ namespace Mummybot.Commands.Modules
                         tries++;
                     }
                 } while (!success);
-                
+
 
             }
             else if (response1.Content != "" && response1.Content.ToLower() == "mdy")
@@ -178,7 +178,7 @@ namespace Mummybot.Commands.Modules
                 do
                 {
                     if (tries >= 3)
-                        return; 
+                        return;
 
                     try
                     {

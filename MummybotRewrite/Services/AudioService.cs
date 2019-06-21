@@ -11,7 +11,7 @@ using Victoria.Entities.Enums;
 
 namespace Mummybot.Services
 {
-    [Service(typeof(AudioService))]
+    [Service("Audio Service",typeof(AudioService))]
     public sealed class AudioService
     {
         private LavaNode LavaNode;
