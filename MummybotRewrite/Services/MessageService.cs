@@ -1,0 +1,415 @@
+﻿using Casino.Common;
+using Discord;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using Mummybot.Attributes;
+using Mummybot.Commands;
+using Mummybot.Database;
+using Mummybot.Enums;
+using Mummybot.Extensions;
+using Qmmands;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+
+namespace Mummybot.Services
+{
+    class MessageService
+    {
+        [Inject] private readonly CommandService _commands;
+        [Inject] private readonly DiscordSocketClient _client;
+        [Inject] private readonly LogService _logger;
+        [Inject] private readonly Random _random;
+        [Inject] private readonly TaskQueue _scheduler;
+        [Inject] private readonly IServiceProvider _services;
+
+        private readonly
+            ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>
+            _messageCache;
+
+        private readonly ConcurrentDictionary<ulong, ulong> _lastJumpUrlQuotes;
+
+        private readonly ConcurrentDictionary<ulong, byte> _quoteReactions;
+
+        private const string Regex = @"(?:https://(?:canary.)?discordapp.com/channels/[\d]+/[\d]+/[\d]+)";
+
+        private static readonly Emoji QuoteEmote = new Emoji("🗨");
+
+        private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
+
+        public MessageService(IServiceProvider services)
+        {
+            _messageCache =
+                new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong,
+                    ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>();
+
+            _lastJumpUrlQuotes = new ConcurrentDictionary<ulong, ulong>();
+
+            _quoteReactions = new ConcurrentDictionary<ulong, byte>();
+
+            var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
+
+            _commands.CommandErrored += CommandErroredAsync;
+            _commands.CommandExecuted += CommandExecutedAsync;
+
+            _client.MessageReceived += msg =>
+                msg is SocketUserMessage message
+                    ? HandleReceivedMessageAsync(message, false)
+                    : Task.CompletedTask;
+
+            _client.MessageReceived += msg =>
+            {
+                if (msg.Channel is IDMChannel)
+                    return Task.CompletedTask;
+
+                var match = jumpUrlRegex.Match(msg.Content);
+
+                if (match.Success)
+                {
+                    _lastJumpUrlQuotes[msg.Channel.Id] = msg.Id;
+
+                    _scheduler.ScheduleTask(MessageLifeTime, () =>
+                    {
+                        _lastJumpUrlQuotes.TryRemove(msg.Channel.Id, out _);
+
+                        return Task.CompletedTask;
+                    });
+                }
+                return Task.CompletedTask;
+            };
+
+            _client.ReactionAdded += async (cache, channel, reaction) =>
+            {
+                if (!reaction.Emote.Equals(QuoteEmote) || _quoteReactions.ContainsKey(cache.Id) ||
+                    channel is IDMChannel)
+                    return;
+
+                var message = await cache.GetOrDownloadAsync();
+
+                if (message is null)
+                    return;
+
+                var embed = await Utilities.QuoteFromString(_client, message.Content);
+
+                if (embed is null)
+                    return;
+
+                await message.Channel.SendMessageAsync(string.Empty, embed: embed);
+
+                _quoteReactions.TryAdd(cache.Id, 0);
+
+                _scheduler.ScheduleTask(MessageLifeTime, () =>
+                {
+                    _quoteReactions.TryRemove(cache.Id, out _);
+
+                    return Task.CompletedTask;
+                });
+            };
+
+            _client.MessageUpdated += (before, msg, __) =>
+                before.HasValue && msg is SocketUserMessage after && after.Content != before.Value.Content
+                    ? HandleReceivedMessageAsync(after, true)
+                    : Task.CompletedTask;
+        }
+
+
+
+
+
+        private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
+        {
+            if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id)
+                return;
+
+            if (!(message.Channel is SocketTextChannel textChannel) ||
+                !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
+                return;
+
+            IReadOnlyCollection<string> prefixes;
+
+            using (var guildStore = _services.GetService<GuildStore>())
+            {
+                var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+                prefixes = guild.Prefixes;
+
+                if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
+                    _ = Task.Run(async () =>
+                    {
+                        var embed = await Utilities.QuoteFromString(_client, message.Content);
+
+                        if (embed is null)
+                            return;
+
+                        await message.Channel.SendMessageAsync(string.Empty, embed: embed);
+
+                        _quoteReactions.TryAdd(message.Id, 0);
+
+                        _scheduler.ScheduleTask(message.Id, MessageLifeTime, mId =>
+                        {
+                            _quoteReactions.TryRemove(mId, out _);
+                            return Task.CompletedTask;
+                        });
+                    });
+            }
+
+            if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture, out var prefix, out var output) ||
+                CommandUtilities.HasPrefix(message.Content, $"<@{_client.CurrentUser.Id}>", StringComparison.Ordinal, out var leftover) ||
+                    CommandUtilities.HasPrefix(message.Content, $"<@!{_client.CurrentUser.Id}>", StringComparison.Ordinal, out leftover))
+            {
+                if (string.IsNullOrWhiteSpace(output))
+                    return;
+
+                try
+                {
+                    var commandContext = await MummyContext.CreateAsync(_client, message, isEdit, prefix);
+
+                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
+
+                    if (result is CommandNotFoundResult)
+                    {
+                        commandContext = await MummyContext.CreateAsync(_client, message, isEdit, prefix);
+                        result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(string.Empty, LogSource.Commands, ex);
+                }
+            }
+        }
+
+        private async Task CommandErroredAsync(CommandErroredEventArgs args)
+        {
+            var context = (MummyContext)args.Context;
+
+            if (args.Result is ExecutionFailedResult failed)
+            {
+                _logger.LogError(string.Empty, LogSource.Commands, failed.Exception);
+
+#if !DEBUG
+                var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
+
+                await c.SendMessageAsync(Format.Sanitize(failed.Exception.ToString().Substring(0, 500)));
+#endif
+            }
+
+            await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
+        }
+
+        private Task CommandExecutedAsync(CommandExecutedEventArgs args)
+        {
+            var context = (MummyContext)args.Context;
+            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}", LogSource.Commands);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task<IUserMessage> SendAsync(MummyContext context, Action<MessageProperties> properties)
+        {
+            if (!_messageCache.TryGetValue(context.Channel.Id, out var foundChannel))
+                foundChannel = _messageCache[context.Channel.Id] =
+                    new ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>();
+
+            if (!foundChannel.TryGetValue(context.User.Id, out var foundCache))
+                foundCache = foundChannel[context.User.Id] =
+                    new ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>();
+
+            var messageProperties = properties.Invoke();
+
+            var (guid, value) = foundCache.FirstOrDefault(x => x.Value.State.Item2.ExecutingId == context.Message.Id);
+
+            IUserMessage sentMessage;
+
+            if (value is null)
+            {
+                sentMessage = await SendMessageAsync(context, messageProperties);
+
+                var message = new CachedMessage(context, sentMessage);
+
+                var key = Guid.NewGuid();
+
+                var task = _scheduler.ScheduleTask((key, message), MessageLifeTime, RemoveAsync);
+
+                _messageCache[context.Channel.Id][context.User.Id][key] = task;
+
+                return sentMessage;
+            }
+
+            if (context.IsEdit)
+            {
+                context.IsEdit = false;
+
+                var perms = context.Guild.CurrentUser.GetPermissions(context.Channel).ManageMessages;
+                await DeleteMessagesAsync(context, perms, new[] { (guid, value) });
+
+                sentMessage = await SendMessageAsync(context, messageProperties);
+
+                var message = new CachedMessage(context, sentMessage);
+
+                var key = Guid.NewGuid();
+
+                var task = _scheduler.ScheduleTask((key, message), MessageLifeTime, RemoveAsync);
+
+                _messageCache[context.Channel.Id][context.User.Id][key] = task;
+
+                return sentMessage;
+            }
+
+            sentMessage = await SendMessageAsync(context, messageProperties);
+            value.State.Item2.ResponseIds.Add(sentMessage.Id);
+
+            return sentMessage;
+        }
+
+        //async needed for the cast
+        private static async Task<IUserMessage> SendMessageAsync(MummyContext context, MessageProperties properties)
+        {
+            if (properties.Stream is null)
+            {
+                return await context.Channel.SendMessageAsync(properties.Content, embed: properties.Embed);
+            }
+
+            return await context.Channel.SendFileAsync(
+                stream: properties.Stream,
+                filename: properties.FileName,
+                text: properties.Content,
+                embed: properties.Embed);
+        }
+
+        private Task<IMessage> GetOrDownloadMessageAsync(ulong channelId, ulong messageId)
+        {
+            if (!(_client.GetChannel(channelId) is SocketTextChannel channel))
+                return null;
+
+            return !(channel.GetCachedMessage(messageId) is IMessage message)
+                ? channel.GetMessageAsync(messageId)
+                : Task.FromResult(message);
+        }
+
+        private Task RemoveAsync((Guid, CachedMessage) obj)
+        {
+            var (key, message) = obj;
+
+            _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
+
+            if (_messageCache[message.ChannelId][message.UserId].Count == 0)
+                _messageCache.Remove(message.UserId, out _);
+
+            if (_messageCache[message.ChannelId].Count == 0)
+                _messageCache.Remove(message.ChannelId, out _);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task DeleteMessagesAsync(MummyContext context, int amount)
+        {
+            var perms = context.Guild.CurrentUser.GetPermissions(context.Channel);
+            var manageMessages = perms.ManageMessages;
+
+            var deleted = 0;
+
+            do
+            {
+                if (!_messageCache.TryGetValue(context.Channel.Id, out var foundCache))
+                    return;
+
+                if (!foundCache.TryGetValue(context.User.Id, out var found))
+                    return;
+
+                if (found is null)
+                    return;
+
+                if (found.Count == 0)
+                {
+                    _messageCache[context.Channel.Id].Remove(context.User.Id, out _);
+
+                    if (_messageCache[context.Channel.Id].Count == 0)
+                        _messageCache.Remove(context.Channel.Id, out _);
+
+                    return;
+                }
+
+                var ordered = found.OrderByDescending(x => x.Value.State.Item2.CreatedAt).ToArray();
+
+                amount = amount > ordered.Length ? ordered.Length : amount;
+
+                var toDelete = new List<(Guid, ScheduledTask<(Guid, CachedMessage)>)>();
+
+                for (var i = 0; i < amount; i++)
+                    toDelete.Add((ordered[i].Key, ordered[i].Value));
+
+                var res = await DeleteMessagesAsync(context, manageMessages, toDelete);
+                deleted += res;
+
+            } while (deleted < amount);
+        }
+
+        private async Task<int> DeleteMessagesAsync(MummyContext context, bool manageMessages,
+            IEnumerable<(Guid Key, ScheduledTask<(Guid, CachedMessage)> Task)> messages)
+        {
+            var fetchedMessages = new List<IMessage>();
+
+            foreach (var (_, task) in messages)
+            {
+                var item = task.State;
+
+                await RemoveAsync(item);
+                task.Cancel();
+
+                foreach (var id in item.Item2.ResponseIds)
+                    fetchedMessages.Add(await GetOrDownloadMessageAsync(item.Item2.ChannelId, id));
+            }
+
+            if (manageMessages)
+            {
+                await context.Channel.DeleteMessagesAsync(fetchedMessages);
+            }
+            else
+            {
+                foreach (var message in fetchedMessages)
+                    await context.Channel.DeleteMessageAsync(message);
+            }
+
+            return fetchedMessages.Count;
+        }
+
+        public bool TryGetLastJumpMessage(ulong channelId, out ulong messageId)
+            => _lastJumpUrlQuotes.TryGetValue(channelId, out messageId);
+
+        private class CachedMessage
+        {
+            public ulong ChannelId { get; }
+            public IList<ulong> ResponseIds { get; }
+            public ulong ExecutingId { get; }
+            public ulong UserId { get; }
+            public long CreatedAt { get; }
+
+            public CachedMessage(MummyContext context, IMessage message)
+            {
+                ChannelId = context.Channel.Id;
+                UserId = context.User.Id;
+                ExecutingId = context.Message.Id;
+                ResponseIds = new List<ulong>
+                {
+                    message.Id
+                };
+                CreatedAt = message.CreatedAt.ToUnixTimeMilliseconds();
+            }
+        }
+
+        public class MessageProperties
+        {
+            public string Content { get; set; }
+            public Embed Embed { get; set; }
+            public Stream Stream { get; set; }
+            public string FileName { get; set; }
+        }
+
+
+    }
+}
