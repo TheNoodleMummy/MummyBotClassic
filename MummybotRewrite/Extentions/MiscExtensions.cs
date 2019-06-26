@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mummybot.Extensions
+namespace Mummybot.Extentions
 {
-    static partial class MiscExtensions
+    static partial class Extentions
     {
         public static T Invoke<T>(this Action<T> action) where T : new()
         {

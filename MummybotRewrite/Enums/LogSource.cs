@@ -8,6 +8,7 @@ namespace Mummybot.Enums
     {
         Unkown,
         MessagesService,
-        Commands
+        Commands,
+        Bot
     }
 }

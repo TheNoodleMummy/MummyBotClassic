@@ -1,3 +1,4 @@
+using Mummybot.Attributes;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Casino.Common
     /// <summary>
     /// A simple task scheduler.
     /// </summary>
+    [Service("Task Queue",typeof(TaskQueue))]
     public sealed partial class TaskQueue : IDisposable
     {
         private readonly ConcurrentQueue<IScheduledTask> _taskQueue;

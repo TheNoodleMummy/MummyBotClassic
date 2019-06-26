@@ -11,8 +11,19 @@ namespace Mummybot.Commands
 {
     public class MummyContext : CommandContext
     {
-        public SocketGuildUser User { get; }
-        public SocketTextChannel Channel { get; }
+
+        public MummyContext(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
+        {
+            Client = client;
+            Message = message;
+            HTTP = hTTP;
+            ServiceProvider = serviceProvider;
+            PrefixUsed = prefixUsed;
+            IsEdit = isEdit;
+        }
+
+        public SocketGuildUser User { get; private set; }
+        public SocketTextChannel Channel { get; private set; }
         public DiscordSocketClient Client { get; }
         public IUserMessage Message { get; }
 
@@ -23,9 +34,14 @@ namespace Mummybot.Commands
 
         public bool IsEdit { get; set; }
 
-        internal static async Task<MummyContext> CreateAsync(DiscordSocketClient client, SocketUserMessage message, bool isEdit, string prefix)
+        internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
         {
-            throw new NotImplementedException();
+            return new MummyContext(client, message, hTTP, serviceProvider, prefixUsed, isEdit)
+            {
+                Channel = message.Channel as SocketTextChannel,
+                User = message.Author as SocketGuildUser
+            };
         }
+       
     }
 }

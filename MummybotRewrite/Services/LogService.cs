@@ -137,7 +137,7 @@ namespace Mummybot.Services
 
             ss.Release(1);
             return Task.CompletedTask;
-        }
+        }       
 
         internal Task LogLavalink(LogMessage arg1)
         => LogEventAsync(arg1);
@@ -158,11 +158,6 @@ namespace Mummybot.Services
         => LogEventAsync(new LogMessage(LogSeverity.Error, source.ToString(), Message, exception));
 
         internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Info, source.ToString(), Message, exception));
-
-        internal void LogError(string empty, object commands, Exception exception)
-        {
-            throw new NotImplementedException();
-        }
+        => LogEventAsync(new LogMessage(LogSeverity.Info, source.ToString(), Message, exception));       
     }
 }

@@ -6,27 +6,28 @@ using Mummybot.Attributes;
 using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Enums;
-using Mummybot.Extensions;
+using Mummybot.Extentions;
 using Qmmands;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
 namespace Mummybot.Services
 {
-    class MessageService
+    [Service("Message service",typeof(MessageService))]
+    public class MessageService
     {
-        [Inject] private readonly CommandService _commands;
-        [Inject] private readonly DiscordSocketClient _client;
-        [Inject] private readonly LogService _logger;
-        [Inject] private readonly Random _random;
-        [Inject] private readonly TaskQueue _scheduler;
-        [Inject] private readonly IServiceProvider _services;
+        private readonly CommandService _commands;
+        private readonly DiscordSocketClient _client;
+        private readonly LogService _logger;
+        private readonly TaskQueue _scheduler;
+        private readonly IServiceProvider _services;
 
         private readonly
             ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>
@@ -44,6 +45,11 @@ namespace Mummybot.Services
 
         public MessageService(IServiceProvider services)
         {
+            _commands = services.GetRequiredService<CommandService>();
+            _client = services.GetRequiredService<DiscordSocketClient>();
+            _logger = services.GetRequiredService<LogService>();
+            _scheduler = services.GetRequiredService<TaskQueue>();
+            _services = services;
             _messageCache =
                 new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong,
                     ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>();
@@ -130,12 +136,12 @@ namespace Mummybot.Services
                 !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
                 return;
 
-            IReadOnlyCollection<string> prefixes;
+            IEnumerable<string> prefixes;
 
             using (var guildStore = _services.GetService<GuildStore>())
             {
                 var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
-                prefixes = guild.Prefixes;
+                prefixes = guild.Prefixes.Select(x=>x.Prefix);
 
                 if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
                     _ = Task.Run(async () =>
@@ -166,13 +172,13 @@ namespace Mummybot.Services
 
                 try
                 {
-                    var commandContext = await MummyContext.CreateAsync(_client, message, isEdit, prefix);
+                    var commandContext = MummyContext.Create(_client, message,_services.GetRequiredService<HttpClient>(),_services, prefix ,isEdit);
 
                     var result = await _commands.ExecuteAsync(output, commandContext, _services);
 
                     if (result is CommandNotFoundResult)
                     {
-                        commandContext = await MummyContext.CreateAsync(_client, message, isEdit, prefix);
+                        commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
                         result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
                     }
                 }
