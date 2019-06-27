@@ -40,7 +40,6 @@ namespace Mummybot.Commands.Modules
                             $"{module.Description}**");
                         sb.AppendLine(description);
                         pages.Add(sb.ToString());
-
                     }
                 }
 
@@ -51,7 +50,6 @@ namespace Mummybot.Commands.Modules
                     Title = "Some Commands you can run"
                 };
                 await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
-
             }
             catch (Exception ex)
             {
@@ -66,7 +64,6 @@ namespace Mummybot.Commands.Modules
 
             var builder = new EmbedBuilder()
             {
-
                 Color = Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed,
                 Description = $"Here are some commands in the  **{module.Name}**"
             };
@@ -76,13 +73,9 @@ namespace Mummybot.Commands.Modules
             {
                 if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
                 sb.AppendLine($"{prefixes.First()}{cmd.Name}");
-
             }
             builder.AddField($"\u200B", sb.ToString());
             await ReplyAsync(embed: builder);
-
-
-
         }
 
         [Command("help"), Description("Specific help for a command")]
@@ -97,7 +90,6 @@ namespace Mummybot.Commands.Modules
 
             var builder = new EmbedBuilder()
             {
-
                 Color = Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed,
                 Description = $"Here are some commands like **{command}**"
             };
@@ -108,7 +100,6 @@ namespace Mummybot.Commands.Modules
                 if (!(await cmd.RunChecksAsync(Context)).IsSuccessful) return;
                 builder.AddField(x =>
                 {
-
                     x.Name = cmd.Name;
                     x.Value = $"Alias: {string.Join(",", cmd.Aliases) ?? "none"}\n" +
                               $"Parameters: {string.Join(", ", cmd.Parameters.Select(p => p.Name)) ?? " none"}\n" +
