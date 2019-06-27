@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Addons.Interactive;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,17 +26,21 @@ namespace MummyBot
         {
             var assembly = Assembly.GetEntryAssembly();
             var types = assembly?.GetTypes().Where(t => t.GetCustomAttributes(true).Any(x => x is ServiceAttribute));
+            var discordClient = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                ExclusiveBulkDelete = true,
+                AlwaysDownloadUsers = true,
+                LogLevel = LogSeverity.Verbose,
+                MessageCacheSize = 100
+            });
+
             var services = new ServiceCollection()
                 .AddServices(types)
+                .AddSingleton(assembly)
                 .AddDbContext<GuildStore>(ServiceLifetime.Transient)
                 .AddDbContext<TokenStore>(ServiceLifetime.Transient)
-                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
-                 {
-                     ExclusiveBulkDelete = true,
-                     AlwaysDownloadUsers = true,
-                     LogLevel = LogSeverity.Verbose,
-                     MessageCacheSize = 100
-                 }))
+                 .AddSingleton(discordClient)
+                 .AddSingleton<InteractiveService>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
                      StringComparison = StringComparison.CurrentCultureIgnoreCase
@@ -56,7 +61,7 @@ namespace MummyBot
                 await guildstore.SaveChangesAsync();
             }
 
-                var mummybot = new BotStartup(services);
+            var mummybot = new BotStartup(services);
             await mummybot.StartAsync();
         }
     }
