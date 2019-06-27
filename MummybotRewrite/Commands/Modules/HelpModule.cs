@@ -15,8 +15,6 @@ namespace Mummybot.Commands.Modules
         public CommandService _commands { get; set; }
         public InteractiveService Iservice { get; set; }
 
-
-
         [Command("commands", "help"), Description("All Command for Mummybot")]
         public async Task HelpAsync()
         {
