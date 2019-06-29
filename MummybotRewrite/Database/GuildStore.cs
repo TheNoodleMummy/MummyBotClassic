@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Mummybot.Database.Entities;
 using Mummybot.Services;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Mummybot.Database
@@ -26,19 +28,34 @@ namespace Mummybot.Database
                 guild.HasMany(x => x.Prefixes)
                 .WithOne(y => y.Guild)
                 .HasForeignKey(z => z.guildID);
+
+                guild.HasMany(x => x.Stars)
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
             });
             modelBuilder.Entity<Prefixes>(prefix=>
             {
                 prefix.HasKey(x => x.Id);
             });
+            modelBuilder.Entity<Star>(star =>
+            {
+                star.HasKey(x => x.Id);
+            });
+        }
+
+        public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression)
+        {
+            return await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == guild.Id)
+                ?? await CreateGuildAsync(guild, expression);
         }
 
         public async Task<Guild> GetOrCreateGuildAsync(IGuild guild)
         {
-            return await Guilds.FindAsync(guild.Id) ?? await CreateGuildAsync(guild);
+            return await Guilds.FirstOrDefaultAsync(g => g.GuildID == guild.Id)
+                ?? await CreateGuildAsync<ulong>(guild, null);
         }
 
-        private async Task<Guild> CreateGuildAsync(IGuild guild)
+        private async Task<Guild> CreateGuildAsync<TProp>(IGuild guild, Expression<Func<Guild, TProp>> expression)
         {
             var newguild = new Guild()
             {
@@ -49,8 +66,11 @@ namespace Mummybot.Database
             await Guilds.AddAsync(newguild);
 
             await SaveChangesAsync();
-
-            return await Guilds.FindAsync(guild.Id);
+            if (expression is null)
+            {
+                await Guilds.FindAsync(guild.Id);
+            }
+            return await Guilds.Include(expression).FirstOrDefaultAsync(x=>x.GuildID == guild.Id);
         }
     }
 }

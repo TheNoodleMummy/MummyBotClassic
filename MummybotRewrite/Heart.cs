@@ -25,7 +25,9 @@ namespace MummyBot
         public async Task MainAsync()
         {
             var assembly = Assembly.GetEntryAssembly();
-            var types = assembly?.GetTypes().Where(t => t.GetCustomAttributes(true).Any(x => x is ServiceAttribute));
+            var types = assembly?.GetTypes()
+                .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
+
             var discordClient = new DiscordSocketClient(new DiscordSocketConfig
             {
                 ExclusiveBulkDelete = true,
@@ -44,7 +46,7 @@ namespace MummyBot
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
                      StringComparison = StringComparison.CurrentCultureIgnoreCase
-                 }))
+                 }).AddTypeParsers(assembly))
                  .AddSingleton<Random>()
                  .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
@@ -62,7 +64,7 @@ namespace MummyBot
             }
 
             var mummybot = new BotStartup(services);
-            await mummybot.StartAsync();
+            await mummybot.StartAsync(types);
         }
     }
 }

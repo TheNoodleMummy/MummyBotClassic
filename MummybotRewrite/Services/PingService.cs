@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    public class PingService
+    public class PingService 
     {
 
         private Dictionary<DateTime, int> HourlyPings = new Dictionary<DateTime, int>();

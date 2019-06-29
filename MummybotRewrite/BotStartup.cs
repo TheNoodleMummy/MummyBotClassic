@@ -4,6 +4,7 @@ using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes;
 using Mummybot.Database;
+using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
 using System;
@@ -29,9 +30,8 @@ namespace Mummybot
             DiscordClient.Log += services.GetRequiredService<LogService>().LogEventAsync;
         }
 
-        public async Task StartAsync()
-        {
-
+        public async Task StartAsync(IEnumerable<Type> types)
+        {            
             using (var tokenstore = Services.GetRequiredService<TokenStore>())
             {
 #if DEBUG
@@ -41,6 +41,7 @@ namespace Mummybot
 #endif
             }
             await DiscordClient.StartAsync();
+            await Services.RunInitialisersAsync(types);
             await Task.Delay(-1);
         }
     }

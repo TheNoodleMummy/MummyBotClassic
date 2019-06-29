@@ -15,8 +15,7 @@ using Mummybot.Attributes;
 
 namespace Mummybot.Services
 {
-    [Service("EvalService",typeof(EvalService))]
-    public class EvalService
+    public class EvalService : BaseService
     {
         public Script<object> Build(string code)
         {

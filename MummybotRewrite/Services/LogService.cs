@@ -12,15 +12,10 @@ using System.IO;
 
 namespace Mummybot.Services
 {
-    [Service("Log Service", typeof(LogService))]
-    public class LogService
-
-
+    public class LogService : BaseService
     {
-
         public string _logDirectory => Path.Combine(DateTime.Now.ToString("MMM"));
         public string _logfile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
-
 
         SemaphoreSlim ss = new SemaphoreSlim(1, 1);
 

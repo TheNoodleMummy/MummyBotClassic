@@ -7,9 +7,9 @@ namespace Mummybot
 {
     public static partial class Utilities
     {
-        public static string GetDisplayName(this IGuildUser user)
+        public static string GetDisplayName(this IUser user)
         {
-            return user.Nickname ?? user.Username;
+            return (user as IGuildUser)?.Nickname ?? user.Username;
         }
 
         public static string GetAvatarOrDefaultUrl(this IUser user)

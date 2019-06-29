@@ -20,8 +20,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    [Service("Message service",typeof(MessageService))]
-    public class MessageService
+    public class MessageService : BaseService
     {
         private readonly CommandService _commands;
         private readonly DiscordSocketClient _client;

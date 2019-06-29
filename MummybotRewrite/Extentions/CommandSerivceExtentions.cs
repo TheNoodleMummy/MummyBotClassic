@@ -21,11 +21,11 @@ namespace Mummybot.Extentions
 
             var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x) && x.GetCustomAttribute<DoNotAutoAddAttribute>() == null);
 
-            var internalAddParser = commands.GetType().GetMethod("AddParserInternal",
+            var internalAddParser = commands.GetType().GetMethod("AddTypeParserInternal",
                 BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (internalAddParser is null)
-                throw new QuahuRenamedException("AddParserInternal");
+                throw new QuahuRenamedException("AddTypeParserInternal");
 
             foreach (var parser in parsers)
             {
