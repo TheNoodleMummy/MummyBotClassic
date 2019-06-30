@@ -11,31 +11,45 @@ namespace Mummybot.Extentions
 {
     public partial class Extentions
     {
+        private const BindingFlags Flags = BindingFlags.NonPublic | BindingFlags.Instance;
+
         public static CommandService AddTypeParsers(this CommandService commands, Assembly assembly)
         {
-            var typeParserInterface = commands.GetType().Assembly.GetTypes()
-                .FirstOrDefault(x => x.Name == "ITypeParser")?.GetTypeInfo();
+            const string addParserName = "AddTypeParserInternal";
 
-            if (typeParserInterface is null)
-                throw new QuahuRenamedException("ITypeParser");
+            var parsers = FindTypeParsers(commands, assembly);
 
-            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x) && x.GetCustomAttribute<DoNotAutoAddAttribute>() == null);
-
-            var internalAddParser = commands.GetType().GetMethod("AddTypeParserInternal",
-                BindingFlags.NonPublic | BindingFlags.Instance);
+            var internalAddParser = commands.GetType().GetMethod(addParserName, Flags);
 
             if (internalAddParser is null)
-                throw new QuahuRenamedException("AddTypeParserInternal");
+                throw new QuahuRenamedException(addParserName);
 
             foreach (var parser in parsers)
             {
+                var @override = parser.GetCustomAttribute<DontOverrideAttribute>() is null;
 
-                var targetType = parser.BaseType.GetGenericArguments().First();
+                var targetType = parser.BaseType?.GetGenericArguments().First();
 
-                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), true });
+                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), @override });
             }
 
             return commands;
+        }
+
+        
+        public static IReadOnlyCollection<Type> FindTypeParsers(this CommandService commands, Assembly assembly)
+        {
+            const string parserInterface = "ITypeParser";
+
+            var typeParserInterface = commands.GetType().Assembly.GetTypes()
+                .FirstOrDefault(x => x.Name == parserInterface)?.GetTypeInfo();
+
+            if (typeParserInterface is null)
+                throw new QuahuRenamedException(parserInterface);
+
+            var parsers = assembly.GetTypes().Where(x => typeParserInterface.IsAssignableFrom(x) && !x.IsAbstract);
+
+            return parsers.ToArray();
         }
     }
 }

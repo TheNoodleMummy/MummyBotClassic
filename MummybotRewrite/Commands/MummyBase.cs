@@ -23,7 +23,7 @@ namespace Mummybot.Commands
 
         protected override async Task BeforeExecutedAsync()
         {
-            GuildConfig = await GuildStore.GetOrCreateGuildAsync(Context.Guild);
+            GuildConfig = await GuildStore.GetOrCreateGuildAsync(Context.Guild, x=> x.Stars);
         }
 
         protected override async Task AfterExecutedAsync()

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.TypeReaders
 {
-    public class BoolTypeReader : TypeParser<bool>
+    public class BoolTypeReader : MummyTypeParser<bool>
     {
-        public override ValueTask<TypeParserResult<bool>> ParseAsync(Parameter parameter, string value, CommandContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<bool>> ParseAsync(Parameter parameter, string value, MummyContext context, IServiceProvider provider)
         {
             if (value.Equals("on", StringComparison.CurrentCultureIgnoreCase))
                 return TypeParserResult<bool>.Successful(true);

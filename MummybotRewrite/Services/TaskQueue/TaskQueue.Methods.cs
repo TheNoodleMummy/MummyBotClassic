@@ -27,7 +27,7 @@ namespace Casino.Common
         /// <param name="whenToExecute">The time at when this task needs to be ran.</param>
         /// <param name="callback">The task to be executed.</param>
         /// <returns>A <see cref="ScheduledTask{T}"/></returns>
-        public ScheduledTask<T> ScheduleTask<T>(T state, DateTimeOffset whenToExecute, Func<T, Task> callback)
+        public ScheduledTask<T> ScheduleTask<T>(T state, DateTimeOffset whenToExecute, Func<T, Task> callback,ulong id= 0)
         {
             ArgChecks(whenToExecute, callback);
 
@@ -36,7 +36,7 @@ namespace Casino.Common
                 if (_disposed)
                     throw new ObjectDisposedException(nameof(TaskQueue));
 
-                var toAdd = new ScheduledTask<T>(this, state, whenToExecute, callback);
+                var toAdd = new ScheduledTask<T>(this, state, whenToExecute, callback, id);
 
                 _taskQueue.Enqueue(toAdd);
                 _cts.Cancel(true);

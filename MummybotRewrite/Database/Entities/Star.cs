@@ -8,7 +8,7 @@ namespace Mummybot.Database.Entities
     {
         public Guild Guild { get; set; }
 
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public ulong GuildID { get; set; }
         public ulong MessageId { get; set; }
         public ulong StarboardMessageId { get; set; }

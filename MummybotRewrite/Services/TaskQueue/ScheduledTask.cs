@@ -21,6 +21,12 @@ namespace Casino.Common
     public class ScheduledTask<T> : IScheduledTask
     {
         /// <summary>
+        /// ID of this task to save in a db orso for then lateron easy retrievel
+        /// </summary>
+        public ulong ID { get; }
+
+
+        /// <summary>
         /// The <see cref="TaskQueue"/> that created this object.
         /// </summary>
         public TaskQueue Queue { get; }
@@ -68,10 +74,11 @@ namespace Casino.Common
 
         private readonly object _lock;
 
-        internal ScheduledTask(TaskQueue queue, T obj, DateTimeOffset when, Func<T, Task> task)
+        internal ScheduledTask(TaskQueue queue, T obj, DateTimeOffset when, Func<T, Task> task,ulong id = 0)
         {
             Queue = queue;
 
+            ID = id;
             State = obj;
             ExecutionTime = when;
             ToExecute = task;
@@ -140,6 +147,7 @@ namespace Casino.Common
         Exception IScheduledTask.Exception => Exception;
 
         DateTimeOffset IScheduledTask.ExecutionTime => ExecutionTime;
+
 
         void IScheduledTask.Cancel()
         {

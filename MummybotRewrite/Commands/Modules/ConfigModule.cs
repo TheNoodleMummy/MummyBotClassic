@@ -5,14 +5,17 @@ using System.Linq;
 using Mummybot.Extentions;
 using System;
 using Mummybot.Commands.TypeReaders;
+using Mummybot.Attributes.Checks;
 
 namespace Mummybot.Commands.Modules
 {
     [Group("config")]
+    [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.Administrator,Group = "or")]
+    [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.ManageGuild,Group = "or")]
     public class ConfigModule : MummyBase
     {
         [Group("starboard")]
-        public class StarboardModule: MummyBase
+        public class StarboardModule : MummyBase
         {
             [Command("setchannel")]
             public async Task SetId(ITextChannel channel)
@@ -64,6 +67,24 @@ namespace Mummybot.Commands.Modules
             public async Task SetQuotesOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
             {
                 GuildConfig.AutoQuotes = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
+        [Group("reminders")]
+        public class ReminderConfigModule : MummyBase
+        {
+            [Command]
+            public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesReminders = onoff;
+                await Context.Message.AddOkAsync();
+            }
+
+            [Command("ingeneral"),RequireReminders]
+            public async Task SetReminderInGeneralOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UseReminderInGeneralChat = onoff;
                 await Context.Message.AddOkAsync();
             }
         }

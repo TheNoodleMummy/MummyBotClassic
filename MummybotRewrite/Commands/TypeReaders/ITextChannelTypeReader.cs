@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.TypeReaders
 {
-    class ITextChannelTypeReader : TypeParser<ITextChannel>
+    public class ITextChannelTypeReader : MummyTypeParser<ITextChannel>
     {
-        //todo make it boi
-        public override ValueTask<TypeParserResult<ITextChannel>> ParseAsync(Parameter parameter, string value, CommandContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<ITextChannel>> ParseAsync(Parameter parameter, string value, MummyContext ctx, IServiceProvider provider)
         {
-            var ctx = context as MummyContext;
             if (ulong.TryParse(value, out ulong id))
             {
                 var chan = ctx.Guild.GetChannel(id) as ITextChannel;

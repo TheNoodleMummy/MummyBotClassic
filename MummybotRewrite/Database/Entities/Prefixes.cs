@@ -6,7 +6,7 @@ namespace Mummybot.Database.Entities
 {
     public class Prefixes
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public Guild Guild { get; set; }
         public ulong guildID { get; set; }
         public string Prefix { get; set; }

@@ -5,6 +5,7 @@ namespace Casino.Common
 {
     internal interface IScheduledTask
     {
+        ulong ID { get; }
         bool IsCancelled { get; }
         Exception Exception { get; }
         DateTimeOffset ExecutionTime { get; }

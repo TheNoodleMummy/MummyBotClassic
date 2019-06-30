@@ -19,7 +19,7 @@ namespace MummyBot
 {
     internal class Heart
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
             => new Heart().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()

@@ -1,4 +1,5 @@
 using Qmmands;
+using System;
 using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
@@ -6,9 +7,10 @@ namespace Mummybot.Commands.Modules
 	public class TestCommandModule : MummyBase
     {
         [Command("test")]
-		public async Task Test()
+		public Task Test()
         {
-            await ReplyAsync(string.Join(',', Context.User.ActiveClients));
+            Console.Write( string.Join("\n",TimeZoneInfo.GetSystemTimeZones()));
+            return Task.CompletedTask;
         }
     }
 }

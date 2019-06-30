@@ -12,10 +12,12 @@ namespace Mummybot.Services
     public class StarBoardService : BaseService
     {
         private DiscordSocketClient _client;
+        private SnowFlakeGeneratorService _snowFlakeGenerator;
 
-        public StarBoardService(DiscordSocketClient client)
+        public StarBoardService(DiscordSocketClient client,SnowFlakeGeneratorService snowFlakeGenerator)
         {
             _client = client;
+            _snowFlakeGenerator = snowFlakeGenerator;
         }
 
         public override Task InitialiseAsync(IServiceProvider services)
@@ -34,6 +36,7 @@ namespace Mummybot.Services
                         {
                             star = new Star
                             {
+                                Id = _snowFlakeGenerator.NextLong(),
                                 MessageId = chachemessage.Id,
                                 Stars = 1
                             };
@@ -105,12 +108,12 @@ namespace Mummybot.Services
                             emb.AddField("\u200b", msg.Content);
 
                             emb.AddField("\u200b", $"in {Textchannel.Guild.Name} / <#{msg.Channel.Id}> /" +
-                                    $"{Format.Url($"Message", msg.GetJumpUrl())}");
+                                    $"{Format.Url("Message", msg.GetJumpUrl())}");
                             var staboardmsg = (await Textchannel.Guild.GetTextChannel(guild.StarboardChannelId).GetMessageAsync(star.StarboardMessageId) as IUserMessage);
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
-                            await guildstore.SaveChangesAsync();                            
+                            await guildstore.SaveChangesAsync();
                         }
                     }
                 }
