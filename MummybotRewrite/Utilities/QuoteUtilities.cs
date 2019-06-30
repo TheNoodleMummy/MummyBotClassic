@@ -19,6 +19,9 @@ namespace Mummybot
             return QuoteFromMessageId(channel, id);
         }
 
+        public static Task<Embed> QuoteFromMessage(IUserMessage message)
+        =>    QuoteFromMessageId(message.Channel as ITextChannel, message.Id);
+
         public static async Task<Embed> QuoteFromMessageId(ITextChannel channel, ulong id)
         {
             var message = await channel.GetMessageAsync(id);

@@ -19,7 +19,7 @@ namespace Mummybot.Commands
         public IServiceProvider Services { get; set; }
 
         protected Task<IUserMessage> ReplyAsync(string content = "", EmbedBuilder embed = null, string FileName = "", Stream Stream = null)
-            => MessageService.SendAsync(Context, x => { x.Content = content; x.Embed = embed?.Build(); x.FileName = FileName; x.Stream = Stream; });        
+            => MessageService.SendAsync(Context, x => { x.Content = content; x.Embed = embed?.Build(); x.FileName = FileName; x.Stream = Stream; });
 
         protected override async Task BeforeExecutedAsync()
         {

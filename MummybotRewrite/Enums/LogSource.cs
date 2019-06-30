@@ -9,6 +9,8 @@ namespace Mummybot.Enums
         Unkown,
         MessagesService,
         Commands,
-        Bot
+        Bot,
+        ReminderService,
+        SnowFlakeGenerator
     }
 }

@@ -17,7 +17,6 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-
 namespace Mummybot.Services
 {
     public class MessageService : BaseService
@@ -58,9 +57,13 @@ namespace Mummybot.Services
             _quoteReactions = new ConcurrentDictionary<ulong, byte>();
 
             var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
+        }
 
+        public override Task InitialiseAsync(IServiceProvider services)
+        {
             _commands.CommandErrored += CommandErroredAsync;
             _commands.CommandExecuted += CommandExecutedAsync;
+            var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
 
             _client.MessageReceived += msg =>
                 msg is SocketUserMessage message
@@ -116,15 +119,40 @@ namespace Mummybot.Services
                 });
             };
 
+            _client.ReactionAdded += async (cache, channel, reaction) =>
+            {
+                if (!reaction.Emote.Equals(QuoteEmote) || _quoteReactions.ContainsKey(cache.Id) ||
+                   channel is IDMChannel)
+                    return;
+
+                var message = await cache.GetOrDownloadAsync();
+
+                if (message is null)
+                    return;
+
+                var embed = await Utilities.QuoteFromMessage(message);
+
+                if (embed is null)
+                    return;
+
+                await message.Channel.SendMessageAsync(string.Empty, embed: embed);
+
+                _quoteReactions.TryAdd(cache.Id, 0);
+
+                _scheduler.ScheduleTask(MessageLifeTime, () =>
+                {
+                    _quoteReactions.TryRemove(cache.Id, out _);
+
+                    return Task.CompletedTask;
+                });
+            };
+
             _client.MessageUpdated += (before, msg, __) =>
                 before.HasValue && msg is SocketUserMessage after && after.Content != before.Value.Content
                     ? HandleReceivedMessageAsync(after, true)
                     : Task.CompletedTask;
+            return Task.CompletedTask;
         }
-
-
-
-
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
@@ -174,11 +202,12 @@ namespace Mummybot.Services
                     var commandContext = MummyContext.Create(_client, message,_services.GetRequiredService<HttpClient>(),_services, prefix ,isEdit);
 
                     var result = await _commands.ExecuteAsync(output, commandContext, _services);
-
-                    if (result is CommandNotFoundResult)
+                    _logger.LogInformation(result.ToString(), LogSource.Commands);
+                    if (result is CommandNotFoundResult notfoundresult)
                     {
                         commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
                         result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
+                        _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
                     }
                 }
                 catch (Exception ex)
@@ -194,7 +223,7 @@ namespace Mummybot.Services
 
             if (args.Result is ExecutionFailedResult failed)
             {
-                _logger.LogError(string.Empty, LogSource.Commands, failed.Exception);
+                _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
 
 #if !DEBUG
                 var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
@@ -414,7 +443,5 @@ namespace Mummybot.Services
             public Stream Stream { get; set; }
             public string FileName { get; set; }
         }
-
-
     }
 }

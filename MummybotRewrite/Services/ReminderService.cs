@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
+using Mummybot.Enums;
 using System;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,6 @@ namespace Mummybot.Services
         public TaskQueue TaskQueue { get; }
         public GuildStore GuildStore { get; }
         public DiscordSocketClient DiscordClient { get; }
-        public LogService LogService { get; }
 
         public ReminderService(TaskQueue taskQueue, GuildStore guildStore,DiscordSocketClient discordclient,LogService logService)
         {
@@ -31,6 +31,7 @@ namespace Mummybot.Services
             {
                 if (guild.UsesReminders)
                 {
+                    LogService.LogInformation("Executing expired reminders.", LogSource.ReminderService);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
                     foreach (Reminder reminder in reminders)
                     {
@@ -39,6 +40,7 @@ namespace Mummybot.Services
                 }
                 else
                 {
+                    LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
                     foreach (Reminder reminder in reminders)
                     {
@@ -53,10 +55,12 @@ namespace Mummybot.Services
         public void RegisterReminder(Reminder reminder,ulong id)
         {
             TaskQueue.ScheduleTask(reminder, reminder.ExpiresAtUTC, ReminderCallbackAsync,id);
+            LogService.LogInformation($"Set Reminder at {reminder.ExpiresAtUTC}UTC", Enums.LogSource.ReminderService);
         }
 
         public async Task ReminderCallbackAsync(Reminder reminder)
         {
+            LogService.LogInformation("Executing reminder callback", Enums.LogSource.ReminderService);
             StringBuilder sb = new StringBuilder();
             bool hasdays = false, hashours = false;
             var time = DateTime.UtcNow - reminder.SetAtUTC;
@@ -97,7 +101,7 @@ namespace Mummybot.Services
                 else
                     sb.Append("minutes, ");
             }
-            sb.Append("ago you asked me to remind you about ").Append(reminder.Message);
+            sb.Append("ago you asked me to remind you about \n").Append(reminder.Message);
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
 
             var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID,r=>r.Reminders);

@@ -1,4 +1,5 @@
 ﻿using Casino.Common;
+using Mummybot.Attributes.Checks;
 using Mummybot.Database.Entities;
 using Mummybot.Services;
 using Qmmands;
@@ -14,7 +15,7 @@ namespace Mummybot.Commands.Modules
         public ReminderService ReminderService { get; set; }
         public SnowFlakeGeneratorService SnowFlakeGenerator { get; set; }
 
-        [Command("remind")]
+        [Command("remind"),RequireReminders]
         public async Task RemindAsync(TimeSpan time,string message)
         {
             var reminder = new Reminder
@@ -65,13 +66,12 @@ namespace Mummybot.Commands.Modules
                 else
                     sb.Append("in ").Append(time.Minutes);
 
-
                 if (time.Minutes == 1)
                     sb.Append("Minute, ");
                 else
                     sb.Append("minutes, ");
             }
-            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id:").Append(reminder.Id);
+            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id);
 
             await ReplyAsync(sb.ToString());
         }

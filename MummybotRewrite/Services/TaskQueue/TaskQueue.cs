@@ -1,4 +1,3 @@
-using Mummybot.Attributes;
 using Mummybot.Services;
 using System;
 using System.Collections.Concurrent;
@@ -11,9 +10,9 @@ namespace Casino.Common
     /// <summary>
     /// A simple task scheduler.
     /// </summary>
-    public sealed partial class TaskQueue : BaseService,IDisposable
+    public sealed partial class TaskQueue : BaseService, IDisposable
     {
-        private readonly ConcurrentQueue<IScheduledTask> _taskQueue;
+        public readonly ConcurrentQueue<IScheduledTask> _taskQueue;
         private CancellationTokenSource _cts;
 
         private readonly object _queueLock;
@@ -36,65 +35,62 @@ namespace Casino.Common
 
         private async Task HandleCallbacksAsync()
         {
-            while (true)
+            if (_disposed)
+                return;
+
+            try
             {
-                if (_disposed)
-                    break;
+                bool wait;
 
-                try
+                lock (_queueLock)
+                    wait = !_taskQueue.TryDequeue(out _currentTask);
+
+                if (wait)
+                    await Task.Delay(-1, _cts.Token);
+
+                var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
+
+                if (time > TimeSpan.Zero)
                 {
-                    bool wait;
-
-                    lock (_queueLock)
-                        wait = !_taskQueue.TryDequeue(out _currentTask);
-
-                    if (wait)
-                        await Task.Delay(-1, _cts.Token);
-
-                    var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
-
-                    if (time > TimeSpan.Zero)
-                    {
-                        await Task.Delay(time, _cts.Token);
-                    }
-
-                    if (_currentTask.IsCancelled)
-                        continue;
-
-                    await _currentTask.ExecuteAsync();
-                    _currentTask.Completed();
+                    await Task.Delay(time, _cts.Token);
                 }
-                catch (TaskCanceledException)
+
+                if (_currentTask.IsCancelled)
+                    return;
+
+                await _currentTask.ExecuteAsync();
+                _currentTask.Completed();
+            }
+            catch (TaskCanceledException)
+            {
+                lock (_queueLock)
                 {
-                    lock (_queueLock)
+                    if (_currentTask?.IsCancelled == false)
+                        _taskQueue.Enqueue(_currentTask);
+
+                    if (!_taskQueue.IsEmpty)
                     {
-                        if (_currentTask != null && !_currentTask.IsCancelled)
-                            _taskQueue.Enqueue(_currentTask);
+                        var copy = _taskQueue.ToArray().Where(x => !x.IsCancelled).OrderBy(x => x.ExecutionTime);
 
-                        if (!_taskQueue.IsEmpty)
+                        //Didn't do ClearQueue() since nested lock
+                        while (_taskQueue.TryDequeue(out _))
                         {
-                            var copy = _taskQueue.ToArray().Where(x => !x.IsCancelled).OrderBy(x => x.ExecutionTime);
-
-                            //Didn't do ClearQueue() since nested lock
-                            while (_taskQueue.TryDequeue(out _))
-                            {
-                            }
-
-                            foreach (var item in copy)
-                                _taskQueue.Enqueue(item);
                         }
 
-                        _cts.Dispose();
-                        _cts = new CancellationTokenSource();
+                        foreach (var item in copy)
+                            _taskQueue.Enqueue(item);
                     }
-                }
-                catch (Exception e)
-                {
-                    _currentTask?.SetException(e);
 
-                    if (OnError != null)
-                        await OnError(e);
+                    _cts.Dispose();
+                    _cts = new CancellationTokenSource();
                 }
+            }
+            catch (Exception e)
+            {
+                _currentTask?.SetException(e);
+
+                if (OnError != null)
+                    await OnError(e);
             }
         }
 

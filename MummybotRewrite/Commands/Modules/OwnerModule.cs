@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Humanizer;
 using Microsoft.CodeAnalysis;
 using Mummybot.Attributes.Checks;
@@ -18,6 +19,8 @@ namespace Mummybot.Commands.Modules
     public class OwnerModule : MummyBase
     {
         public EvalService EvalService { get; set; }
+
+        public TaskQueue TaskQueue { get; set; }
 
         [Command("eval")]
         public async Task Eval([Remainder]string code)
@@ -155,6 +158,13 @@ namespace Mummybot.Commands.Modules
             }
 
             await msg.ModifyAsync(x => x.Embed = builder.Build());
+        }
+
+        [Command("Tasks")]
+        public async Task GetTasks()
+        {
+
+            TaskQueue._taskQueue
         }
     }
 }

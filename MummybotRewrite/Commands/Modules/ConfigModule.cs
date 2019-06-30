@@ -80,13 +80,6 @@ namespace Mummybot.Commands.Modules
                 GuildConfig.UsesReminders = onoff;
                 await Context.Message.AddOkAsync();
             }
-
-            [Command("ingeneral"),RequireReminders]
-            public async Task SetReminderInGeneralOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
-            {
-                GuildConfig.UseReminderInGeneralChat = onoff;
-                await Context.Message.AddOkAsync();
-            }
         }
     }
 }

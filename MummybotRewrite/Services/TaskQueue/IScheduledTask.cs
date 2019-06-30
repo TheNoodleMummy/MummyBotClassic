@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Casino.Common
 {
-    internal interface IScheduledTask
+    public interface IScheduledTask
     {
         ulong ID { get; }
         bool IsCancelled { get; }

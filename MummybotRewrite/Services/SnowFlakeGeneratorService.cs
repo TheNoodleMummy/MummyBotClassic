@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mummybot.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -37,12 +38,14 @@ namespace Mummybot.Services
         }
 
         public ulong NextLong()
-        {
+        {            
             SpinToNextSequence();
             WriteValuesToByteArray(_buffer, _previousTime, _sequence);
 
             Array.Reverse(_buffer);
-            return BitConverter.ToUInt64(_buffer, 0);
+            var id = BitConverter.ToUInt64(_buffer, 0);
+            LogService.LogInformation($"Generated new snowflake: {id}", LogSource.SnowFlakeGenerator);
+            return id;
         }
 
         internal unsafe void WriteValuesToByteArray(byte[] target, long time, short sequence)
