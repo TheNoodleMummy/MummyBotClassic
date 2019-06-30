@@ -11,6 +11,7 @@ namespace Mummybot.Database.Entities
         public List<Prefixes> Prefixes { get; set; } = new List<Prefixes>() { new Prefixes() {Prefix = "!"} };
         public List<Star> Stars { get; set; } = new List<Star>();
         public List<Reminder> Reminders { get; set; } = new List<Reminder>();
+        public List<Tag> Tags { get; set; } = new List<Tag>();
         public ulong GuildID { get; set; }
 
         public bool AutoQuotes { get; set; }

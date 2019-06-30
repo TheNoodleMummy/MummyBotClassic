@@ -163,8 +163,11 @@ namespace Mummybot.Commands.Modules
         [Command("Tasks")]
         public async Task GetTasks()
         {
-
-            TaskQueue._taskQueue
+            var tasks = TaskQueue.Queue.ToArray() as ScheduledTask[];
+            if (tasks is null)
+                await ReplyAsync("Currently not tracking anything");
+            else
+                await ReplyAsync(string.Join("\n",tasks.ToList()));
         }
     }
 }

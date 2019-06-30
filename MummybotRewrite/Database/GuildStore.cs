@@ -41,12 +41,20 @@ namespace Mummybot.Database
             modelBuilder.Entity<Prefixes>(prefix=>
             {
                 prefix.HasKey(x => x.Id);
-                prefix.Property(x => x.Id).ValueGeneratedNever();
+                prefix.Property(x => x.Id)
+                .ValueGeneratedNever();
             });
             modelBuilder.Entity<Star>(star =>
             {
                 star.HasKey(x => x.Id);
-                star.Property(x => x.Id).ValueGeneratedNever();
+                star.Property(x => x.Id)
+                .ValueGeneratedNever();
+            });
+            modelBuilder.Entity<Tag>(tag =>
+            {
+                tag.HasKey(x => x.Id);
+                tag.Property(x => x.Id)
+                .ValueGeneratedNever();
             });
         }
 

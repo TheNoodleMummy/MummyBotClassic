@@ -38,7 +38,7 @@ namespace Casino.Common
 
                 var toAdd = new ScheduledTask<T>(this, state, whenToExecute, callback, id);
 
-                _taskQueue.Enqueue(toAdd);
+                Queue.Enqueue(toAdd);
                 _cts.Cancel(true);
 
                 return toAdd;
@@ -76,7 +76,7 @@ namespace Casino.Common
 
                 var toAdd = new ScheduledTask(this, state, whenToExecute, callback);
 
-                _taskQueue.Enqueue(toAdd);
+                Queue.Enqueue(toAdd);
                 _cts.Cancel(true);
 
                 return toAdd;
@@ -116,7 +116,7 @@ namespace Casino.Common
 
                 var toAdd = new ScheduledTask(this, null, whenToExecute, _ => callback());
 
-                _taskQueue.Enqueue(toAdd);
+                Queue.Enqueue(toAdd);
                 _cts.Cancel(true);
 
                 return toAdd;
@@ -150,7 +150,7 @@ namespace Casino.Common
 
                 _currentTask.Cancel();
 
-                while (_taskQueue.TryDequeue(out var task))
+                while (Queue.TryDequeue(out var task))
                 {
                     task.Cancel();
                 }
