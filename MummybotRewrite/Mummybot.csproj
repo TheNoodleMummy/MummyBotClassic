@@ -10,6 +10,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20190629.2" />
     <PackageReference Include="Discord.Net.Rest" Version="2.2.0-dev-20190629.2" />
