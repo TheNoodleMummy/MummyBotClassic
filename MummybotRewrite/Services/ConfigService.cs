@@ -11,12 +11,12 @@ namespace Mummybot.Services
     {
         public static string GetTokenDB()
         {
-            return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText(@"Connections.json")).TokenDB;
+            return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText("Connections.json")).TokenDB;
         }
 
         public static string GetRuntimeDB()
         {
-            return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText(@"Connections.json")).RuntimeDB;
+            return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText("Connections.json")).RuntimeDB;
         }
     }
 
