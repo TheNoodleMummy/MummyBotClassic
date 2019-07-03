@@ -50,7 +50,7 @@ namespace Mummybot.Commands.Modules
                 {
                     await Context.Message.AddNotOkAsync();
                 }
-            } 
+            }
 
             [Command]
             public async Task SetStarBoardOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
