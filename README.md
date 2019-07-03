@@ -7,4 +7,3 @@ plus the required [Utilities](https://github.com/TheCasino/Espeon/tree/Rewrite/E
 
 Mummybot also makes use of [Foxbot's](https://github.com/foxbot) [Discord.Addons.Interactive](https://github.com/foxbot/Discord.Addons.Interactive)
 and [Quahu's](https://github.com/quahu) [Qmmands](https://github.com/Quahu/Qmmands)
-
