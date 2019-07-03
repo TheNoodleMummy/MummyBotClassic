@@ -50,6 +50,9 @@
     <PackageReference Include="PureWebSockets" Version="2.4.2" />
     <PackageReference Include="Qmmands" Version="2.3.1-nightly-00124" />
     <PackageReference Include="Victoria" Version="4.0.4" />
+<<<<<<< HEAD
+>>>>>>> parent of 33e15cd... 
+=======
 >>>>>>> parent of 33e15cd... 
   </ItemGroup>
 
