@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20190623.1" />
-    <PackageReference Include="Discord.Net.Rest" Version="2.2.0-dev-20190623.1" />
-    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190623.1" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20190623.1" />
+    <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20190629.2" />
+    <PackageReference Include="Discord.Net.Rest" Version="2.2.0-dev-20190629.2" />
+    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190629.2" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20190629.2" />
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.1.0" />
@@ -24,5 +24,17 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Qmmands" Version="3.0.0-nightly-00195" />
     <PackageReference Include="Victoria" Version="4.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Connections.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="libsodium.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="opus.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
