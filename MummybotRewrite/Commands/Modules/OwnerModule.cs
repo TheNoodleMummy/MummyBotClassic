@@ -159,23 +159,23 @@ namespace Mummybot.Commands.Modules
             await msg.ModifyAsync(x => x.Embed = builder.Build());
         }
 
-        [Command("Tasks")]
-        public async Task GetTasks()
-        {
-            var tasks = TaskQueue.Queue.ToArray();
-            if (tasks is null)
-                await ReplyAsync("Currently not tracking anything");
-            else
-            {
-                var sb = new StringBuilder();
-                foreach (var task in tasks)
-                {
-                    var stask = task as ScheduledTask;
-                    sb.Append("```").Append(stask.State.ToString()).Append(" at ").Append(task.ExecutionTime).AppendLine("```");
-                }
-            }
-                await ReplyAsync(string.Join("\n",tasks.ToList()));
-        }
+        //[Command("Tasks")]
+        //public async Task GetTasks()
+        //{
+        //    var tasks = TaskQueue.Queue.ToArray();
+        //    if (tasks is null)
+        //        await ReplyAsync("Currently not tracking anything");
+        //    else
+        //    {
+        //        var sb = new StringBuilder();
+        //        foreach (var task in tasks)
+        //        {
+        //            var stask = task as ScheduledTask;
+        //            sb.Append("```").Append(stask.State.ToString()).Append(" at ").Append(task.ExecutionTime).AppendLine("```");
+        //        }
+        //    }
+        //        await ReplyAsync(string.Join("\n",tasks.ToList()));
+        //}
     }
 }
 
