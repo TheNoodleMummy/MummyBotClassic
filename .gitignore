@@ -284,3 +284,5 @@ database.json
 /MummybotRewrite/GlobalSuppressions.cs
 /MummybotRewrite/Connections.json
 /MummybotRewrite/Migrations
+/MummybotRewrite/libsodium.dll
+/MummybotRewrite/opus.dll

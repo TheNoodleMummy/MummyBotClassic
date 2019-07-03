@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Mummybot.Commands.Modules
 {
     [Group("tag")]
-    public class TagModule : MummyBase
+    public class TagModule : MummyModule
     {
         public SnowFlakeGeneratorService SnowFlakeGenerator { get; set; }
         [Command]
@@ -29,7 +29,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Group("edit")]
-        public class EditTagModule : MummyBase
+        public class EditTagModule : MummyModule
         {
             [Command("key")]
             public async Task EditKey(string key,string newkey)

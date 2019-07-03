@@ -17,11 +17,11 @@ namespace Mummybot.Services
         public string _logDirectory => Path.Combine(DateTime.Now.ToString("MMM"));
         public string _logfile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
 
-        SemaphoreSlim ss = new SemaphoreSlim(1, 1);
+
+        public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
 
         public Task LogEventAsync(LogMessage log)
         {
-
             ss.Wait();
             var source = log.Source;
             var message = log.Message;
@@ -126,13 +126,9 @@ namespace Mummybot.Services
             string logText = $"{DateTime.UtcNow.ToString("hh:mm:ss")} [{severity}] {source}: {message} => {exception}";
             File.AppendAllText(_logfile, logText + Environment.NewLine);  
 #endif
-
-
-
-
             ss.Release(1);
             return Task.CompletedTask;
-        }       
+        }
 
         internal Task LogLavalink(LogMessage arg1)
         => LogEventAsync(arg1);
@@ -153,6 +149,6 @@ namespace Mummybot.Services
         => LogEventAsync(new LogMessage(LogSeverity.Error, source.ToString(), Message, exception));
 
         internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Info, source.ToString(), Message, exception));       
+        => LogEventAsync(new LogMessage(LogSeverity.Info, source.ToString(), Message, exception));
     }
 }

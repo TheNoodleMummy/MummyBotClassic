@@ -11,6 +11,8 @@ namespace Mummybot.Enums
         Commands,
         Bot,
         ReminderService,
-        SnowFlakeGenerator
+        SnowFlakeGenerator,
+        BirthdayService,
+        MusicService
     }
 }

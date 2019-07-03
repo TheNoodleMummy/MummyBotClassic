@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
-    public class ReminderModule : MummyBase
+    public class ReminderModule : MummyModule
     {
         public ReminderService ReminderService { get; set; }
         public SnowFlakeGeneratorService SnowFlakeGenerator { get; set; }

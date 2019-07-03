@@ -27,10 +27,13 @@ namespace Mummybot.Extentions
             foreach (var parser in parsers)
             {
                 var @override = parser.GetCustomAttribute<DontOverrideAttribute>() is null;
-
+                var autoadd = parser.GetCustomAttribute<DontAutoAddAttribute>() is null;
                 var targetType = parser.BaseType?.GetGenericArguments().First();
 
-                internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), @override });
+                if (autoadd)
+                {
+                    internalAddParser.Invoke(commands, new[] { targetType, Activator.CreateInstance(parser), @override });
+                }
             }
 
             return commands;

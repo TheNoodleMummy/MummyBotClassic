@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes;
+using Mummybot.Commands.TypeReaders;
 using Mummybot.Database;
 using Mummybot.Extentions;
 using Mummybot.Services;
@@ -18,20 +19,24 @@ namespace Mummybot
 {
     class BotStartup
     {
-        private DiscordSocketClient DiscordClient;
-        private IServiceProvider Services;
-        private CommandService CommandService;
+        private readonly DiscordSocketClient DiscordClient;
+        private readonly IServiceProvider Services;
+        private readonly CommandService CommandService;
+        private bool  ranInitialisers;
+
         public BotStartup(IServiceProvider services)
         {
             Services = services;
             DiscordClient = services.GetRequiredService<DiscordSocketClient>();
             CommandService = services.GetRequiredService<CommandService>();
             CommandService.AddModules(services.GetRequiredService<Assembly>());
+            CommandService.AddTypeParser(parser: new UserTypeparser<SocketGuildUser>());
+
             DiscordClient.Log += services.GetRequiredService<LogService>().LogEventAsync;
         }
 
         public async Task StartAsync(IEnumerable<Type> types)
-        {            
+        {
             using (var tokenstore = Services.GetRequiredService<TokenStore>())
             {
 #if DEBUG
@@ -41,7 +46,15 @@ namespace Mummybot
 #endif
             }
             await DiscordClient.StartAsync();
-            await Services.RunInitialisersAsync(types);
+
+            DiscordClient.Ready += async () =>
+            {
+                if (!ranInitialisers)
+                {
+                    await Services.RunInitialisersAsync(types);
+                    ranInitialisers = true;
+                }
+            };
             await Task.Delay(-1);
         }
     }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Mummybot.Commands.Modules
 {
     [Name("Help Commands"), Description("This Module helps with commands as in what they need and if its required or optional")]
-    public class HelpModule : MummyBase
+    public class HelpModule : MummyModule
     {
         public CommandService _commands { get; set; }
         public InteractiveService Iservice { get; set; }
@@ -36,8 +36,7 @@ namespace Mummybot.Commands.Modules
                     if (!string.IsNullOrWhiteSpace(description))
                     {
                         StringBuilder sb = new StringBuilder();
-                        sb.AppendLine($"**__{module.Name}__\n" +
-                            $"{module.Description}**");
+                        sb.Append("**__").Append(module.Name).Append("__\n").Append(module.Description).AppendLine("**");
                         sb.AppendLine(description);
                         pages.Add(sb.ToString());
                     }
@@ -72,9 +71,9 @@ namespace Mummybot.Commands.Modules
             foreach (var cmd in module.Commands)
             {
                 if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
-                sb.AppendLine($"{prefixes.First()}{cmd.Name}");
+                sb.Append(prefixes[0]).AppendLine(cmd.Name);
             }
-            builder.AddField($"\u200B", sb.ToString());
+            builder.AddField("\u200B", sb.ToString());
             await ReplyAsync(embed: builder);
         }
 

@@ -23,10 +23,12 @@ namespace Mummybot.Services
         private short _sequence;
         private long _previousTime;
 
-        public SnowFlakeGeneratorService()
+
+        public SnowFlakeGeneratorService(LogService logService)
         {
             CalculateIdBytes(2);
             _start = DateTime.UtcNow;
+            LogService = logService;
         }
 
         public string Next()

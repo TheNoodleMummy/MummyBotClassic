@@ -17,6 +17,7 @@ namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
+
         public Script<object> Build(string code)
         {
             var codes = Utilities.GetCodes(code);

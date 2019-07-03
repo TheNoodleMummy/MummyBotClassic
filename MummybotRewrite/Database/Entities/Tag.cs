@@ -13,6 +13,6 @@ namespace Mummybot.Database.Entities
         public ulong Id { get; set; }
 
         public Guild Guild { get; set; }
-        public ulong guildID { get; set; }
+        public ulong GuildID { get; set; }
     }
 }

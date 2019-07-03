@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Mummybot.Commands.Modules
 {
     [RequireOwner]
-    public class OwnerModule : MummyBase
+    public class OwnerModule : MummyModule
     {
         public EvalService EvalService { get; set; }
 
@@ -100,11 +100,10 @@ namespace Mummybot.Commands.Modules
 
                             if (list.Count > 0)
                             {
-
                                 sb.AppendLine("```css");
 
                                 foreach (var element in list)
-                                    sb.AppendLine($"[{element}]");
+                                    sb.Append('[').Append(element).AppendLine("]");
 
                                 sb.AppendLine("```");
                             }
@@ -163,10 +162,18 @@ namespace Mummybot.Commands.Modules
         [Command("Tasks")]
         public async Task GetTasks()
         {
-            var tasks = TaskQueue.Queue.ToArray() as ScheduledTask[];
+            var tasks = TaskQueue.Queue.ToArray();
             if (tasks is null)
                 await ReplyAsync("Currently not tracking anything");
             else
+            {
+                var sb = new StringBuilder();
+                foreach (var task in tasks)
+                {
+                    var stask = task as ScheduledTask;
+                    sb.Append("```").Append(stask.State.ToString()).Append(" at ").Append(task.ExecutionTime).AppendLine("```");
+                }
+            }
                 await ReplyAsync(string.Join("\n",tasks.ToList()));
         }
     }

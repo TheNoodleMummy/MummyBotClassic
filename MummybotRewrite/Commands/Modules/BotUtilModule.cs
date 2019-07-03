@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
-    public class BotUtilModule : MummyBase
+    public class BotUtilModule : MummyModule
     {
         public PingService PingService { get; set; }
 

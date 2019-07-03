@@ -12,10 +12,10 @@ namespace Mummybot.Commands.Modules
     [Group("config")]
     [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.Administrator,Group = "or")]
     [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.ManageGuild,Group = "or")]
-    public class ConfigModule : MummyBase
+    public class ConfigModule : MummyModule
     {
         [Group("starboard")]
-        public class StarboardModule : MummyBase
+        public class StarboardModule : MummyModule
         {
             [Command("setchannel")]
             public async Task SetId(ITextChannel channel)
@@ -61,7 +61,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Group("Quotes")]
-        public class AutoQuotes : MummyBase
+        public class AutoQuotes : MummyModule
         {
             [Command]
             public async Task SetQuotesOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
@@ -72,7 +72,29 @@ namespace Mummybot.Commands.Modules
         }
 
         [Group("reminders")]
-        public class ReminderConfigModule : MummyBase
+        public class ReminderConfigModule : MummyModule
+        {
+            [Command]
+            public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesReminders = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
+        [Group("tags")]
+        public class TagsConfigModule : MummyModule
+        {
+            [Command]
+            public async Task SettagOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesTags = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
+        [Group("birthdays")]
+        public class BirthdaysConfigModule : MummyModule
         {
             [Command]
             public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)

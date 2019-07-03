@@ -26,7 +26,7 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-            var guildconfigs = await GuildStore.GetAlllGuildsAsync(x => x.Reminders);
+            var guildconfigs = await GuildStore.GetAllGuildsAsync(x => x.Reminders);
             foreach (Guild guild in guildconfigs)
             {
                 if (guild.UsesReminders)

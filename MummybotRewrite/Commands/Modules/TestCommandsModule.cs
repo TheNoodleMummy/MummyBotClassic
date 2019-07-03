@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
-	public class TestCommandModule : MummyBase
+	public class TestCommandModule : MummyModule
     {
         [Command("test")]
-		public Task Test()
+		public async Task Test([Remainder]DateTimeOffset dateTime)
         {
-            Console.Write( string.Join("\n",TimeZoneInfo.GetSystemTimeZones()));
-            return Task.CompletedTask;
+            await ReplyAsync(dateTime.ToString());
         }
     }
 }

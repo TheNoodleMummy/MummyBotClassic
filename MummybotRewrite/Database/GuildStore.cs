@@ -38,7 +38,7 @@ namespace Mummybot.Database
                 .WithOne(y => y.Guild)
                 .HasForeignKey(z => z.GuildID);
             });
-            modelBuilder.Entity<Prefixes>(prefix=>
+            modelBuilder.Entity<Prefixes>(prefix =>
             {
                 prefix.HasKey(x => x.Id);
                 prefix.Property(x => x.Id)
@@ -56,7 +56,24 @@ namespace Mummybot.Database
                 tag.Property(x => x.Id)
                 .ValueGeneratedNever();
             });
+            modelBuilder.Entity<Birthday>(birthday =>
+            {
+                birthday.HasKey(x => x.Id);
+                birthday.Property(x => x.Id)
+                .ValueGeneratedNever();
+            });
         }
+
+        public Task<Guild> GetGuildForModule(IGuild guild)
+       => GetGuildForModule(guild.Id);
+
+        public Task<Guild> GetGuildForModule(ulong id)
+        => Guilds.Include(g => g.Birthdays)
+                .Include(g => g.Prefixes)
+                .Include(g => g.Reminders)
+                .Include(g => g.Stars)
+                .Include(g => g.Tags)
+                .FirstOrDefaultAsync(x => x.GuildID == id);
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild iguild, Expression<Func<Guild, TProp>> expression)
         {
@@ -82,6 +99,18 @@ namespace Mummybot.Database
             return guild;
         }
 
+        public async Task<Guild> GetOrCreateGuildAsync(ulong guildid)
+        {
+            await Slim.WaitAsync();
+            var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == guildid);
+            if (guild is null)
+            {
+                _logservice.LogInformation($"guild: {guildid} was not found creating new object");
+                return await CreateGuildAsync<ulong>(guildid: guildid, null);
+            }
+            return guild;
+        }
+
         public async Task<Guild> GetOrCreateGuildAsync(IGuild iguild)
         {
             await Slim.WaitAsync();
@@ -89,12 +118,12 @@ namespace Mummybot.Database
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object");
-                return await CreateGuildAsync<ulong>(guildid:iguild.Id,null);
+                return await CreateGuildAsync<ulong>(guildid: iguild.Id, null);
             }
             return guild;
         }
 
-        public Task<List<Guild>> GetAlllGuildsAsync<TProp>(Expression<Func<Guild, TProp>> expression)
+        public Task<List<Guild>> GetAllGuildsAsync<TProp>(Expression<Func<Guild, TProp>> expression)
             => Guilds.Include(expression).ToListAsync();
 
         public Task<List<Guild>> GetAllGuildsAsync()
@@ -114,7 +143,7 @@ namespace Mummybot.Database
             {
                 return await Guilds.FindAsync(guildid);
             }
-            return await Guilds.Include(expression).FirstOrDefaultAsync(x=>x.GuildID == guildid);
+            return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.GuildID == guildid);
         }
     }
 }

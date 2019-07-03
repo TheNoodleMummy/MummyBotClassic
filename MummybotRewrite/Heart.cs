@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot;
 using Mummybot.Attributes;
+using Mummybot.Commands.TypeReaders;
 using Mummybot.Database;
 using Mummybot.Extentions;
 using Mummybot.Services;
@@ -46,7 +47,8 @@ namespace MummyBot
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
                      StringComparison = StringComparison.CurrentCultureIgnoreCase
-                 }).AddTypeParsers(assembly))
+                 })
+                 .AddTypeParsers(assembly))
                  .AddSingleton<Random>()
                  .AddSingleton<HttpClient>()
                 .BuildServiceProvider();

@@ -11,14 +11,17 @@ namespace Mummybot.Services
 {
     public class StarBoardService : BaseService
     {
-        private DiscordSocketClient _client;
-        private SnowFlakeGeneratorService _snowFlakeGenerator;
+        private readonly DiscordSocketClient _client;
+        private readonly SnowFlakeGeneratorService _snowFlakeGenerator;
 
-        public StarBoardService(DiscordSocketClient client,SnowFlakeGeneratorService snowFlakeGenerator)
+        public StarBoardService(DiscordSocketClient client,SnowFlakeGeneratorService snowFlakeGenerator,LogService logService)
         {
             _client = client;
             _snowFlakeGenerator = snowFlakeGenerator;
+            LogService = LogService;
         }
+
+        
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
@@ -31,7 +34,7 @@ namespace Mummybot.Services
                     if (guild.UsesStarBoard && guild.StarboardEmote == reaction.Emote.Name)
                     {
                         var msg = await chachemessage.GetOrDownloadAsync();
-                        var star = guild.Stars.FirstOrDefault(x => x.MessageId == chachemessage.Id);
+                        var star = guild.Stars.Find(x => x.MessageId == chachemessage.Id);
                         if (star is null)
                         {
                             star = new Star
@@ -70,10 +73,8 @@ namespace Mummybot.Services
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
                             await guildstore.SaveChangesAsync();
-
                         }
                     }
-
                 }
             };
             _client.ReactionRemoved += async (chachemessage, channel, reaction) =>
@@ -85,17 +86,15 @@ namespace Mummybot.Services
                     if (guild.UsesStarBoard && guild.StarboardEmote == reaction.Emote.Name)
                     {
                         var msg = await chachemessage.GetOrDownloadAsync();
-                        var star = guild.Stars.FirstOrDefault(x => x.MessageId == chachemessage.Id);
+                        var star = guild.Stars.Find(x => x.MessageId == chachemessage.Id);
                         if (star is null)
                             return;
                         else
                         {
-
                             star.Stars--;
                             var starboard = _client.GetGuild(guild.GuildID).GetTextChannel(guild.StarboardChannelId);
                             if (star.Stars == 0)
                             {
-
                                 await starboard.DeleteMessageAsync(star.StarboardMessageId);
                                 guild.Stars.Remove(star);
                                 guildstore.Update(guild);
