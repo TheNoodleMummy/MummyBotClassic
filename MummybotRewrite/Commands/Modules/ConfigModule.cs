@@ -102,6 +102,21 @@ namespace Mummybot.Commands.Modules
                 GuildConfig.UsesReminders = onoff;
                 await Context.Message.AddOkAsync();
             }
+
+            [Command("setchannel")]
+            public async Task SetId(ITextChannel channel)
+            {
+                PermValue? permissions = channel.GetPermissionOverwrite(Context.Guild.CurrentUser.Roles.OrderByDescending(r => r.Position).FirstOrDefault())?.ViewChannel;
+                if (permissions is null || permissions == PermValue.Deny)
+                {
+                    await ReplyAsync("this channel cannot be used as Birthday channel (i cannot see this channel)");
+                }
+                else
+                {
+                    GuildConfig.BdayChannelId = channel.Id;
+                    await Context.Message.AddOkAsync();
+                }
+            }
         }
     }
 }
