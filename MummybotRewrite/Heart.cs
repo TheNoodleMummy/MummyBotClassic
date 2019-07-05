@@ -15,6 +15,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Victoria;
 
 namespace MummyBot
 {
@@ -44,6 +45,8 @@ namespace MummyBot
                 .AddDbContext<TokenStore>(ServiceLifetime.Transient)
                  .AddSingleton(discordClient)
                  .AddSingleton<InteractiveService>()
+                 .AddSingleton<LavaSocketClient>()
+                 .AddSingleton<LavaRestClient>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
                      StringComparison = StringComparison.CurrentCultureIgnoreCase

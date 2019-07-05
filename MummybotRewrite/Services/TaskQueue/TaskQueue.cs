@@ -48,7 +48,7 @@ namespace Casino.Common
                 if (wait)
                     await Task.Delay(-1, _cts.Token);
 
-                var time = _currentTask.ExecutionTime.ToUniversalTime() - DateTimeOffset.UtcNow;
+                var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
 
                 if (time > TimeSpan.Zero)
                 {

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot
 {
-    class BotStartup
+    public class BotStartup
     {
         private readonly DiscordSocketClient DiscordClient;
         private readonly IServiceProvider Services;
