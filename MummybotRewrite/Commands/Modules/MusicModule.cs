@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Humanizer;
 using Mummybot.Attributes.Checks;
+using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Mummybot.Commands.Modules
     public class MusicModule : MummyModule
     {
         private readonly MusicService _musicService;
+        //toodo add vote skip command
 
         public MusicModule(MusicService musicService, LogService logService)
         {
@@ -25,12 +27,28 @@ namespace Mummybot.Commands.Modules
         public async Task Join()
         {
             await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel);
+            await Context.Message.AddOkAsync();
         }
 
         [Command("leave")]
         public async Task LeaveAsync()
         {
             await _musicService.LeaveAsync(Context.Guild.Id);
+            await Context.Message.AddOkAsync();
+        }
+
+        [Command("volume")]
+        public async Task SetVolumeAsync(int volume)
+        {
+            var result = await _musicService.SetVolumeAsync(Context.Guild.Id, volume);
+            if (result.IsSuccess)
+            {
+                await ReplyAsync($"Changed Volume to {result.Volume}");
+            }
+            else
+            {
+                await ReplyAsync(result.ErrorReason);
+            }
         }
 
         [Command("play")]

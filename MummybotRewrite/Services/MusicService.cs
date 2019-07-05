@@ -15,6 +15,7 @@ namespace Mummybot.Services
     using Discord.Audio;
     using Discord.WebSocket;
     using Microsoft.Extensions.DependencyInjection;
+    using Mummybot.Interfaces;
     using Victoria.Entities;
 
     public class MusicService : BaseService
@@ -46,6 +47,19 @@ namespace Mummybot.Services
 
             LavaSocketClient.Log += services.GetRequiredService<LogService>().LogLavalink;
             return Task.CompletedTask;
+        }
+
+        public async Task<VolumeResult> SetVolumeAsync(ulong guildid, int volume)
+        {
+            if (ConnectedChannels.TryGetValue(guildid,out var musicDetails))
+            {
+                if (volume <=0&& volume >= 150)
+                    return new VolumeResult() { IsSuccess = false, ErrorReason = "Volume must be between 0 and 150" };
+
+                await musicDetails.Player.SetVolumeAsync(volume);
+                return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.CurrentVolume };
+            }
+            return new VolumeResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
         }
 
         public async Task<PlayResult> PlayAsync(ulong guildid,string url)
@@ -153,12 +167,23 @@ namespace Mummybot.Services
         public LavaPlayer Player { get; set; }
     }
 
-    public class PlayResult
+    public class PlayResult :IMummyResult
     {
         public bool PlayerWasPlaying { get; set; }
         public int QueuePosition { get; set; }
         public LavaTrack Track { get; set; }
 
         public bool WasConnected { get; set; } = true;
+
+        public bool IsSuccess { get; set; }
+        public string ErrorReason { get; set; }
+    }
+
+    public class VolumeResult : IMummyResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorReason { get; set; }
+
+        public int Volume { get; set; }
     }
 }
