@@ -15,6 +15,7 @@ namespace Mummybot.Enums
         BirthdayService,
         MusicService,
         LavaLink,
-        Victoria
+        Victoria,
+        TaskQueue
     }
 }

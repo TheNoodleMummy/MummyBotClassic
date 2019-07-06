@@ -104,7 +104,7 @@ namespace Mummybot.Services
                 if (time.Minutes == 1)
                     sb.Append("Minute, ");
                 else
-                    sb.Append("minutes, ");
+                    sb.Append("Minutes, ");
             }
             sb.Append("ago you asked me to remind you about \n").Append(reminder.Message);
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());

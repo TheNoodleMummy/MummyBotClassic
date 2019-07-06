@@ -15,7 +15,6 @@ namespace Mummybot.Commands.Modules
     public class MusicModule : MummyModule
     {
         private readonly MusicService _musicService;
-        //toodo add vote skip command
 
         public MusicModule(MusicService musicService, LogService logService)
         {
@@ -54,7 +53,7 @@ namespace Mummybot.Commands.Modules
         [Command("play")]
         public async Task PlayAsync([Remainder]string url)
         {
-            PlayResult playResult = await _musicService.PlayAsync(Context.Guild.Id, url);
+            var playResult = await _musicService.PlayAsync(Context.Guild.Id, url);
             if (playResult.PlayerWasPlaying)
             {
                 await ReplyAsync($"Added {playResult.Track.Title} To queue position: {playResult.QueuePosition}");
