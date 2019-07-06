@@ -35,62 +35,61 @@ namespace Casino.Common
 
         private async Task HandleCallbacksAsync()
         {
-            if (_disposed)
-                return;
-
-            try
+            while (!_disposed)
             {
-                bool wait;
-
-                lock (_queueLock)
-                    wait = !Queue.TryDequeue(out _currentTask);
-
-                if (wait)
-                    await Task.Delay(-1, _cts.Token);
-
-                var time = _currentTask.ExecutionTime.ToUniversalTime() - DateTimeOffset.UtcNow;
-
-                if (time > TimeSpan.Zero)
+                try
                 {
-                    await Task.Delay(time, _cts.Token);
-                }
+                    bool wait;
 
-                if (_currentTask.IsCancelled)
-                    return;
+                    lock (_queueLock)
+                        wait = !Queue.TryDequeue(out _currentTask);
 
-                await _currentTask.ExecuteAsync();
-                _currentTask.Completed();
-            }
-            catch (TaskCanceledException)
-            {
-                lock (_queueLock)
-                {
-                    if (_currentTask?.IsCancelled == false)
-                        Queue.Enqueue(_currentTask);
+                    if (wait)
+                        await Task.Delay(-1, _cts.Token);
 
-                    if (!Queue.IsEmpty)
+                    var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
+
+                    if (time > TimeSpan.Zero)
                     {
-                        var copy = Queue.ToArray().Where(x => !x.IsCancelled).OrderBy(x => x.ExecutionTime);
-
-                        //Didn't do ClearQueue() since nested lock
-                        while (Queue.TryDequeue(out _))
-                        {
-                        }
-
-                        foreach (var item in copy)
-                            Queue.Enqueue(item);
+                        await Task.Delay(time, _cts.Token);
                     }
 
-                    _cts.Dispose();
-                    _cts = new CancellationTokenSource();
-                }
-            }
-            catch (Exception e)
-            {
-                _currentTask?.SetException(e);
+                    if (_currentTask.IsCancelled)
+                        continue;
 
-                if (OnError != null)
-                    await OnError(e);
+                    await _currentTask.ExecuteAsync();
+                    _currentTask.Completed();
+                }
+                catch (TaskCanceledException)
+                {
+                    lock (_queueLock)
+                    {
+                        if (_currentTask?.IsCancelled == false)
+                            Queue.Enqueue(_currentTask);
+
+                        if (!Queue.IsEmpty)
+                        {
+                            var copy = Queue.ToArray().Where(x => !x.IsCancelled).OrderBy(x => x.ExecutionTime);
+
+                            //Didn't do ClearQueue() since nested lock
+                            while (Queue.TryDequeue(out _))
+                            {
+                            }
+
+                            foreach (var item in copy)
+                                Queue.Enqueue(item);
+                        }
+
+                        _cts.Dispose();
+                        _cts = new CancellationTokenSource();
+                    }
+                }
+                catch (Exception e)
+                {
+                    _currentTask?.SetException(e);
+
+                    OnError?.Invoke(e);
+                }
             }
         }
 

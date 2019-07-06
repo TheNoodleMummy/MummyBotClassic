@@ -13,6 +13,9 @@ namespace Mummybot.Enums
         ReminderService,
         SnowFlakeGenerator,
         BirthdayService,
-        MusicService
+        MusicService,
+        LavaLink,
+        Victoria,
+        TaskQueue
     }
 }

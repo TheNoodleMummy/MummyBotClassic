@@ -3,6 +3,7 @@ using Discord;
 using Humanizer;
 using Microsoft.CodeAnalysis;
 using Mummybot.Attributes.Checks;
+using Mummybot.Database.Entities;
 using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
@@ -159,23 +160,35 @@ namespace Mummybot.Commands.Modules
             await msg.ModifyAsync(x => x.Embed = builder.Build());
         }
 
-        //[Command("Tasks")]
-        //public async Task GetTasks()
-        //{
-        //    var tasks = TaskQueue.Queue.ToArray();
-        //    if (tasks is null)
-        //        await ReplyAsync("Currently not tracking anything");
-        //    else
-        //    {
-        //        var sb = new StringBuilder();
-        //        foreach (var task in tasks)
-        //        {
-        //            var stask = task as ScheduledTask;
-        //            sb.Append("```").Append(stask.State.ToString()).Append(" at ").Append(task.ExecutionTime).AppendLine("```");
-        //        }
-        //    }
-        //        await ReplyAsync(string.Join("\n",tasks.ToList()));
-        //}
+        [Command("Tasks")]
+        public async Task GetTasks()
+        {
+            var tasks = TaskQueue.Queue.ToArray();
+            if (tasks is null)
+                await ReplyAsync("Currently not tracking anything");
+            else
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("```");
+                foreach (var task in tasks)
+                {
+                    if (task is ScheduledTask<Birthday> bdaytask)
+                    {
+                        sb.AppendLine(bdaytask.State.ToString());
+                    }
+                    else if (task is ScheduledTask<Reminder> remidnertask)
+                    {
+                        sb.Append(remidnertask.State.ToString()).Append(" at ").AppendLine(task.ExecutionTime.ToString());
+                    }
+                    else if (task is ScheduledTask scheduledTask)
+                    {
+                        sb.AppendLine(scheduledTask.ToString());
+                    }
+                }
+                sb.AppendLine("```");
+                await ReplyAsync(sb.ToString());
+            }
+        }
     }
 }
 

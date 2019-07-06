@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,11 +18,12 @@ using System.Threading.Tasks;
 
 namespace Mummybot
 {
-    class BotStartup
+    public class BotStartup
     {
         private readonly DiscordSocketClient DiscordClient;
         private readonly IServiceProvider Services;
         private readonly CommandService CommandService;
+        private readonly TaskQueue taskQueue;
         private bool  ranInitialisers;
 
         public BotStartup(IServiceProvider services)
@@ -29,8 +31,12 @@ namespace Mummybot
             Services = services;
             DiscordClient = services.GetRequiredService<DiscordSocketClient>();
             CommandService = services.GetRequiredService<CommandService>();
+            taskQueue = services.GetRequiredService<TaskQueue>();
+
             CommandService.AddModules(services.GetRequiredService<Assembly>());
             CommandService.AddTypeParser(parser: new UserTypeparser<SocketGuildUser>());
+
+            taskQueue.OnError += (ex) => Task.Run(() => services.GetRequiredService<LogService>().LogError(string.Empty,Enums.LogSource.TaskQueue,ex));
 
             DiscordClient.Log += services.GetRequiredService<LogService>().LogEventAsync;
         }

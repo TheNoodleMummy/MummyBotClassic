@@ -31,8 +31,8 @@ namespace Mummybot.Services
             {
                 if (guild.UsesReminders)
                 {
-                    LogService.LogInformation("Executing expired reminders.", LogSource.ReminderService);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
+                    LogService.LogInformation($"Executing {reminders.Count} expired reminders.", LogSource.ReminderService);
                     foreach (Reminder reminder in reminders)
                     {
                         await ReminderCallbackAsync(reminder);
@@ -49,6 +49,11 @@ namespace Mummybot.Services
                 }
                 GuildStore.Update(guild);
                 await GuildStore.SaveChangesAsync();
+
+                foreach (var item in guild.Reminders)
+                {
+                    TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, ReminderCallbackAsync);
+                }
             }
         }
 
@@ -99,7 +104,7 @@ namespace Mummybot.Services
                 if (time.Minutes == 1)
                     sb.Append("Minute, ");
                 else
-                    sb.Append("minutes, ");
+                    sb.Append("Minutes, ");
             }
             sb.Append("ago you asked me to remind you about \n").Append(reminder.Message);
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());

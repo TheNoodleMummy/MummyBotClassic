@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
+    [RequireReminders]
     public class ReminderModule : MummyModule
     {
         public ReminderService ReminderService { get; set; }
         public SnowFlakeGeneratorService SnowFlakeGenerator { get; set; }
 
-        [Command("remind"),RequireReminders]
+        [Command("remind")]
         public async Task RemindAsync(TimeSpan time,string message)
         {
             var reminder = new Reminder
