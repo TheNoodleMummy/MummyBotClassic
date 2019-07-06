@@ -37,7 +37,6 @@ namespace Casino.Common
         {
             while (!_disposed)
             {
-
                 try
                 {
                     bool wait;
