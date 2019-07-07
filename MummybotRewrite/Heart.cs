@@ -4,8 +4,6 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot;
-using Mummybot.Attributes;
-using Mummybot.Commands.TypeReaders;
 using Mummybot.Database;
 using Mummybot.Extentions;
 using Mummybot.Services;
@@ -30,23 +28,24 @@ namespace MummyBot
             var types = assembly?.GetTypes()
                 .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
-            var discordClient = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                ExclusiveBulkDelete = true,
-                AlwaysDownloadUsers = true,
-                LogLevel = LogSeverity.Verbose,
-                MessageCacheSize = 100
-            });
+            
 
             var services = new ServiceCollection()
                 .AddServices(types)
                 .AddSingleton(assembly)
                 .AddDbContext<GuildStore>(ServiceLifetime.Transient)
                 .AddDbContext<TokenStore>(ServiceLifetime.Transient)
-                 .AddSingleton(discordClient)
+                 .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+                 {
+                     ExclusiveBulkDelete = true,
+                     AlwaysDownloadUsers = true,
+                     LogLevel = LogSeverity.Verbose,
+                     MessageCacheSize = 100
+                 }))
                  .AddSingleton<InteractiveService>()
                  .AddSingleton<LavaSocketClient>()
                  .AddSingleton<LavaRestClient>()
+                 .AddSingleton<Random>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
                      StringComparison = StringComparison.CurrentCultureIgnoreCase

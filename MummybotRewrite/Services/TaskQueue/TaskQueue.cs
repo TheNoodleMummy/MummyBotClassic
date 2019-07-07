@@ -12,6 +12,8 @@ namespace Casino.Common
     /// </summary>
     public sealed partial class TaskQueue : BaseService, IDisposable
     {
+        private readonly TimeSpan _maxTime = TimeSpan.FromMilliseconds(int.MaxValue);
+
         public readonly ConcurrentQueue<IScheduledTask> Queue;
         private CancellationTokenSource _cts;
 
@@ -49,9 +51,10 @@ namespace Casino.Common
 
                     var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
 
-                    if (time > TimeSpan.Zero)
+                    while (time > _maxTime)
                     {
-                        await Task.Delay(time, _cts.Token);
+                        await Task.Delay(_maxTime, _cts.Token);
+                        time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
                     }
 
                     if (_currentTask.IsCancelled)
