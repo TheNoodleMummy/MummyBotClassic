@@ -28,8 +28,6 @@ namespace MummyBot
             var types = assembly?.GetTypes()
                 .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
-            
-
             var services = new ServiceCollection()
                 .AddServices(types)
                 .AddSingleton(assembly)
@@ -39,7 +37,7 @@ namespace MummyBot
                  {
                      ExclusiveBulkDelete = true,
                      AlwaysDownloadUsers = true,
-                     LogLevel = LogSeverity.Verbose,
+                     LogLevel = LogSeverity.Info,
                      MessageCacheSize = 100
                  }))
                  .AddSingleton<InteractiveService>()
@@ -61,8 +59,10 @@ namespace MummyBot
             {
                 var tokenstore = services.GetRequiredService<TokenStore>();
                 var guildstore = services.GetRequiredService<GuildStore>();
+
                 await tokenstore.Database.MigrateAsync();
                 await guildstore.Database.MigrateAsync();
+
                 await tokenstore.SaveChangesAsync();
                 await guildstore.SaveChangesAsync();
             }

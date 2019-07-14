@@ -17,7 +17,6 @@ namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
-
         public Script<object> Build(string code)
         {
             var codes = Utilities.GetCodes(code);
@@ -25,7 +24,7 @@ namespace Mummybot.Services
             var namespaces = Assembly.GetEntryAssembly()?.GetTypes()
               .Where(x => !string.IsNullOrWhiteSpace(x.Namespace))
               .Select(x => x.Namespace)
-              .Distinct();           
+              .Distinct();
 
             var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(namespaces);
 
@@ -43,7 +42,6 @@ namespace Mummybot.Services
                 .Create($"{string.Join("", usings.Select(x => $"using {x};"+Environment.NewLine))} {toEval}",
                     scriptOptions,
                     typeof(RoslynContext));
-
         }
 
         internal IEnumerable<Assembly> GetAssemblies()
@@ -54,8 +52,6 @@ namespace Mummybot.Services
             foreach (var assembly in assm)
                 yield return assembly;
         }
-
-                  
     }
 
     public class RoslynContext
