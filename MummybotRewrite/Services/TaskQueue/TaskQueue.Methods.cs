@@ -148,7 +148,7 @@ namespace Casino.Common
                 if (_disposed)
                     throw new ObjectDisposedException(nameof(TaskQueue));
 
-                _currentTask.Cancel();
+                CurrentTask.Cancel();
 
                 while (Queue.TryDequeue(out var task))
                 {

@@ -1,22 +1,29 @@
-﻿using Discord;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Immutable;
-using Mummybot.Attributes;
 
 namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
+        public List<string> usings = new List<string>() {
+         "Discord",
+         "Discord.WebSocket",
+         "Microsoft.Extensions.DependencyInjection",
+         "System",
+         "System.Collections.Generic",
+         "System.Linq",
+         "System.Text",
+         "System.Threading.Tasks",
+         "Qmmands"
+         };
+
         public Script<object> Build(string code)
         {
             var codes = Utilities.GetCodes(code);
@@ -28,18 +35,10 @@ namespace Mummybot.Services
 
             var scriptOptions = ScriptOptions.Default.WithReferences(GetAssemblies().Select(x => MetadataReference.CreateFromFile(x.Location))).AddImports(namespaces);
 
-            var usings = new[]
-            {
-                "Discord", "Discord.WebSocket",
-                "Microsoft.Extensions.DependencyInjection",
-                "System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks",
-                "Qmmands"
-            };
-
             var toEval = codes.Count == 0 ? code : string.Join('\n', codes);
 
             return CSharpScript
-                .Create($"{string.Join("", usings.Select(x => $"using {x};"+Environment.NewLine))} {toEval}",
+                .Create($"{string.Concat(usings.Select(x => $"using {x};" + Environment.NewLine))} {toEval}",
                     scriptOptions,
                     typeof(RoslynContext));
         }
@@ -60,7 +59,7 @@ namespace Mummybot.Services
         public IServiceProvider Services { get; set; }
         public MessageService MessageService { get; set; }
 
-        public RoslynContext(MummyContext context,IServiceProvider services)
+        public RoslynContext(MummyContext context, IServiceProvider services)
         {
             Ctx = context;
             Services = services;
