@@ -160,12 +160,47 @@ namespace Mummybot.Commands.Modules
             await msg.ModifyAsync(x => x.Embed = builder.Build());
         }
 
+        [Command("addusing")]
+        public async Task AddUsingsAsync(string ns)
+        {
+            if (ns.Contains(" "))
+            {
+                await ReplyAsync($"the namespace {ns} contains a space => no beuno");
+                return;
+            }
+            EvalService.usings.Add(ns);
+            await Context.Message.AddOkAsync();
+        }
+
+        [Command("using")]
+        public Task UsingsAsync()
+        => ReplyAsync(string.Join('\n', EvalService.usings));
+
         [Command("Tasks")]
         public async Task GetTasks()
         {
             var tasks = TaskQueue.Queue.ToArray();
-            if (tasks is null)
+            var current = TaskQueue.CurrentTask;
+            if (tasks is null && current is null)
                 await ReplyAsync("Currently not tracking anything");
+            else if (tasks is null && current !=null)
+            {
+                var sb = new StringBuilder();
+
+                if (current is ScheduledTask<Birthday> bdaytask)
+                {
+                    sb.AppendLine(bdaytask.State.ToString());
+                }
+                else if (current is ScheduledTask<Reminder> remindertask)
+                {
+                    sb.Append(remindertask.State.ToString()).Append(" at ").AppendLine(remindertask.ExecutionTime.ToString());
+                }
+                else if (current is ScheduledTask scheduledTask)
+                {
+                    sb.AppendLine(scheduledTask.ToString());
+                }
+                await ReplyAsync(sb.ToString());
+            }
             else
             {
                 var sb = new StringBuilder();
@@ -176,9 +211,9 @@ namespace Mummybot.Commands.Modules
                     {
                         sb.AppendLine(bdaytask.State.ToString());
                     }
-                    else if (task is ScheduledTask<Reminder> remidnertask)
+                    else if (task is ScheduledTask<Reminder> remindertask)
                     {
-                        sb.Append(remidnertask.State.ToString()).Append(" at ").AppendLine(task.ExecutionTime.ToString());
+                        sb.Append(remindertask.State.ToString()).Append(" at ").AppendLine(remindertask.ExecutionTime.ToString());
                     }
                     else if (task is ScheduledTask scheduledTask)
                     {

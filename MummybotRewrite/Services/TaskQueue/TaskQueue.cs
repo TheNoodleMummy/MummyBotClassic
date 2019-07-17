@@ -12,12 +12,14 @@ namespace Casino.Common
     /// </summary>
     public sealed partial class TaskQueue : BaseService, IDisposable
     {
+        private readonly TimeSpan _maxTime = TimeSpan.FromMilliseconds(int.MaxValue);
+
         public readonly ConcurrentQueue<IScheduledTask> Queue;
         private CancellationTokenSource _cts;
 
         private readonly object _queueLock;
 
-        private IScheduledTask _currentTask;
+        public IScheduledTask CurrentTask;
 
         public TaskQueue()
         {
@@ -42,30 +44,31 @@ namespace Casino.Common
                     bool wait;
 
                     lock (_queueLock)
-                        wait = !Queue.TryDequeue(out _currentTask);
+                        wait = !Queue.TryDequeue(out CurrentTask);
 
                     if (wait)
                         await Task.Delay(-1, _cts.Token);
 
-                    var time = _currentTask.ExecutionTime - DateTimeOffset.UtcNow;
+                    var time = CurrentTask.ExecutionTime - DateTimeOffset.UtcNow;
 
-                    if (time > TimeSpan.Zero)
+                    while (time > _maxTime)
                     {
-                        await Task.Delay(time, _cts.Token);
+                        await Task.Delay(_maxTime, _cts.Token);
+                        time = CurrentTask.ExecutionTime - DateTimeOffset.UtcNow;
                     }
 
-                    if (_currentTask.IsCancelled)
+                    if (CurrentTask.IsCancelled)
                         continue;
 
-                    await _currentTask.ExecuteAsync();
-                    _currentTask.Completed();
+                    await CurrentTask.ExecuteAsync();
+                    CurrentTask.Completed();
                 }
                 catch (TaskCanceledException)
                 {
                     lock (_queueLock)
                     {
-                        if (_currentTask?.IsCancelled == false)
-                            Queue.Enqueue(_currentTask);
+                        if (CurrentTask?.IsCancelled == false)
+                            Queue.Enqueue(CurrentTask);
 
                         if (!Queue.IsEmpty)
                         {
@@ -86,7 +89,7 @@ namespace Casino.Common
                 }
                 catch (Exception e)
                 {
-                    _currentTask?.SetException(e);
+                    CurrentTask?.SetException(e);
 
                     OnError?.Invoke(e);
                 }

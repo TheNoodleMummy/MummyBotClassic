@@ -24,7 +24,6 @@ namespace Mummybot
         private readonly IServiceProvider Services;
         private readonly CommandService CommandService;
         private readonly TaskQueue taskQueue;
-        private bool  ranInitialisers;
 
         public BotStartup(IServiceProvider services)
         {
@@ -53,14 +52,8 @@ namespace Mummybot
             }
             await DiscordClient.StartAsync();
 
-            DiscordClient.Ready += async () =>
-            {
-                if (!ranInitialisers)
-                {
-                    await Services.RunInitialisersAsync(types);
-                    ranInitialisers = true;
-                }
-            };
+            await Task.Delay(2000);
+           await Services.RunInitialisersAsync(types);
             await Task.Delay(-1);
         }
     }
