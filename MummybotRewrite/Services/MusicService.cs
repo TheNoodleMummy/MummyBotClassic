@@ -28,7 +28,7 @@ namespace Mummybot.Services
             {
                 AutoDisconnect = false,
                 SelfDeaf = false,
-                LogSeverity = LogSeverity.Debug,
+                LogSeverity = LogSeverity.Info,
                 ReconnectInterval = TimeSpan.FromSeconds(10),
                 Host = "127.0.0.1",
                 Port = 2333,
