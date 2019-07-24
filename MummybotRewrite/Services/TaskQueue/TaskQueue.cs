@@ -57,6 +57,9 @@ namespace Casino.Common
                         time = CurrentTask.ExecutionTime - DateTimeOffset.UtcNow;
                     }
 
+                    if (time > TimeSpan.Zero)
+                        await Task.Delay(time, _cts.Token);
+
                     if (CurrentTask.IsCancelled)
                         continue;
 

@@ -1,5 +1,6 @@
 ﻿using Casino.Common;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Enums;
@@ -15,13 +16,15 @@ namespace Mummybot.Services
         public TaskQueue TaskQueue { get; }
         public GuildStore GuildStore { get; }
         public DiscordSocketClient DiscordClient { get; }
+        private readonly IServiceProvider _services;
 
-        public ReminderService(TaskQueue taskQueue, GuildStore guildStore,DiscordSocketClient discordclient,LogService logService)
+        public ReminderService(TaskQueue taskQueue, GuildStore guildStore,DiscordSocketClient discordclient,LogService logService,IServiceProvider service)
         {
             TaskQueue = taskQueue;
             GuildStore = guildStore;
             DiscordClient = discordclient;
             LogService = logService;
+            _services = service;
         }
 
         public override async Task InitialiseAsync(IServiceProvider services)
@@ -109,10 +112,11 @@ namespace Mummybot.Services
             sb.Append("ago you asked me to remind you about \n").Append(reminder.Message);
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
 
-            var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID,r=>r.Reminders);
+            var store = _services.GetRequiredService<GuildStore>();
+            var guildconfig = await store.GetOrCreateGuildAsync(reminder.GuildID,r=>r.Reminders);
             guildconfig.Reminders.Remove(reminder);
-            GuildStore.Update(guildconfig);
-            await GuildStore.SaveChangesAsync();
+            store.Update(guildconfig);
+            await store.SaveChangesAsync();
         }
     }
 }
