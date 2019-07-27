@@ -24,6 +24,8 @@ namespace Mummybot
         private readonly IServiceProvider Services;
         private readonly CommandService CommandService;
         private readonly TaskQueue taskQueue;
+        private IEnumerable<Type> Types;
+
 
         public BotStartup(IServiceProvider services)
         {
@@ -42,6 +44,7 @@ namespace Mummybot
 
         public async Task StartAsync(IEnumerable<Type> types)
         {
+            Types = types;
             using (var tokenstore = Services.GetRequiredService<TokenStore>())
             {
 #if DEBUG
@@ -52,9 +55,15 @@ namespace Mummybot
             }
             await DiscordClient.StartAsync();
 
-            await Task.Delay(2000);
-           await Services.RunInitialisersAsync(types);
+            DiscordClient.Ready += DiscordClient_ReadyAsync;
+
             await Task.Delay(-1);
+        }
+
+        private async Task DiscordClient_ReadyAsync()
+        {
+            await Services.RunInitialisersAsync(Types);
+            DiscordClient.Ready -= DiscordClient_ReadyAsync;
         }
     }
 }

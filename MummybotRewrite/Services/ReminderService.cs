@@ -39,6 +39,7 @@ namespace Mummybot.Services
                     foreach (Reminder reminder in reminders)
                     {
                         await ReminderCallbackAsync(reminder);
+                        guild.Reminders.Remove(reminder);
                     }
                 }
                 else
