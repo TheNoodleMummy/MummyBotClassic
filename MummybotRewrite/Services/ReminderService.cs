@@ -117,6 +117,7 @@ namespace Mummybot.Services
             guildconfig.Reminders.Remove(reminder);
             store.Update(guildconfig);
             await store.SaveChangesAsync();
+            store.Dispose();
         }
     }
 }
