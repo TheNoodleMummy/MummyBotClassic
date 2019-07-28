@@ -8,18 +8,19 @@ init:
   - cmd: git config --global core.autocrlf true
 install:
   # Install repo specific stuff here
+  - cmd: choco install dotnetcore-sdk --pre #required untill appveyor auto comes with core 3.0 this will slow down auto build pretty bad i think
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
   # Display minimal restore text
   - cmd: dotnet restore ./MummybotRewrite/Mummybot.csproj --verbosity m
 build_script:
-  # output will be in ./src/bin/release/netcoreapp2.2/publish
+  # output will be in ./src/bin/release/netcoreapp3.0/publish
   - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release
 after_build:
   # For once the build has completed
 artifacts:
- - path: '\MummybotRewrite\bin\release\netcoreapp2.2\publish'
+ - path: '\MummybotRewrite\bin\release\netcoreapp3.0\publish'
    name: MummyBot
    type: WebDeployPackage
 clone_depth: 1
