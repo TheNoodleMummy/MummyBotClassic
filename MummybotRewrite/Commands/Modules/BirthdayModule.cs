@@ -51,17 +51,17 @@ namespace Mummybot.Commands.Modules
                 if (result.IsSuccess)
                     await ReplyAsync($"Added birthday for {Context.User.GetDisplayName()} on {dateTimeOffset.ToString()}");
                 else
-                    await ReplyAsync(result.Error);
+                    await ReplyAsync(result.ErrorReason);
             }
 
             [Command("birthday")]
             public async Task RegisterBirthday(ulong userid, [Remainder]DateTimeOffset dateTimeOffset)
             {
-                var result = await BirthdayService.RegisterBirthdayAsync(Context, dateTimeOffset,userid);
+                var result = await BirthdayService.RegisterBirthdayAsync(Context, dateTimeOffset, userid);
                 if (result.IsSuccess)
                     await ReplyAsync($"Added birthday for {Context.Guild.GetUser(userid).GetDisplayName()} on {dateTimeOffset.ToString()}");
                 else
-                    await ReplyAsync(result.Error);
+                    await ReplyAsync(result.ErrorReason);
             }
         }
     }

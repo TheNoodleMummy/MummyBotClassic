@@ -8,5 +8,6 @@ namespace Mummybot.Interfaces
     {
         bool IsSuccess { get; set; }
         string ErrorReason { get; set; }
+        Exception Exception { get; set; } 
     }
 }

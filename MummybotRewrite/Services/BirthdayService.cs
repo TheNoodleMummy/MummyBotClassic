@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
+using Mummybot.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Mummybot.Services
         private readonly DiscordSocketClient _discordClient;
         private readonly SnowFlakeGeneratorService _snowFlakeGenerator;
 
-        public BirthdayService(TaskQueue taskQueue, GuildStore guildStore,DiscordSocketClient discord,LogService logService,SnowFlakeGeneratorService snowFlake)
+        public BirthdayService(TaskQueue taskQueue, GuildStore guildStore, DiscordSocketClient discord, LogService logService, SnowFlakeGeneratorService snowFlake)
         {
             _taskQueue = taskQueue;
             _guildStore = guildStore;
@@ -36,7 +37,7 @@ namespace Mummybot.Services
         /// </summary>
         internal async Task<BirthdayResult> RegisterBirthdayAsync(MummyContext context, DateTimeOffset dateTimeOffset, ulong userid = 0)
         {
-            var guildconfig = await _guildStore.GetOrCreateGuildAsync(context.Guild.Id,x=>x.Birthdays);
+            var guildconfig = await _guildStore.GetOrCreateGuildAsync(context.Guild.Id, x => x.Birthdays);
             Birthday birthday;
             ulong id = _snowFlakeGenerator.NextLong();
             DateTimeOffset nextbdayUTC = dateTimeOffset.AddYears(DateTimeOffset.UtcNow.Year - dateTimeOffset.ToUniversalTime().Year);
@@ -52,9 +53,9 @@ namespace Mummybot.Services
                 var dbbday = guildconfig.Birthdays.Find(b => b.Id == id);
                 return new BirthdayResult() { Birthday = dbbday, IsSuccess = true };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new BirthdayResult() { Birthday = null, IsSuccess = false, Error= "Something went wrong"};
+                return new BirthdayResult() { Birthday = null, IsSuccess = false, ErrorReason = "Something went wrong",Exception = ex };
             }
         }
 
@@ -67,13 +68,13 @@ namespace Mummybot.Services
             var expiredbdays = bdays.Where(b => b.NextBdayUTC < DateTimeOffset.UtcNow);
             foreach (var birthday in expiredbdays)
             {
-                await BirthdayCallbackAsync(birthday);
+                await ExpiredBirthdayCallbackAsync(birthday);
             }
 
             var bday = (await _guildStore.GetAllGuildsAsync(x => x.Birthdays))
                 .SelectMany(x => x.Birthdays)
                 .OrderByDescending(b => b.NextBdayUTC.ToUniversalTime())
-                .FirstOrDefault(b=>b.NextBdayUTC > DateTimeOffset.UtcNow);
+                .FirstOrDefault(b => b.NextBdayUTC > DateTimeOffset.UtcNow);
 
             if (bday is null)
             {
@@ -81,6 +82,39 @@ namespace Mummybot.Services
             }
             else
                 _taskQueue.ScheduleTask(bday, bday.NextBdayUTC, BirthdayCallbackAsync);
+        }
+
+        /// <summary>
+        /// callback for when a bday expired :( (bot was offline at the moment of the bday itself)
+        /// </summary>
+        /// <param name="birthday"></param>
+        /// <returns></returns>
+        private async Task ExpiredBirthdayCallbackAsync(Birthday birthday)
+        {
+            var guildconfig = await _guildStore.GetOrCreateGuildAsync(birthday.GuildID, x => x.Birthdays);
+            if (!guildconfig.UsesBirthdays)
+                return;
+            var age = DateTimeOffset.UtcNow.Year - birthday.BDay.ToUniversalTime().Year;
+            var guild = _discordClient.GetGuild(birthday.GuildID);
+            if (guildconfig.BdayChannelId == 0)
+            {
+                var channels = guild.TextChannels.OrderBy(c => c.Position);
+                var channel = channels.FirstOrDefault(c => c.PermissionOverwrites.Any(p => p.Permissions.SendMessages == PermValue.Allow));
+                await channel.SendMessageAsync($"sorry im late by {(DateTimeOffset.UtcNow - birthday.NextBdayUTC).TotalSeconds}seconds please forgive me.{Environment.NewLine}" +
+                    $"Anyway Happy {age} Birthday {guild.GetUser(birthday.UserId).Mention}");
+            }
+            else
+            {
+                var channel = guild.GetTextChannel(guildconfig.BdayChannelId);
+                await channel.SendMessageAsync($"sorry im late by {(DateTimeOffset.UtcNow - birthday.NextBdayUTC).TotalSeconds}seconds please forgive me.{Environment.NewLine}" +
+                    $"Anyway Happy {age} Birthday {guild.GetUser(birthday.UserId).Mention}");
+            }
+
+            birthday.NextBdayUTC = birthday.NextBdayUTC.AddYears(1);
+            var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
+            bday = birthday;
+            _guildStore.Update(guildconfig);
+            await _guildStore.SaveChangesAsync();
         }
 
         /// <summary>
@@ -97,7 +131,7 @@ namespace Mummybot.Services
             if (guildconfig.BdayChannelId == 0)
             {
                 var channels = guild.TextChannels.OrderBy(c => c.Position);
-                var channel = channels.FirstOrDefault(c=>c.PermissionOverwrites.Any(p=>p.Permissions.SendMessages == PermValue.Allow));
+                var channel = channels.FirstOrDefault(c => c.PermissionOverwrites.Any(p => p.Permissions.SendMessages == PermValue.Allow));
                 await channel.SendMessageAsync($"Happy {age} Birthday {guild.GetUser(birthday.UserId).Mention}");
             }
             else
@@ -114,10 +148,11 @@ namespace Mummybot.Services
         }
     }
 
-    public class BirthdayResult
+    public class BirthdayResult : IMummyResult
     {
-        public string Error { get; set; }
         public bool IsSuccess { get; set; }
         public Birthday Birthday { get; set; }
+        public string ErrorReason { get; set; }
+        public Exception Exception { get; set; }
     }
 }
