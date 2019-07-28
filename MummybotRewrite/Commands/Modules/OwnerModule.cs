@@ -42,9 +42,8 @@ namespace Mummybot.Commands.Modules
             var msg = await ReplyAsync(embed: builder);
             var sw = Stopwatch.StartNew();
             var script = EvalService.Build(code);
-            string[] lines = script.Code.Split(Environment.NewLine.ToCharArray()).Where(line => !line.StartsWith("using")).ToArray();
 
-            string snippet = string.Join(Environment.NewLine, lines);
+            string snippet = string.Join(Environment.NewLine, script.Code.Split(Environment.NewLine.ToCharArray()).Where(line => !line.StartsWith("using")));
 
             var diagnostics = script.Compile();
             var compilationTime = sw.ElapsedMilliseconds;
@@ -72,7 +71,7 @@ namespace Mummybot.Commands.Modules
 
                 sw.Stop();
                 builder.WithColor(Color.Green);
-                builder.AddField("Code", $"```cs\n{snippet}```");
+                builder.AddField("Code", $"```cs{Environment.NewLine}{snippet}```");
 
                 builder.WithDescription($"Code compiled in {compilationTime}ms and ran in {sw.ElapsedMilliseconds}ms");
                 builder.WithTitle("Code Evaluated");

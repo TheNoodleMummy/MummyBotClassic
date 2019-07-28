@@ -14,10 +14,10 @@ namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
-        public List<string> usings = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("usings.json"));
+        public List<string> usings = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("usings.json")).ToList();
 
         public void SaveUsings()
-            => File.WriteAllText("usings.json",JsonConvert.SerializeObject(usings));
+            => File.WriteAllText("usings.json",JsonConvert.SerializeObject(usings.ToArray()));
 
         public Script<object> Build(string code)
         {
