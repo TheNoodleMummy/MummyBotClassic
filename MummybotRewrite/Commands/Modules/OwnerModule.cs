@@ -54,7 +54,7 @@ namespace Mummybot.Commands.Modules
                 builder.WithColor(Color.Red);
                 builder.WithTitle("Failed Evaluation");
 
-                builder.AddField("Code", $"```cs\n{snippet}```");
+                builder.AddField("Code", $"```cs{Environment.NewLine}{snippet}```");
                 builder.AddField("Compilation Errors", string.Join('\n', diagnostics.Select(x => $"{x}")));
 
                 await msg.ModifyAsync(x => x.Embed = builder.Build());
@@ -71,10 +71,10 @@ namespace Mummybot.Commands.Modules
 
                 sw.Stop();
                 builder.WithColor(Color.Green);
-                builder.AddField("Code", $"```cs{Environment.NewLine}{snippet}```");
 
                 builder.WithDescription($"Code compiled in {compilationTime}ms and ran in {sw.ElapsedMilliseconds}ms");
                 builder.WithTitle("Code Evaluated");
+                builder.AddField("Code", $"```cs{Environment.NewLine}{snippet}```");
 
                 if (!(result.ReturnValue is null))
                 {
@@ -148,11 +148,11 @@ namespace Mummybot.Commands.Modules
             {
                 sw.Stop();
 
-                builder.AddField("Code", $"```cs\n{snippet}```");
 
                 builder.WithDescription($"Code evaluated in {sw.ElapsedMilliseconds}ms but there was a issue tho");
                 builder.WithColor(Color.Red);
                 builder.WithTitle("Failed Evaluation");
+                builder.AddField("Code", $"```cs{Environment.NewLine}{snippet}```");
 
                 var str = ex.ToString();
 
