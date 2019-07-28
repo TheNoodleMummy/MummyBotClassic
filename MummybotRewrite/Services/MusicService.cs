@@ -242,6 +242,7 @@ namespace Mummybot.Services
 
         public bool IsSuccess { get; set; }
         public string ErrorReason { get; set; }
+        public Exception Exception { get; set; }
     }
 
     public class VolumeResult : IMummyResult
@@ -250,5 +251,6 @@ namespace Mummybot.Services
         public string ErrorReason { get; set; }
 
         public int Volume { get; set; }
+        public Exception Exception { get; set; }
     }
 }
