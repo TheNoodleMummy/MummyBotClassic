@@ -97,9 +97,9 @@ namespace Mummybot.Commands.Modules
         public class BirthdaysConfigModule : MummyModule
         {
             [Command]
-            public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SetBirthdaysOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
             {
-                GuildConfig.UsesReminders = onoff;
+                GuildConfig.UsesBirthdays = onoff;
                 await Context.Message.AddOkAsync();
             }
 

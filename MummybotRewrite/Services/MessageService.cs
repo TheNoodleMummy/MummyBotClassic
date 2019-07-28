@@ -213,6 +213,12 @@ namespace Mummybot.Services
                         result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
                         _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
                     }
+                    if (result is OverloadsFailedResult overloadsFailedResult)
+                    {
+                        Console.Write(string.Join(Environment.NewLine, overloadsFailedResult.FailedOverloads.Select(x => $"{x.Key}: {x.Value}")));
+                    }
+
+
                 }
                 catch (Exception ex)
                 {

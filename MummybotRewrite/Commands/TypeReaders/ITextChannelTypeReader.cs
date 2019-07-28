@@ -12,9 +12,10 @@ namespace Mummybot.Commands.TypeReaders
     {
         public override ValueTask<TypeParserResult<ITextChannel>> ParseAsync(Parameter parameter, string value, MummyContext ctx, IServiceProvider provider)
         {
-            if (ulong.TryParse(value, out ulong id))
+            if (value.Length > 3 && value[0] == '<' && value[1] == '#' && value[^ 1] == '>' &&
+               ulong.TryParse(value[2..^ 1], out var id) || ulong.TryParse(value, out id))
             {
-                var chan = ctx.Guild.GetChannel(id) as ITextChannel;
+                var chan = ctx.Guild.TextChannels.FirstOrDefault(c => c.Id == id) as ITextChannel;
                 if (chan is null)
                     return TypeParserResult<ITextChannel>.Unsuccessful($"Could not find channel with id: {id}");
                 else
