@@ -3,8 +3,10 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -12,17 +14,10 @@ namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
-        public List<string> usings = new List<string>() {
-         "Discord",
-         "Discord.WebSocket",
-         "Microsoft.Extensions.DependencyInjection",
-         "System",
-         "System.Collections.Generic",
-         "System.Linq",
-         "System.Text",
-         "System.Threading.Tasks",
-         "Qmmands"
-         };
+        public List<string> usings = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("usings.json"));
+
+        public void SaveUsings()
+            => File.WriteAllText("usings.json",JsonConvert.SerializeObject(usings));
 
         public Script<object> Build(string code)
         {
@@ -55,13 +50,13 @@ namespace Mummybot.Services
 
     public class RoslynContext
     {
-        public MummyContext Ctx;
+        public MummyContext Context;
         public IServiceProvider Services { get; set; }
         public MessageService MessageService { get; set; }
 
         public RoslynContext(MummyContext context, IServiceProvider services)
         {
-            Ctx = context;
+            Context = context;
             Services = services;
             MessageService = services.GetRequiredService<MessageService>();
         }

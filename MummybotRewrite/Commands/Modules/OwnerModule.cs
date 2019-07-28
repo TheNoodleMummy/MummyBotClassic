@@ -42,6 +42,10 @@ namespace Mummybot.Commands.Modules
             var msg = await ReplyAsync(embed: builder);
             var sw = Stopwatch.StartNew();
             var script = EvalService.Build(code);
+            string[] lines = script.Code.Split(Environment.NewLine.ToCharArray()).Where(line => !line.StartsWith("using")).ToArray();
+
+            string snippet = string.Join(Environment.NewLine, lines);
+
             var diagnostics = script.Compile();
             var compilationTime = sw.ElapsedMilliseconds;
 
@@ -51,6 +55,7 @@ namespace Mummybot.Commands.Modules
                 builder.WithColor(Color.Red);
                 builder.WithTitle("Failed Evaluation");
 
+                builder.AddField("Code", $"```cs\n{snippet}```");
                 builder.AddField("Compilation Errors", string.Join('\n', diagnostics.Select(x => $"{x}")));
 
                 await msg.ModifyAsync(x => x.Embed = builder.Build());
@@ -67,6 +72,7 @@ namespace Mummybot.Commands.Modules
 
                 sw.Stop();
                 builder.WithColor(Color.Green);
+                builder.AddField("Code", $"```cs\n{snippet}```");
 
                 builder.WithDescription($"Code compiled in {compilationTime}ms and ran in {sw.ElapsedMilliseconds}ms");
                 builder.WithTitle("Code Evaluated");
@@ -143,6 +149,8 @@ namespace Mummybot.Commands.Modules
             {
                 sw.Stop();
 
+                builder.AddField("Code", $"```cs\n{snippet}```");
+
                 builder.WithDescription($"Code evaluated in {sw.ElapsedMilliseconds}ms but there was a issue tho");
                 builder.WithColor(Color.Red);
                 builder.WithTitle("Failed Evaluation");
@@ -169,10 +177,22 @@ namespace Mummybot.Commands.Modules
                 return;
             }
             EvalService.usings.Add(ns);
+            EvalService.SaveUsings();
             await Context.Message.AddOkAsync();
         }
 
-        [Command("using")]
+        [Command("removeusing")]
+        public async Task RemoveUsingsAsync(string ns)
+        {
+            if (EvalService.usings.Contains(ns))
+            {
+                EvalService.usings.Remove(ns);
+                EvalService.SaveUsings();
+            }
+            await Context.Message.AddOkAsync();
+        }
+
+        [Command("usings")]
         public Task UsingsAsync()
         => ReplyAsync(string.Join('\n', EvalService.usings));
 
