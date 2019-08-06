@@ -14,6 +14,8 @@ namespace Mummybot.Database
     {
         public DbSet<Guild> Guilds { get; set; }
 
+        public SnowFlakeGeneratorService SnowFlakeGeneratorService { get; set; }
+
         private readonly LogService _logservice = new LogService();
 
         public SemaphoreSlim Slim = new SemaphoreSlim(1, 1);
@@ -134,7 +136,9 @@ namespace Mummybot.Database
             var newguild = new Guild()
             {
                 AutoQuotes = false,
-                GuildID = guildid
+                GuildID = guildid,
+                Prefixes = new List<Prefixes>() { new Prefixes() { guildID= guildid,Prefix = "!",Id= SnowFlakeGeneratorService.NextLong() } }
+                
             };
             await Guilds.AddAsync(newguild);
 
