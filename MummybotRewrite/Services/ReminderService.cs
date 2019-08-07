@@ -46,6 +46,7 @@ namespace Mummybot.Services
                 {
                     LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
+                    LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService);
                     foreach (Reminder reminder in reminders)
                     {
                         guild.Reminders.Remove(reminder);
@@ -110,7 +111,7 @@ namespace Mummybot.Services
                 else
                     sb.Append("Minutes, ");
             }
-            sb.Append("ago you asked me to remind you about \n").Append(reminder.Message);
+            sb.Append("ago you asked me to remind you about: \n").Append(reminder.Message);
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
 
             var store = _services.GetRequiredService<GuildStore>();
