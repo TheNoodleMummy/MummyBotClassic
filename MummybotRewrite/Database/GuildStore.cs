@@ -12,9 +12,15 @@ namespace Mummybot.Database
 {
     public class GuildStore : DbContext
     {
+        
+        public GuildStore(SnowFlakeGeneratorService snowflakes)
+        {
+            SnowFlakeGeneratorService = snowflakes;
+        }
+
         public DbSet<Guild> Guilds { get; set; }
 
-        public SnowFlakeGeneratorService SnowFlakeGeneratorService { get; set; }
+        private readonly SnowFlakeGeneratorService SnowFlakeGeneratorService;
 
         private readonly LogService _logservice = new LogService();
 
