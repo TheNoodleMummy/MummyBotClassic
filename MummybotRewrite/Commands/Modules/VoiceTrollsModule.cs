@@ -43,7 +43,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("dieoma"), RunMode(RunMode.Parallel)]
         public  Task DieOmaAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\cunt.mp3");
+            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\dieoma.mp3");
 
         [Command("getout"), RunMode(RunMode.Parallel)]
         public  Task GetOutAsync()
@@ -71,7 +71,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("legalshit"), RunMode(RunMode.Parallel)]
         public Task LegalShitAsync()
-            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\legalshit.mp3");
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\legaleshit.mp3");
 
         [Command("letitgo"), RunMode(RunMode.Parallel)]
         public Task LetItGoAsync()
