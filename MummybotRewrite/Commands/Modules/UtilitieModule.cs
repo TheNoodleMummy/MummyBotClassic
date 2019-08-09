@@ -24,6 +24,7 @@ namespace Mummybot.Commands.Modules
             else
                 await role.ModifyAsync(r => r.Color= color);            
         }
+
         [Command("color")]
         [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
         public async Task Color(uint hex, SocketGuildUser user = null)

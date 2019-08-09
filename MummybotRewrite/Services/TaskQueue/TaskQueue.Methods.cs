@@ -13,10 +13,10 @@ namespace Casino.Common
         /// <param name="executeIn">How long to wait before execution.</param>
         /// <param name="callback">The task to be executed.</param>
         /// <returns>A <see cref="ScheduledTask{T}"/></returns>
-        public ScheduledTask<T> ScheduleTask<T>(T state, TimeSpan executeIn, Func<T, Task> callback)
+        public ScheduledTask<T> ScheduleTask<T>(T state, TimeSpan executeIn, Func<T, Task> callback,ulong id = 0)
         {
             ArgChecks(executeIn);
-            return ScheduleTask(state, DateTimeOffset.UtcNow.Add(executeIn), callback);
+            return ScheduleTask(state, DateTimeOffset.UtcNow.Add(executeIn), callback, id);
         }
 
         /// <summary>
