@@ -69,6 +69,7 @@ namespace MummyBot
 
             var mummybot = new BotStartup(services);
             await mummybot.StartAsync(types);
+            await Task.Delay(-1);
         }
     }
 }
