@@ -17,10 +17,10 @@ namespace Mummybot.Commands.Modules
         public async Task Color(int r,int g,int b,SocketGuildUser user= null)
         {
             user = user ?? Context.User;
-            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.IsHoisted);
+            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r=>r.Name.Equals(Context.User.Username,StringComparison.InvariantCultureIgnoreCase));
             var color = new Discord.Color(r, g, b);
             if (role is null)
-                role = await Context.Guild.CreateRoleAsync(Context.User.GetDisplayName(), color: color, isHoisted: true);
+                role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: true);
             else
                 await role.ModifyAsync(r => r.Color= color);            
         }
@@ -29,10 +29,10 @@ namespace Mummybot.Commands.Modules
         public async Task Color(uint hex, SocketGuildUser user = null)
         {
             user = user ?? Context.User;
-            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.IsHoisted);
+            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.Name.Equals(Context.User.Username, StringComparison.InvariantCultureIgnoreCase));
             var color = new Discord.Color(hex);
             if (role is null)
-                role = await Context.Guild.CreateRoleAsync(Context.User.GetDisplayName(), color: color, isHoisted: true);
+                role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: true);
             else
                 await role.ModifyAsync(r => r.Color = color);
         }
