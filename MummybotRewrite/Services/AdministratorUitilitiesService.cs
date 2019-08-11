@@ -23,9 +23,10 @@ namespace Mummybot.Services
 
         public async Task VoiceMute(MummyContext ctx, SocketGuildUser user, TimeSpan time)
         {
-            IRole role = ctx.Guild.Roles.FirstOrDefault(r => r.Name.Equals("muted", StringComparison.InvariantCultureIgnoreCase));
+            string rolename = "voice muted";
+            IRole role = ctx.Guild.Roles.FirstOrDefault(r => r.Name.Equals(rolename, StringComparison.InvariantCultureIgnoreCase));
             if (role is null)
-                role = await ctx.Guild.CreateRoleAsync("voice muted", new Discord.GuildPermissions(speak: false));
+                role = await ctx.Guild.CreateRoleAsync(rolename, new Discord.GuildPermissions(speak: false));
 
             user.AddRoleAsync(role);
             var id = SnowFlakeGenerator.NextLong();
