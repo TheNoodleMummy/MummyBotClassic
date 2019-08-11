@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
-    class AdministratorUtilities : MummyModule
+    public class AdministratorUtilities : MummyModule
     {
 
         [Group("voice")]

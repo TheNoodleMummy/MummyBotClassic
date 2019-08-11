@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    class AdministratorUitilitiesService : BaseService
+    public class AdministratorUitilitiesService : BaseService
     {
         private readonly TaskQueue TaskQueue;
         private readonly SnowFlakeGeneratorService SnowFlakeGenerator;
