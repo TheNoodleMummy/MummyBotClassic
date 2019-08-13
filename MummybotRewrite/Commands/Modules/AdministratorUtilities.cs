@@ -19,13 +19,25 @@ namespace Mummybot.Commands.Modules
         [Group("voice")]
         public class AdministratorVoiceUtilities : MummyModule
         {
-            public AdministratorUitilitiesService AdministratorService { get; set; }
-
-            [Command("mute")]
-            [RequirePermissions(Enums.PermissionTarget.Bot,guildPerms: GuildPermission.ManageRoles)]
-            public async Task VoiceMute(TimeSpan time, SocketGuildUser user)
+            [Group("mute")]
+            public class AdministratorMuteUtilities : MummyModule
             {
-                await AdministratorService.VoiceMute(Context, user, time);
+                public AdministratorUitilitiesService AdministratorService { get; set; }
+
+                [Command]
+                [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
+                public async Task VoiceMute(SocketGuildUser user, TimeSpan howlong)
+                {
+                    await AdministratorService.VoiceMute(Context, user, howlong);
+                }
+
+                //[Command("cancel")]
+                //[RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
+                //public async Task VocieMuteCancel(SocketGuildUser user)
+                //{
+                //    await AdministratorService.CancelMuteAsync(user);
+                //}
+
             }
         }
     }

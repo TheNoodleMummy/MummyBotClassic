@@ -12,6 +12,8 @@ namespace Mummybot.Database
 {
     public class GuildStore : DbContext
     {
+        [Obsolete("dont use this ya dummy but use the ctor with snowflake param")]
+        public GuildStore() { }
         
         public GuildStore(SnowFlakeGeneratorService snowflakes)
         {
@@ -27,7 +29,7 @@ namespace Mummybot.Database
         public SemaphoreSlim Slim = new SemaphoreSlim(1, 1);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer(ConfigService.GetRuntimeDB());
+            => optionsBuilder.UseSqlServer(ConfigService.GetDebugDB());
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +47,18 @@ namespace Mummybot.Database
                 guild.HasMany(x => x.Stars)
                 .WithOne(y => y.Guild)
                 .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.Birthdays)
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.VoiceMutedUsers)
+               .WithOne(y => y.Guild)
+               .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.Reminders)
+               .WithOne(y => y.Guild)
+               .HasForeignKey(z => z.GuildID);
             });
             modelBuilder.Entity<Prefixes>(prefix =>
             {
@@ -68,6 +82,12 @@ namespace Mummybot.Database
             {
                 birthday.HasKey(x => x.Id);
                 birthday.Property(x => x.Id)
+                .ValueGeneratedNever();
+            });
+            modelBuilder.Entity<VoiceMutedUser>(vmu =>
+            {
+                vmu.HasKey(x => x.Id);
+                vmu.Property(x => x.Id)
                 .ValueGeneratedNever();
             });
         }

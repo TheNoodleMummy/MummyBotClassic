@@ -32,10 +32,9 @@ namespace Mummybot.Commands.TypeReaders
                     var match = users.Where(x =>
                         x.Username.Equals(value, StringComparison.OrdinalIgnoreCase)
                         || (x as SocketGuildUser).Nickname.Equals(value, StringComparison.OrdinalIgnoreCase)).ToList();
-                    if (match.Count > 1)
-                        return TypeParserResult<TUser>.Unsuccessful(
-                            "Multiple users found, try mentioning the user or using their ID.")
-                        ;
+                if (match.Count > 1)
+                    return TypeParserResult<TUser>.Unsuccessful(
+                        "Multiple users found, try mentioning the user or using their ID.");
 
                     user = match.FirstOrDefault();
                 }

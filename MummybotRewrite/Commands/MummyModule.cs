@@ -22,12 +22,12 @@ namespace Mummybot.Commands
         protected Task<IUserMessage> ReplyAsync(string content = "", EmbedBuilder embed = null, string FileName = "", Stream Stream = null)
             => MessageService.SendAsync(Context, x => { x.Content = content; x.Embed = embed?.Build(); x.FileName = FileName; x.Stream = Stream; });
 
-        protected override async Task BeforeExecutedAsync()
+        protected override async ValueTask BeforeExecutedAsync()
         {
             GuildConfig = await GuildStore.GetGuildForModule(Context.Guild);
         }
 
-        protected override async Task AfterExecutedAsync()
+        protected override async ValueTask AfterExecutedAsync()
         {
             GuildStore.Update(GuildConfig);
             await GuildStore.SaveChangesAsync();

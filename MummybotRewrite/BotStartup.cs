@@ -1,7 +1,6 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
-using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes;
 using Mummybot.Commands.TypeReaders;

@@ -25,21 +25,26 @@ namespace Mummybot.Commands.Modules
                 var pages = new List<string>();
                 foreach (var module in _commands.GetAllModules())
                 {
-                    string description = null;
-                    foreach (var cmd in module.Commands)
+                    var modulechecks = await module.RunChecksAsync(Context, Services);
+                    if (modulechecks.IsSuccessful)
                     {
-                        var result = await cmd.RunChecksAsync(Context, Services);
-                        if (result.IsSuccessful)
-                            description += $"{prefixes?.FirstOrDefault()?.Prefix??Context.Client.CurrentUser.Mention}{cmd?.FullAliases?.First()}\n";
-                    }
+                        string description = null;
+                        foreach (var cmd in module.Commands)
+                        {
+                            var commandchecks = await cmd.RunChecksAsync(Context, Services);
+                            if (commandchecks.IsSuccessful)
+                                description += $"{prefixes?.FirstOrDefault()?.Prefix ?? Context.Client.CurrentUser.Mention}{cmd?.FullAliases?.First()}\n";
+                        }
 
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append("**__").Append(module.Name).Append("__\n").Append(module.Description).AppendLine("**");
-                        sb.AppendLine(description);
-                        pages.Add(sb.ToString());
+                        if (!string.IsNullOrWhiteSpace(description))
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append("**__").Append(module.Name).Append("__\n").Append(module.Description).AppendLine("**");
+                            sb.AppendLine(description);
+                            pages.Add(sb.ToString());
+                        }
                     }
+                    
                 }
 
                 var msg = new PaginatedMessage

@@ -18,6 +18,11 @@ namespace Mummybot.Services
         {
             return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText("Connections.json")).RuntimeDB;
         }
+
+        public static string GetDebugDB()
+        {
+            return JsonConvert.DeserializeObject<ConnectionStrings>(File.ReadAllText("Connections.json")).DebugDB;
+        }
     }
 
     public class ConnectionStrings

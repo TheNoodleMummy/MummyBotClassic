@@ -61,8 +61,8 @@ namespace Mummybot.Services
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
-            _commands.CommandErrored += CommandErroredAsync;
-            _commands.CommandExecuted += CommandExecutedAsync;
+            _commands.CommandExecutionFailed += CommandErroredAsync; //fires for parralel command that had a exception
+            _commands.CommandExecuted += CommandExecutedAsync;//fires for parralel command that went ok
             var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
 
             _client.MessageReceived += msg =>
@@ -201,11 +201,12 @@ namespace Mummybot.Services
                 {
                     var commandContext = MummyContext.Create(_client, message,_services.GetRequiredService<HttpClient>(),_services, prefix ,isEdit);
 
-                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
-                        _logger.LogInformation(result.ToString(), LogSource.Commands);
+                    var result = await _commands.ExecuteAsync(output, commandContext, _services);                       
 
                     if (!result.IsSuccessful)
-                        await SendAsync(commandContext, x => x.Content = result.ToString());
+                        _logger.LogError(result.ToString(),LogSource.Commands);
+                    else
+                        _logger.LogInformation(result.ToString(), LogSource.Commands);
 
                     if (result is CommandNotFoundResult notfoundresult)
                     {
@@ -213,10 +214,33 @@ namespace Mummybot.Services
                         result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
                         _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
                     }
-                    if (result is OverloadsFailedResult overloadsFailedResult)
+                    else if (result is OverloadsFailedResult overloadsFailedResult)
                     {
                         Console.Write(string.Join(Environment.NewLine, overloadsFailedResult.FailedOverloads.Select(x => $"{x.Key}: {x.Value}")));
                     }
+                    else if (result is ChecksFailedResult checks)
+                    {
+                        var emb = new EmbedBuilder();
+                        foreach (var item in checks.FailedChecks.Take(25))
+                        {
+                            emb.AddField(item.Check.ToString(), item.Result.Reason,true);
+                        }
+                        SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
+                    }
+                    else if (result is TypeParseFailedResult parser)
+                    {
+                        var emb = new EmbedBuilder();
+                        emb.AddField(parser.Parameter.Name, parser.Value);
+                        SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
+                    }
+                    //else if (result is ArgumentParseFailedResult argumentParse)
+                    //{
+                    //    var emb = new EmbedBuilder();
+                    //    var postion = argumentParse.ParserResult.Arguments. ?? 1;
+                    //    emb.AddField(argumentParse.Reason,$"{argumentParse.RawArguments}\n{string.Concat(Enumerable.Repeat(" ",postion-1))}^");
+                    //    SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
+                    //}
+
 
 
                 }
@@ -227,7 +251,7 @@ namespace Mummybot.Services
             }
         }
 
-        private async Task CommandErroredAsync(CommandErroredEventArgs args)
+        private async Task CommandErroredAsync(CommandExecutionFailedEventArgs args)
         {
             var context = (MummyContext)args.Context;
 

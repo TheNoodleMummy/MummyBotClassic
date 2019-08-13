@@ -14,13 +14,13 @@ namespace Mummybot.Services
 {
     public class LogService : BaseService
     {
-        public string _logDirectory => Path.Combine(DateTime.Now.ToString("MMM"));
+        public string _logDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));
         public string _logfile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
 
 
         public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
-
-        public Task LogEventAsync(LogMessage log)
+        public Task LogEventAsync(LogMessage log) => LogEventCustomAsync(new Structs.LogMessage(log.Severity, log.Source, log.Message, log.Exception));
+        public Task LogEventCustomAsync(Structs.LogMessage log)
         {
             ss.Wait();
             var source = log.Source;
@@ -96,6 +96,53 @@ namespace Mummybot.Services
             Console.ResetColor();
             Console.Write("] ");
 
+            if (log.Guild != null)
+            {
+                Console.Write("[");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                if (log.Guild.Id.ToString().Length > 20)
+                {
+                    Console.Write($"Id to long");
+                }
+                else
+                {
+                    Console.Write(log.Guild.Id.ToString());
+                }
+                Console.Write("/");
+                if (log.Guild.Name.Length < 15)
+                {
+                    var builder = new StringBuilder(15);
+                    builder.Append(log.Guild.Name);
+                    builder.Append(' ', 15 - log.Guild.Name.Length);
+                    Console.Write($"{builder}");
+                }
+                else if (log.Guild.Name.Length > 15)
+                {
+                    Console.Write($"{log.Guild.Name.Substring(0, 15)}");
+                }
+                else
+                {
+                    Console.Write(log.Guild.Name);
+                }
+                Console.ResetColor();
+                Console.Write("] ");
+            }
+            else
+            {
+                Console.Write("[");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                var builder = new StringBuilder(40);
+                builder.Append("No Guild Specified");
+                builder.Append(' ', 34 - "No Guild Specified".Length);
+                Console.Write($"{builder}");
+            
+                Console.ResetColor();
+                Console.Write("] ");
+            }
+            
+
             if (!string.IsNullOrEmpty(message))
                 Console.Write(string.Join("", message.Where(x => !char.IsControl(x))));
 
@@ -133,22 +180,22 @@ namespace Mummybot.Services
         internal Task LogLavalink(LogMessage arg1)
         => LogEventAsync(arg1);
 
-        internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Debug, source.ToString(), Message, exception));
+        internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null,SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception,Guild));
 
-        internal void LogWarning(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Warning, source.ToString(), Message, exception));
+        internal void LogWarning(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Warning, source.ToString(), Message, exception,Guild));
 
-        internal void LogVerbose(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Verbose, source.ToString(), Message, exception));
+        internal void LogVerbose(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Verbose, source.ToString(), Message, exception, Guild));
 
-        internal void LogCritical(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Critical, source.ToString(), Message, exception));
+        internal void LogCritical(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Critical, source.ToString(), Message, exception, Guild));
 
-        internal void LogError(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Error, source.ToString(), Message, exception));
+        internal void LogError(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
 
-        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
-        => LogEventAsync(new LogMessage(LogSeverity.Info, source.ToString(), Message, exception));
+        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
+        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
     }
 }

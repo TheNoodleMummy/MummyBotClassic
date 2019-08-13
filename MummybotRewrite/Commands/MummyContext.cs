@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Mummybot.Enums;
+using Mummybot.Services;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -30,11 +32,38 @@ namespace Mummybot.Commands
         public SocketGuild Guild => User.Guild;
         public HttpClient HTTP { get; }
         public IServiceProvider ServiceProvider { get; }
+        public LogService LogService {get;}
         public string PrefixUsed { get; }
 
         public bool IsEdit { get; set; }
 
-        internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
+
+        public ulong ChannelId => Channel.Id;
+        public ulong UserId => User.Id;
+        public ulong GuildId => Guild.Id;
+
+
+
+        internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+       => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception, Guild));
+
+        internal void LogWarning(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Warning, source.ToString(), Message, exception, Guild));
+
+        internal void LogVerbose(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Verbose, source.ToString(), Message, exception, Guild));
+
+        internal void LogCritical(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Critical, source.ToString(), Message, exception, Guild));
+
+        internal void LogError(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
+
+        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
+        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
+    
+
+    internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
         {
             return new MummyContext(client, message, hTTP, serviceProvider, prefixUsed, isEdit)
             {

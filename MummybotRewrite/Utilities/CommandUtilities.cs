@@ -34,49 +34,49 @@ namespace Mummybot
 
             switch (result)
             {
-                case ArgumentParseFailedResult argumentParseFailedResult:
-                    switch (argumentParseFailedResult.ArgumentParserFailure)
-                    {
-                        case ArgumentParserFailure.UnclosedQuote:
-                        case ArgumentParserFailure.UnexpectedQuote:
-                        case ArgumentParserFailure.NoWhitespaceBetweenArguments:
-                        case ArgumentParserFailure.TooManyArguments:
+                //case ArgumentParseFailedResult argumentParseFailedResult:
+                    //switch (argumentParseFailedResult.)
+                    //{
+                    //    case ArgumentParserFailure.UnclosedQuote:
+                    //    case ArgumentParserFailure.UnexpectedQuote:
+                    //    case ArgumentParserFailure.NoWhitespaceBetweenArguments:
+                    //    case ArgumentParserFailure.TooManyArguments:
 
-                            var position = argumentParseFailedResult.Position ??
-                                           throw new QuahuLiedException("Result.Position");
+                    //        var position = argumentParseFailedResult.Position ??
+                    //                       throw new QuahuLiedException("Result.Position");
 
-                            var padding = position + context.PrefixUsed.Length 
-                                                   + string.Join(' ', context.Path).Length + 2;
+                    //        var padding = position + context.PrefixUsed.Length 
+                    //                               + string.Join(' ', context.Path).Length + 2;
 
-                            var leftPad = "^".PadLeft(padding, ' ');
-                            var rightPad = leftPad.PadRight(context.Message.Content.Length, '^');
+                    //        var leftPad = "^".PadLeft(padding, ' ');
+                    //        var rightPad = leftPad.PadRight(context.Message.Content.Length, '^');
 
-                            message = string.Concat(
-                                result.Reason,
-                                "\n```",
-                                $"\n{context.Message.Content}\n",
-                                rightPad,
-                                "\n```");
+                    //        message = string.Concat(
+                    //            result.Reason,
+                    //            "\n```",
+                    //            $"\n{context.Message.Content}\n",
+                    //            rightPad,
+                    //            "\n```");
 
-                            builder.WithDescription(message);
-                            break;
+                    //        builder.WithDescription(message);
+                    //        break;
 
-                        case ArgumentParserFailure.TooFewArguments:
+                    //    case ArgumentParserFailure.TooFewArguments:
 
-                            var cmd = argumentParseFailedResult.Command;
-                            var parameters = cmd.Parameters;
+                    //        var cmd = argumentParseFailedResult.Command;
+                    //        var parameters = cmd.Parameters;
 
-                            var response = string.Concat(
-                                result.Reason,
-                                "\n",
-                                cmd.FullAliases.First(),
-                                " ",
-                                string.Join(' ', parameters.Select(x => x.Name)));
+                    //        var response = string.Concat(
+                    //            result.Reason,
+                    //            "\n",
+                    //            cmd.FullAliases.First(),
+                    //            " ",
+                    //            string.Join(' ', parameters.Select(x => x.Name)));
 
-                            builder.WithDescription(response);
-                            break;
-                    }
-                    break;
+                    //        builder.WithDescription(response);
+                    //        break;
+                    //}
+                    //break;
 
                 case ChecksFailedResult checksFailedResult:
                     message = string.Concat(
