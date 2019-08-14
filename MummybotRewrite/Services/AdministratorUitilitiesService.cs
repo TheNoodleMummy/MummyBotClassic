@@ -85,15 +85,15 @@ namespace Mummybot.Services
 
         }
 
-        public async Task CancelMuteAsync(SocketGuildUser user)
-        {
+        //public async Task CancelMuteAsync(SocketGuildUser user)
+        //{
 
-        }
+        //}
 
         public async Task VoiceMuteCallback(VoiceMutedUser args)
         {
             var user = DiscordClient.GetGuild(args.GuildID).GetUser(args.UserID);
-            user.ModifyAsync(user => user.Mute = false);
+            await user.ModifyAsync(user => user.Mute = false);
             using (var store = ServiceProvider.GetRequiredService<GuildStore>())
             {
                 var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);

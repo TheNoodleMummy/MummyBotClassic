@@ -22,7 +22,7 @@ namespace Mummybot.Commands.Modules
             if (role is null)
             {
                 role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: true);
-                user.AddRoleAsync(role);
+                await user.AddRoleAsync(role);
             }
             else
                 await role.ModifyAsync(r => r.Color = color);            
@@ -38,7 +38,7 @@ namespace Mummybot.Commands.Modules
             if (role is null)
             {
                 role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: true);
-                user.AddRoleAsync(role);
+                await user.AddRoleAsync(role);
             }
             else
                 await role.ModifyAsync(r => r.Color = color);

@@ -225,13 +225,13 @@ namespace Mummybot.Services
                         {
                             emb.AddField(item.Check.ToString(), item.Result.Reason,true);
                         }
-                        SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
+                        await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
                     else if (result is TypeParseFailedResult parser)
                     {
                         var emb = new EmbedBuilder();
                         emb.AddField(parser.Parameter.Name, parser.Value);
-                        SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
+                        await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
                     //else if (result is ArgumentParseFailedResult argumentParse)
                     //{
