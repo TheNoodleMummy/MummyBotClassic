@@ -41,6 +41,6 @@ on_failure:
 
   
 after_deploy:
-  - ps: Update-Database -Context guildstore
+  - cmd: dotnet ef database update
   - ps: start-sleep -s 60
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
