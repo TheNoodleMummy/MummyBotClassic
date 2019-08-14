@@ -4,7 +4,10 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot;
+using Mummybot.Commands;
 using Mummybot.Database;
+using Mummybot.Enums;
+using Mummybot.Exceptions;
 using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
@@ -46,7 +49,8 @@ namespace MummyBot
                  .AddSingleton<Random>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
-                     StringComparison = StringComparison.CurrentCultureIgnoreCase
+                     StringComparison = StringComparison.CurrentCultureIgnoreCase,
+                     CooldownBucketKeyGenerator = CoolDownBucketGenerator
                  })
                  .AddTypeParsers(assembly))
                  .AddSingleton<Random>()
@@ -57,7 +61,7 @@ namespace MummyBot
 
             using (var scope = services.CreateScope())
             using (var tokenstore = services.GetRequiredService<TokenStore>())
-            using (var guildstore = services.GetRequiredService<GuildStore>())           
+            using (var guildstore = services.GetRequiredService<GuildStore>())
             {
                 await tokenstore.Database.MigrateAsync();
                 await guildstore.Database.MigrateAsync();
@@ -68,6 +72,36 @@ namespace MummyBot
 
             var mummybot = new BotStartup(services);
             await mummybot.StartAsync(types);
+        }
+
+        public object CoolDownBucketGenerator(object bucketType, CommandContext context, IServiceProvider provider)
+        {
+            if (!(context is MummyContext ctx))
+            {
+                throw new InvalidContextException(context.GetType());
+            }
+            object obj = null;
+            if (bucketType is CooldownBucketType CBT)
+                switch (CBT)
+                {
+                    case CooldownBucketType.Guilds:
+                        obj = ctx.GuildId;
+                        break;
+                    case CooldownBucketType.User:
+                        obj = ctx.UserId;
+                        break;
+                    case CooldownBucketType.Channels:
+                        obj = ctx.ChannelId;
+                        break;
+                    case CooldownBucketType.Global:
+                        obj = ctx.Command;
+                        break;
+                    default:
+                        throw new InvalidOperationException("got unexpected cooldownbuckettype");
+                        break;
+                }
+            
+            return obj;
         }
     }
 }

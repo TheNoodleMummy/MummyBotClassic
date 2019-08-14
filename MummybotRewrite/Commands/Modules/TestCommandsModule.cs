@@ -1,4 +1,5 @@
 using Mummybot.Attributes.Checks;
+using Mummybot.Enums;
 using Qmmands;
 using System;
 using System.Threading.Tasks;
@@ -9,9 +10,10 @@ namespace Mummybot.Commands.Modules
 	public class TestCommandModule : MummyModule
     {
         [Command("test")]
-		public async Task Test([Remainder]DateTimeOffset dateTime)
+        [Cooldown(1,1,CooldownMeasure.Hours,CooldownBucketType.User)]
+		public async Task Test()
         {
-            await ReplyAsync(dateTime.ToString());
+            await ReplyAsync(Context.Message.Content);
         }
     }
 }

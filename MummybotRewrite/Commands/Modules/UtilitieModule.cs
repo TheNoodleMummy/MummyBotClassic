@@ -30,11 +30,11 @@ namespace Mummybot.Commands.Modules
 
         [Command("color")]
         [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
-        public async Task Color(uint hex, SocketGuildUser user = null)
+        public async Task Color(uint rawhex, SocketGuildUser user = null)
         {
             user ??= Context.User;
             IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.Name.Equals(Context.User.Username, StringComparison.InvariantCultureIgnoreCase));
-            var color = new Discord.Color(hex);
+            var color = new Discord.Color(rawhex);
             if (role is null)
             {
                 role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: false);
