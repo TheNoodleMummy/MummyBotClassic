@@ -1,6 +1,7 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
+using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes;
 using Mummybot.Commands;
@@ -156,7 +157,7 @@ namespace Mummybot.Services
 
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
-            if (message.Author.IsBot && message.Author.Id != _client.CurrentUser.Id)
+            if (message.Author.IsBot)
                 return;
 
             if (!(message.Channel is SocketTextChannel textChannel) ||
@@ -168,7 +169,7 @@ namespace Mummybot.Services
             using (var guildStore = _services.GetService<GuildStore>())
             {
                 var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
-                prefixes = guild.Prefixes.Select(x=>x.Prefix);
+                prefixes = guild.Prefixes.Select(x => x.Prefix);
 
                 if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
                     _ = Task.Run(async () =>
@@ -199,12 +200,12 @@ namespace Mummybot.Services
 
                 try
                 {
-                    var commandContext = MummyContext.Create(_client, message,_services.GetRequiredService<HttpClient>(),_services, prefix ,isEdit);
+                    var commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
 
-                    var result = await _commands.ExecuteAsync(output, commandContext, _services);                       
+                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
 
                     if (!result.IsSuccessful)
-                        _logger.LogError(result.ToString(),LogSource.Commands);
+                        _logger.LogError(result.ToString(), LogSource.Commands);
                     else
                         _logger.LogInformation(result.ToString(), LogSource.Commands);
 
@@ -223,7 +224,7 @@ namespace Mummybot.Services
                         var emb = new EmbedBuilder();
                         foreach (var item in checks.FailedChecks.Take(25))
                         {
-                            emb.AddField(item.Check.ToString(), item.Result.Reason,true);
+                            emb.AddField(item.Check.ToString(), item.Result.Reason, true);
                         }
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
@@ -240,9 +241,39 @@ namespace Mummybot.Services
                     //    emb.AddField(argumentParse.Reason,$"{argumentParse.RawArguments}\n{string.Concat(Enumerable.Repeat(" ",postion-1))}^");
                     //    SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     //}
-
-
-
+                    else if (result is CommandOnCooldownResult ccr)
+                    {
+                        var emb = new EmbedBuilder();
+                        emb.WithTitle(ccr.Command.Name + " is on cooldown");
+                        foreach (var item in ccr.Cooldowns)
+                        {
+                            if (Enum.TryParse<CooldownBucketType>(item.Cooldown.BucketType.ToString(), true, out var enumeration))
+                                switch (enumeration)
+                                {
+                                    case CooldownBucketType.Guilds:
+                                        emb.WithAuthor(commandContext.Guild.Name, commandContext.Guild.IconUrl);
+                                        emb.AddField("Guild on Cooldown", $"retry in {item.RetryAfter}");
+                                        break;
+                                    case CooldownBucketType.Channels:
+                                        emb.WithAuthor(commandContext.Channel.Name);
+                                        emb.AddField("channel on Cooldown", $"retry in {item.RetryAfter}");
+                                        break;
+                                    case CooldownBucketType.User:
+                                        emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
+                                        emb.AddField("channel on Cooldown", $"retry in {item.RetryAfter}");
+                                        break;
+                                    case CooldownBucketType.Global:
+                                        emb.WithAuthor(commandContext.Guild.CurrentUser.GetDisplayName(), commandContext.Guild.CurrentUser.GetAvatarOrDefaultUrl());
+                                        emb.AddField("channel on Cooldown", $"retry in {item.RetryAfter}");
+                                        break;
+                                    default:
+                                        throw new InvalidOperationException($"got unhandled bucketType");
+                                        break;
+                                }
+                            else
+                                throw new InvalidOperationException($"got invalid CooldownBucketType expected: {typeof(CooldownBucketType)} got: {item.Cooldown.BucketType}");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -272,7 +303,7 @@ namespace Mummybot.Services
         private Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
             var context = (MummyContext)args.Context;
-            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}} in {{{context.Guild.Name}/{context.Channel.Name}}}", LogSource.Commands);
+            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands,Guild:context.Guild);
 
             return Task.CompletedTask;
         }
