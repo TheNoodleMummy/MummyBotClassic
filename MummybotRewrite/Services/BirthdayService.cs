@@ -1,6 +1,7 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
@@ -16,17 +17,17 @@ namespace Mummybot.Services
     public class BirthdayService : BaseService
     {
         private readonly TaskQueue _taskQueue;
-        private readonly GuildStore _guildStore;
         private readonly DiscordSocketClient _discordClient;
         private readonly SnowFlakeGeneratorService _snowFlakeGenerator;
+        private readonly IServiceProvider serviceProvider;
 
-        public BirthdayService(TaskQueue taskQueue, GuildStore guildStore, DiscordSocketClient discord, LogService logService, SnowFlakeGeneratorService snowFlake)
+        public BirthdayService(TaskQueue taskQueue, DiscordSocketClient discord, LogService logService, SnowFlakeGeneratorService snowFlake,IServiceProvider services)
         {
             _taskQueue = taskQueue;
-            _guildStore = guildStore;
             _discordClient = discord;
             LogService = logService;
             _snowFlakeGenerator = snowFlake;
+            serviceProvider = services;
         }
 
         public override Task InitialiseAsync(IServiceProvider services)
@@ -37,7 +38,9 @@ namespace Mummybot.Services
         /// </summary>
         internal async Task<BirthdayResult> RegisterBirthdayAsync(MummyContext context, DateTimeOffset dateTimeOffset, ulong userid = 0)
         {
-            var guildconfig = await _guildStore.GetOrCreateGuildAsync(context.Guild.Id, x => x.Birthdays);
+            using var guildstore = serviceProvider.GetRequiredService<GuildStore>();
+
+            var guildconfig = await guildstore.GetOrCreateGuildAsync(context.Guild.Id, x => x.Birthdays);
             Birthday birthday;
             ulong id = _snowFlakeGenerator.NextLong();
             DateTimeOffset nextbdayUTC = dateTimeOffset.AddYears(DateTimeOffset.UtcNow.Year - dateTimeOffset.ToUniversalTime().Year);
@@ -48,14 +51,14 @@ namespace Mummybot.Services
             try
             {
                 guildconfig.Birthdays.Add(birthday);
-                _guildStore.Update(guildconfig);
-                await _guildStore.SaveChangesAsync();
+                guildstore.Update(guildconfig);
+                await guildstore.SaveChangesAsync();
                 var dbbday = guildconfig.Birthdays.Find(b => b.Id == id);
                 return new BirthdayResult() { Birthday = dbbday, IsSuccess = true };
             }
             catch (Exception ex)
             {
-                return new BirthdayResult() { Birthday = null, IsSuccess = false, ErrorReason = "Something went wrong",Exception = ex };
+                return new BirthdayResult() { Birthday = null, IsSuccess = false, ErrorReason = "Something went wrong", Exception = ex };
             }
         }
 
@@ -64,14 +67,16 @@ namespace Mummybot.Services
         /// </summary>
         private async Task NextBirthday()
         {
-            var bdays = (await _guildStore.GetAllGuildsAsync(x => x.Birthdays)).SelectMany(x => x.Birthdays).OrderByDescending(b => b.NextBdayUTC.ToUniversalTime());
+            using var guildstore = serviceProvider.GetRequiredService<GuildStore>();
+
+            var bdays = (await guildstore.GetAllGuildsAsync(x => x.Birthdays)).SelectMany(x => x.Birthdays).OrderByDescending(b => b.NextBdayUTC.ToUniversalTime());
             var expiredbdays = bdays.Where(b => b.NextBdayUTC < DateTimeOffset.UtcNow);
             foreach (var birthday in expiredbdays)
             {
                 await ExpiredBirthdayCallbackAsync(birthday);
             }
 
-            var bday = (await _guildStore.GetAllGuildsAsync(x => x.Birthdays))
+            var bday = (await guildstore.GetAllGuildsAsync(x => x.Birthdays))
                 .SelectMany(x => x.Birthdays)
                 .OrderByDescending(b => b.NextBdayUTC.ToUniversalTime())
                 .FirstOrDefault(b => b.NextBdayUTC > DateTimeOffset.UtcNow);
@@ -91,7 +96,9 @@ namespace Mummybot.Services
         /// <returns></returns>
         private async Task ExpiredBirthdayCallbackAsync(Birthday birthday)
         {
-            var guildconfig = await _guildStore.GetOrCreateGuildAsync(birthday.GuildID, x => x.Birthdays);
+            using var guildstore = serviceProvider.GetRequiredService<GuildStore>();
+
+            var guildconfig = await guildstore.GetOrCreateGuildAsync(birthday.GuildID, x => x.Birthdays);
             if (!guildconfig.UsesBirthdays)
                 return;
             var age = DateTimeOffset.UtcNow.Year - birthday.BDay.ToUniversalTime().Year;
@@ -113,8 +120,8 @@ namespace Mummybot.Services
             birthday.NextBdayUTC = birthday.NextBdayUTC.AddYears(1);
             var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
             bday = birthday;
-            _guildStore.Update(guildconfig);
-            await _guildStore.SaveChangesAsync();
+            guildstore.Update(guildconfig);
+            await guildstore.SaveChangesAsync();
         }
 
         /// <summary>
@@ -123,7 +130,9 @@ namespace Mummybot.Services
         /// <param name="birthday"></param>
         public async Task BirthdayCallbackAsync(Birthday birthday)
         {
-            var guildconfig = await _guildStore.GetOrCreateGuildAsync(birthday.GuildID, x => x.Birthdays);
+            using var guildstore = serviceProvider.GetRequiredService<GuildStore>();
+
+            var guildconfig = await guildstore.GetOrCreateGuildAsync(birthday.GuildID, x => x.Birthdays);
             if (!guildconfig.UsesBirthdays)
                 return;
             var age = DateTimeOffset.UtcNow.Year - birthday.BDay.ToUniversalTime().Year;
@@ -143,8 +152,8 @@ namespace Mummybot.Services
             birthday.NextBdayUTC = birthday.NextBdayUTC.AddYears(1);
             var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
             bday = birthday;
-            _guildStore.Update(guildconfig);
-            await _guildStore.SaveChangesAsync();
+            guildstore.Update(guildconfig);
+            await guildstore.SaveChangesAsync();
         }
     }
 

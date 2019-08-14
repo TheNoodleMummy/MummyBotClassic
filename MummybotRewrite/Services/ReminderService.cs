@@ -14,14 +14,12 @@ namespace Mummybot.Services
     public class ReminderService : BaseService
     {
         public TaskQueue TaskQueue { get; }
-        public GuildStore GuildStore { get; }
         public DiscordSocketClient DiscordClient { get; }
         private readonly IServiceProvider _services;
 
-        public ReminderService(TaskQueue taskQueue, GuildStore guildStore,DiscordSocketClient discordclient,LogService logService,IServiceProvider service)
+        public ReminderService(TaskQueue taskQueue, DiscordSocketClient discordclient, LogService logService, IServiceProvider service)
         {
             TaskQueue = taskQueue;
-            GuildStore = guildStore;
             DiscordClient = discordclient;
             LogService = logService;
             _services = service;
@@ -29,6 +27,8 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
+            using var GuildStore = _services.GetRequiredService<GuildStore>();
+
             var guildconfigs = await GuildStore.GetAllGuildsAsync(x => x.Reminders);
             foreach (Guild guild in guildconfigs)
             {
@@ -37,7 +37,7 @@ namespace Mummybot.Services
                 if (guild.UsesReminders)
                 {
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
-                    LogService.LogInformation($"Executing {reminders.Count} expired reminders.", LogSource.ReminderService,Guild: socketguild);
+                    LogService.LogInformation($"Executing {reminders.Count} expired reminders.", LogSource.ReminderService, Guild: socketguild);
                     foreach (Reminder reminder in reminders)
                     {
                         await ReminderCallbackAsync(reminder);
@@ -48,7 +48,7 @@ namespace Mummybot.Services
                 {
                     LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService, Guild: socketguild);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
-                    LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService,Guild:socketguild);
+                    LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService, Guild: socketguild);
                     foreach (Reminder reminder in reminders)
                     {
                         guild.Reminders.Remove(reminder);
@@ -65,11 +65,11 @@ namespace Mummybot.Services
 
         }
 
-        public void RegisterReminder(Reminder reminder,ulong id)
+        public void RegisterReminder(Reminder reminder, ulong id)
         {
             var guild = DiscordClient.GetGuild(reminder.GuildID);
-            TaskQueue.ScheduleTask(reminder, reminder.ExpiresAtUTC, ReminderCallbackAsync,id);
-            LogService.LogInformation($"Set Reminder at {reminder.ExpiresAtUTC}UTC", Enums.LogSource.ReminderService,Guild:guild);
+            TaskQueue.ScheduleTask(reminder, reminder.ExpiresAtUTC, ReminderCallbackAsync, id);
+            LogService.LogInformation($"Set Reminder at {reminder.ExpiresAtUTC}UTC", Enums.LogSource.ReminderService, Guild: guild);
         }
 
         public async Task ReminderCallbackAsync(Reminder reminder)
@@ -121,13 +121,12 @@ namespace Mummybot.Services
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
 
 
-            using (var store = _services.GetRequiredService<GuildStore>())
-            {
-                var guildconfig = await store.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
-                guildconfig.Reminders.Remove(reminder);
-                store.Update(guildconfig);
-                await store.SaveChangesAsync();
-            }
+            using var GuildStore = _services.GetRequiredService<GuildStore>();
+            var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
+            guildconfig.Reminders.Remove(reminder);
+            GuildStore.Update(guildconfig);
+            await GuildStore.SaveChangesAsync();
+
         }
     }
 }

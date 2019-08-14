@@ -18,7 +18,7 @@ namespace Mummybot.Services
         {
             _client = client;
             _snowFlakeGenerator = snowFlakeGenerator;
-            LogService = LogService;
+            LogService = logService;
         }
 
         
@@ -29,7 +29,7 @@ namespace Mummybot.Services
             {
                 if (channel is SocketTextChannel Textchannel)
                 {
-                    var guildstore = services.GetService<GuildStore>();
+                    using var guildstore = services.GetService<GuildStore>();
                     var guild = await guildstore.GetOrCreateGuildAsync(Textchannel.Guild, g => g.Stars);
                     if (guild.UsesStarBoard && guild.StarboardEmote == reaction.Emote.Name)
                     {
@@ -81,7 +81,7 @@ namespace Mummybot.Services
             {
                 if (channel is SocketTextChannel Textchannel)
                 {
-                    var guildstore = services.GetService<GuildStore>();
+                    using var guildstore = services.GetService<GuildStore>();
                     var guild = await guildstore.GetOrCreateGuildAsync(Textchannel.Guild, g => g.Stars);
                     if (guild.UsesStarBoard && guild.StarboardEmote == reaction.Emote.Name)
                     {

@@ -56,10 +56,9 @@ namespace MummyBot
             services.GetRequiredService<MessageService>();
 
             using (var scope = services.CreateScope())
+            using (var tokenstore = services.GetRequiredService<TokenStore>())
+            using (var guildstore = services.GetRequiredService<GuildStore>())           
             {
-                var tokenstore = services.GetRequiredService<TokenStore>();
-                var guildstore = services.GetRequiredService<GuildStore>();
-
                 await tokenstore.Database.MigrateAsync();
                 await guildstore.Database.MigrateAsync();
 

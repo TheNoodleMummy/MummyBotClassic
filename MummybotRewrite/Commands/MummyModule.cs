@@ -31,6 +31,7 @@ namespace Mummybot.Commands
         {
             GuildStore.Update(GuildConfig);
             await GuildStore.SaveChangesAsync();
+            GuildStore.Dispose();
         }
     }
 }
