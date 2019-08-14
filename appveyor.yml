@@ -41,7 +41,7 @@ on_failure:
 
   
 after_deploy:
-  - cmd: cd C:\projects\mummybot
+  - cmd: cd C:\projects\mummybot\MummybotRewrite
   - cmd: dotnet ef database update
   - ps: start-sleep -s 60
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
