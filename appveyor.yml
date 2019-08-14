@@ -40,6 +40,5 @@ on_failure:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
     
 after_deploy:
-  - cmd: cd C:\projects\mummybot\MummybotRewrite
-  - ps: start-sleep -s 60
+  - ps: start-sleep -s 45
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
