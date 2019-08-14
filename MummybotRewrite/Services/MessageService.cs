@@ -236,9 +236,10 @@ namespace Mummybot.Services
                     }
                     //else if (result is ArgumentParseFailedResult argumentParse)
                     //{
+                    //    argumentParse.
                     //    var emb = new EmbedBuilder();
-                    //    var postion = argumentParse.ParserResult.Arguments. ?? 1;
-                    //    emb.AddField(argumentParse.Reason,$"{argumentParse.RawArguments}\n{string.Concat(Enumerable.Repeat(" ",postion-1))}^");
+                    //    var postion = (argumentParse. .ParserResult.Arguments.Keys.First(). ?? 1;
+                    //    emb.AddField(argumentParse.Reason, $"{argumentParse.RawArguments}\n{string.Concat(Enumerable.Repeat(" ", postion - 1))}^");
                     //    SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     //}
                     else if (result is CommandOnCooldownResult ccr)

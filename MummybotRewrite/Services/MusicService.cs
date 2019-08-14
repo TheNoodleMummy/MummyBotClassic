@@ -22,6 +22,7 @@ namespace Mummybot.Services
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
+#if !DEBUG
             LogService = services.GetRequiredService<LogService>();
             LavaSocketClient = services.GetRequiredService<LavaSocketClient>();
             LavaSocketClient.StartAsync(services.GetRequiredService<DiscordSocketClient>(), new Configuration()
@@ -42,6 +43,7 @@ namespace Mummybot.Services
             LavaSocketClient.OnTrackStuck += LavaClient_OnTrackStuck;
 
             LavaSocketClient.Log += services.GetRequiredService<LogService>().LogLavalink;
+#endif
             return Task.CompletedTask;
         }
 
