@@ -29,7 +29,11 @@ namespace Mummybot.Database
         public SemaphoreSlim Slim = new SemaphoreSlim(1, 1);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#if DEBUG
             => optionsBuilder.UseSqlServer(ConfigService.GetDebugDB());
+#else
+            => optionsBuilder.UseSqlServer(ConfigService.GetRuntimeDB());
+#endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
