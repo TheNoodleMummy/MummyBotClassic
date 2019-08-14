@@ -62,6 +62,13 @@ namespace Mummybot
         private async Task DiscordClient_ReadyAsync()
         {
             Console.Title = DiscordClient.CurrentUser.Username;
+            using (var store = Services.GetRequiredService<GuildStore>())
+            {
+                foreach (var guild in DiscordClient.Guilds)
+                {
+                    _ = await store.GetOrCreateGuildAsync(guild.Id);
+                }
+            }
             await Services.RunInitialisersAsync(Types);
             DiscordClient.Ready -= DiscordClient_ReadyAsync;
         }
