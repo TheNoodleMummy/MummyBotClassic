@@ -36,7 +36,7 @@ namespace Mummybot
             CommandService.AddModules(services.GetRequiredService<Assembly>());
             CommandService.AddTypeParser(parser: new UserTypeparser<SocketGuildUser>());
 
-            taskQueue.OnError += (ex) => Task.Run(() => services.GetRequiredService<LogService>().LogError(string.Empty,Enums.LogSource.TaskQueue,ex));
+            taskQueue.OnError += (ex) => Task.Run(() => services.GetRequiredService<LogService>().LogError(string.Empty, Enums.LogSource.TaskQueue, ex));
 
             DiscordClient.Log += services.GetRequiredService<LogService>().LogEventAsync;
         }
@@ -47,7 +47,7 @@ namespace Mummybot
             using (var tokenstore = Services.GetRequiredService<TokenStore>())
             {
 #if DEBUG
-                await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t=>t.BotName.Equals("dummybot",StringComparison.CurrentCultureIgnoreCase)).BotToken);
+                await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t => t.BotName.Equals("dummybot", StringComparison.CurrentCultureIgnoreCase)).BotToken);
 #else
                 await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t=>t.BotName.Equals("mummybot",StringComparison.CurrentCultureIgnoreCase)).BotToken);
 #endif
@@ -55,20 +55,12 @@ namespace Mummybot
             await DiscordClient.StartAsync();
 
             DiscordClient.Ready += DiscordClient_ReadyAsync;
-
             await Task.Delay(-1);
         }
 
         private async Task DiscordClient_ReadyAsync()
         {
             Console.Title = DiscordClient.CurrentUser.Username;
-            using (var store = Services.GetRequiredService<GuildStore>())
-            {
-                foreach (var guild in DiscordClient.Guilds)
-                {
-                    _ = await store.GetOrCreateGuildAsync(guild.Id);
-                }
-            }
             await Services.RunInitialisersAsync(Types);
             DiscordClient.Ready -= DiscordClient_ReadyAsync;
         }

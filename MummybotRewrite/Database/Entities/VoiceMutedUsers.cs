@@ -14,6 +14,5 @@ namespace Mummybot.Database.Entities
         public DateTimeOffset ExpiresAtUTC { get; set; }
         public ulong UserID { get; set; }
         public ulong ChannelID { get; set; }
-        public ulong temp { get; set; }
     }
 }

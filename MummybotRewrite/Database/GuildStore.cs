@@ -167,8 +167,8 @@ namespace Mummybot.Database
             {
                 AutoQuotes = false,
                 GuildID = guildid,
-                Prefixes = new List<Prefixes>() { new Prefixes() { guildID= guildid,Prefix = "!",Id= SnowFlakeGeneratorService.NextLong() } }
-                
+                Prefixes = new List<Prefixes>() { new Prefixes() { guildID = guildid, Prefix = "!", Id = SnowFlakeGeneratorService.NextLong() } }
+
             };
             await Guilds.AddAsync(newguild);
 

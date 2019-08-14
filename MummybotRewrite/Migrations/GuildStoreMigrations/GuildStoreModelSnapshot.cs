@@ -188,9 +188,6 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     b.Property<decimal>("UserID")
                         .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-                    b.Property<decimal>("temp")
-                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
-
                     b.HasKey("Id");
 
                     b.HasIndex("GuildID");
