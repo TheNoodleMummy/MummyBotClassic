@@ -9,6 +9,7 @@ init:
 install:
   # Install repo specific stuff here
   - cmd: choco install dotnetcore-sdk --pre #required untill appveyor auto comes with core 3.0 this will slow down auto build pretty bad i think
+  - cmd: dotnet tool install --global dotnet-ef --version 3.0.0-*
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
@@ -40,5 +41,6 @@ on_failure:
 
   
 after_deploy:
+  - ps: Update-Database -Context guildstore
   - ps: start-sleep -s 60
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
