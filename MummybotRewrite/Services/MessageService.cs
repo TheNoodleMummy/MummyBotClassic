@@ -260,11 +260,11 @@ namespace Mummybot.Services
                                         break;
                                     case CooldownBucketType.User:
                                         emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
-                                        emb.AddField("channel on Cooldown", $"retry in {item.RetryAfter}");
+                                        emb.AddField("user on Cooldown", $"retry in {item.RetryAfter}");
                                         break;
                                     case CooldownBucketType.Global:
                                         emb.WithAuthor(commandContext.Guild.CurrentUser.GetDisplayName(), commandContext.Guild.CurrentUser.GetAvatarOrDefaultUrl());
-                                        emb.AddField("channel on Cooldown", $"retry in {item.RetryAfter}");
+                                        emb.AddField("Global on Cooldown", $"retry in {item.RetryAfter}");
                                         break;
                                     default:
                                         throw new InvalidOperationException($"got unhandled bucketType");
@@ -273,6 +273,7 @@ namespace Mummybot.Services
                             else
                                 throw new InvalidOperationException($"got invalid CooldownBucketType expected: {typeof(CooldownBucketType)} got: {item.Cooldown.BucketType}");
                         }
+                        SendAsync(commandContext, msg => msg.Embed = emb.Build());
                     }
                 }
                 catch (Exception ex)
