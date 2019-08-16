@@ -2,6 +2,7 @@
 using Mummybot.Services;
 using Qmmands;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace Mummybot.Commands.Modules
         public async Task GetBirthdays()
         {
             var sb = new StringBuilder();
-            foreach (var birthday in GuildConfig.Birthdays)
+            foreach (var birthday in GuildConfig.Birthdays.OrderBy(x=>x.NextBdayUTC))
             {
                 var user = Context.Guild.GetUser(birthday.UserId);
                 sb.Append(birthday.BDay.ToString())

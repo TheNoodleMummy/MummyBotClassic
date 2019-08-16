@@ -166,30 +166,30 @@ namespace Mummybot.Services
 
             IEnumerable<string> prefixes;
 
-            using (var guildStore = _services.GetService<GuildStore>())
-            {
-                var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
-                prefixes = guild.Prefixes.Select(x => x.Prefix);
+            using var guildStore = _services.GetService<GuildStore>();
 
-                if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
-                    _ = Task.Run(async () =>
+            var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+            prefixes = guild.Prefixes.Select(x => x.Prefix);
+
+            if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
+                _ = Task.Run(async () =>
+                {
+                    var embed = await Utilities.QuoteFromString(_client, message.Content);
+
+                    if (embed is null)
+                        return;
+
+                    await message.Channel.SendMessageAsync(string.Empty, embed: embed);
+
+                    _quoteReactions.TryAdd(message.Id, 0);
+
+                    _scheduler.ScheduleTask(message.Id, MessageLifeTime, mId =>
                     {
-                        var embed = await Utilities.QuoteFromString(_client, message.Content);
-
-                        if (embed is null)
-                            return;
-
-                        await message.Channel.SendMessageAsync(string.Empty, embed: embed);
-
-                        _quoteReactions.TryAdd(message.Id, 0);
-
-                        _scheduler.ScheduleTask(message.Id, MessageLifeTime, mId =>
-                        {
-                            _quoteReactions.TryRemove(mId, out _);
-                            return Task.CompletedTask;
-                        });
+                        _quoteReactions.TryRemove(mId, out _);
+                        return Task.CompletedTask;
                     });
-            }
+                });
+
 
             if (CommandUtilities.HasAnyPrefix(message.Content, prefixes, StringComparison.CurrentCulture, out var prefix, out var output) ||
                 CommandUtilities.HasPrefix(message.Content, $"<@{_client.CurrentUser.Id}>", StringComparison.Ordinal, out output) ||
@@ -204,19 +204,19 @@ namespace Mummybot.Services
 
                     var result = await _commands.ExecuteAsync(output, commandContext, _services);
 
-                    if (!result.IsSuccessful)
-                        _logger.LogError(result.ToString(), LogSource.Commands);
-                    else
-                        _logger.LogInformation(result.ToString(), LogSource.Commands);
+
 
                     if (result is CommandNotFoundResult notfoundresult)
                     {
-                        commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
-                        result = await _commands.ExecuteAsync($"help {output}", commandContext, _services);
+                        var emb = new EmbedBuilder();
+                        emb.WithAuthor(commandContext.User.GetDisplayName(),commandContext.User.GetAvatarOrDefaultUrl());
+                        emb.WithDescription("Could not find any command with that name");
+                        await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                         _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
                     }
                     else if (result is OverloadsFailedResult overloadsFailedResult)
                     {
+
                         Console.Write(string.Join(Environment.NewLine, overloadsFailedResult.FailedOverloads.Select(x => $"{x.Key}: {x.Value}")));
                     }
                     else if (result is ChecksFailedResult checks)
@@ -305,7 +305,7 @@ namespace Mummybot.Services
         private Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
             var context = (MummyContext)args.Context;
-            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands,Guild:context.Guild);
+            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands, Guild: context.Guild);
 
             return Task.CompletedTask;
         }
