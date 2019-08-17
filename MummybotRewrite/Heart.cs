@@ -77,31 +77,18 @@ namespace MummyBot
         public object CoolDownBucketGenerator(object bucketType, CommandContext context, IServiceProvider provider)
         {
             if (!(context is MummyContext ctx))
-            {
-                throw new InvalidContextException(context.GetType());
-            }
-            object obj = null;
+                throw new InvalidContextException(context.GetType());            
+           
             if (bucketType is CooldownBucketType CBT)
-                switch (CBT)
+                return CBT switch
                 {
-                    case CooldownBucketType.Guilds:
-                        obj = ctx.GuildId;
-                        break;
-                    case CooldownBucketType.User:
-                        obj = ctx.UserId;
-                        break;
-                    case CooldownBucketType.Channels:
-                        obj = ctx.ChannelId;
-                        break;
-                    case CooldownBucketType.Global:
-                        obj = ctx.Command;
-                        break;
-                    default:
-                        throw new InvalidOperationException("got unexpected cooldownbuckettype");
-                        break;
-                }
-            
-            return obj;
+                    CooldownBucketType.Guilds =>(object) ctx.GuildId,
+                    CooldownBucketType.User => ctx.UserId,
+                    CooldownBucketType.Channels => ctx.ChannelId,
+                    CooldownBucketType.Global => ctx.Command,
+                    _ => throw new InvalidOperationException("got unexpected cooldownbuckettype"),
+                };
+            throw new InvalidOperationException($"cooldownbuckettype fail to parse as {typeof(CooldownBucketType)}");
         }
     }
 }

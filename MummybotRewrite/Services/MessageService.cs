@@ -1,12 +1,11 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
-using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
-using Mummybot.Attributes;
 using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Enums;
+using Mummybot.Exceptions;
 using Mummybot.Extentions;
 using Qmmands;
 using System;
@@ -56,8 +55,6 @@ namespace Mummybot.Services
             _lastJumpUrlQuotes = new ConcurrentDictionary<ulong, ulong>();
 
             _quoteReactions = new ConcurrentDictionary<ulong, byte>();
-
-            var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
         }
 
         public override Task InitialiseAsync(IServiceProvider services)
@@ -209,7 +206,7 @@ namespace Mummybot.Services
                     if (result is CommandNotFoundResult notfoundresult)
                     {
                         var emb = new EmbedBuilder();
-                        emb.WithAuthor(commandContext.User.GetDisplayName(),commandContext.User.GetAvatarOrDefaultUrl());
+                        emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.WithDescription("Could not find any command with that name");
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                         _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
@@ -222,9 +219,9 @@ namespace Mummybot.Services
                     else if (result is ChecksFailedResult checks)
                     {
                         var emb = new EmbedBuilder();
-                        foreach (var item in checks.FailedChecks.Take(25))
+                        foreach (var (Check, Result) in checks.FailedChecks.Take(25))
                         {
-                            emb.AddField(item.Check.ToString(), item.Result.Reason, true);
+                            emb.AddField(Check.ToString(), Result.Reason, true);
                         }
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
@@ -269,12 +266,11 @@ namespace Mummybot.Services
                                         break;
                                     default:
                                         throw new InvalidOperationException($"got unhandled bucketType");
-                                        break;
                                 }
                             else
                                 throw new InvalidOperationException($"got invalid CooldownBucketType expected: {typeof(CooldownBucketType)} got: {item.Cooldown.BucketType}");
                         }
-                        SendAsync(commandContext, msg => msg.Embed = emb.Build());
+                        await SendAsync(commandContext, msg => msg.Embed = emb.Build());
                     }
                 }
                 catch (Exception ex)
@@ -286,28 +282,35 @@ namespace Mummybot.Services
 
         private async Task CommandErroredAsync(CommandExecutionFailedEventArgs args)
         {
-            var context = (MummyContext)args.Context;
-
-            if (args.Result is ExecutionFailedResult failed)
+            if ((args.Context is MummyContext context))
             {
-                _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
+                if (args.Result is ExecutionFailedResult failed)
+                {
+                    _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
 
 #if !DEBUG
-                var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
+                    var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
 
-                await c.SendMessageAsync(Format.Sanitize(failed.Exception.ToString().Substring(0, 500)));
+                    await c.SendMessageAsync(Format.Sanitize(failed.Exception.ToString().Substring(0, 500)));
 #endif
-            }
+                }
 
-            await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
+                await SendAsync(context, x => x.Embed = Utilities.BuildErrorEmbed(args.Result, context));
+            }
+            else
+                throw new InvalidContextException(args.Context.GetType());
         }
 
         private Task CommandExecutedAsync(CommandExecutedEventArgs args)
         {
-            var context = (MummyContext)args.Context;
-            _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands, Guild: context.Guild);
+            if ((args.Context is MummyContext context))
+            {
+                _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands, Guild: context.Guild);
 
-            return Task.CompletedTask;
+                return Task.CompletedTask;
+            }
+            else
+                throw new InvalidContextException(args.Context.GetType());
         }
 
         public async Task<IUserMessage> SendAsync(MummyContext context, Action<MessageProperties> properties)
