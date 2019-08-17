@@ -18,7 +18,7 @@ namespace Mummybot.Commands.Modules
         {
             user ??= Context.User;
             IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r=>r.Name.Equals(Context.User.Username,StringComparison.InvariantCultureIgnoreCase));
-            var color = new Discord.Color(r, g, b);
+            var color = new Color(r, g, b);
             if (role is null)
             {
                 role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: false);
@@ -34,7 +34,7 @@ namespace Mummybot.Commands.Modules
         {
             user ??= Context.User;
             IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.Name.Equals(Context.User.Username, StringComparison.InvariantCultureIgnoreCase));
-            var color = new Discord.Color(rawhex);
+            var color = new Color(rawhex);
             if (role is null)
             {
                 role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: false);

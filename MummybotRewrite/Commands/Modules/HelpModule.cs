@@ -12,7 +12,7 @@ namespace Mummybot.Commands.Modules
     [Name("Help Commands"), Description("This Module helps with commands as in what they need and if its required or optional")]
     public class HelpModule : MummyModule
     {
-        public CommandService _commands { get; set; }
+        public CommandService Commands { get; set; }
         public InteractiveService Iservice { get; set; }
 
         [Command("commands", "help"), Description("All Command for Mummybot")]
@@ -23,7 +23,7 @@ namespace Mummybot.Commands.Modules
                 var prefixes = GuildConfig.Prefixes;
 
                 var pages = new List<string>();
-                foreach (var module in _commands.GetAllModules())
+                foreach (var module in Commands.GetAllModules())
                 {
                     var modulechecks = await module.RunChecksAsync(Context, Services);
                     if (modulechecks.IsSuccessful)
@@ -85,7 +85,7 @@ namespace Mummybot.Commands.Modules
         [Command("help"), Description("Specific help for a command")]
         public async Task HelpAsync([Description("Command you want the help for")]string command)
         {
-            var result = _commands.FindCommands(command).ToArray();
+            var result = Commands.FindCommands(command).ToArray();
             if (result.Length == 0)
             {
                 await ReplyAsync($"Sorry, I couldn't find a command like **{command}**.");
