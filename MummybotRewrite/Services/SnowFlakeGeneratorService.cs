@@ -23,6 +23,7 @@ namespace Mummybot.Services
         private short _sequence;
         private long _previousTime;
 
+        private readonly LogService LogService;
 
         public SnowFlakeGeneratorService(LogService logService)
         {

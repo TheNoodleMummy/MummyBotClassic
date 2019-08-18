@@ -9,11 +9,6 @@ namespace Mummybot.Services
     public class BaseService
     {
         /// <summary>
-        /// A Log service for logging, idk /shrug
-        /// </summary>
-        public LogService LogService { get; set; }
-
-        /// <summary>
         /// gets run when RunInitializers() is called on IServiceProvider
         /// </summary>
         /// <param name="services">the current IServiceProvider</param>

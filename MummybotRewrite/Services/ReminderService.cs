@@ -15,6 +15,8 @@ namespace Mummybot.Services
     {
         public TaskQueue TaskQueue { get; }
         public DiscordSocketClient DiscordClient { get; }
+
+        private readonly LogService LogService;
         private readonly IServiceProvider _services;
 
         public ReminderService(TaskQueue taskQueue, DiscordSocketClient discordclient, LogService logService, IServiceProvider service)

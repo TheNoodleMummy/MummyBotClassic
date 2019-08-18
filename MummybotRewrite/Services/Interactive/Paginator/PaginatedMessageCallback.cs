@@ -35,7 +35,7 @@ namespace Discord.Addons.Interactive
             Context = sourceContext;
             _criterion = criterion ?? new EmptyCriterion<SocketReaction>();
             _pager = pager;
-            pages = _pager.Pages.Count();
+            pages = _pager.Pages.Count;
         }
 
         public async Task DisplayAsync()
@@ -133,13 +133,7 @@ namespace Discord.Addons.Interactive
         
         protected Embed BuildEmbed()
         {
-            return new EmbedBuilder()
-                .WithAuthor(_pager.Author)
-                .WithColor(_pager.Color)
-                .WithDescription(_pager.Pages.ElementAt(page-1).ToString())
-                .WithFooter(f => f.Text = string.Format(options.FooterFormat, page, pages))
-                .WithTitle(_pager.Title)
-                .Build();
+            return _pager.Pages[page].Build();
         }
         private async Task RenderAsync()
         {

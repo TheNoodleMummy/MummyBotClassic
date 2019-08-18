@@ -16,6 +16,11 @@ namespace Mummybot.Services
     {
         public List<string> usings = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("usings.json")).ToList();
 
+        public EvalService(LogService logs)
+        { 
+            logs.LogInformation("added logservice to eval servce");
+        }
+
         public void SaveUsings()
             => File.WriteAllText("usings.json",JsonConvert.SerializeObject(usings.ToArray()));
 

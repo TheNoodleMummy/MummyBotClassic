@@ -18,10 +18,16 @@ namespace Mummybot.Services
     {
         private readonly TaskQueue _taskQueue;
         private readonly DiscordSocketClient _discordClient;
+        private readonly LogService LogService;
         private readonly SnowFlakeGeneratorService _snowFlakeGenerator;
         private readonly IServiceProvider serviceProvider;
 
-        public BirthdayService(TaskQueue taskQueue, DiscordSocketClient discord, LogService logService, SnowFlakeGeneratorService snowFlake,IServiceProvider services)
+        public BirthdayService(
+            TaskQueue taskQueue,
+            DiscordSocketClient discord,
+            LogService logService,
+            SnowFlakeGeneratorService snowFlake,
+            IServiceProvider services)
         {
             _taskQueue = taskQueue;
             _discordClient = discord;

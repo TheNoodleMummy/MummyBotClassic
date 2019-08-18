@@ -1,6 +1,7 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
+using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
 using Mummybot.Database;
@@ -20,9 +21,14 @@ namespace Mummybot.Services
         private readonly SnowFlakeGeneratorService SnowFlakeGenerator;
         private readonly DiscordSocketClient DiscordClient;
         private readonly IServiceProvider ServiceProvider;
+        private readonly LogService LogService;
 
-
-        public AdministratorUitilitiesService(TaskQueue taskQueue, SnowFlakeGeneratorService snowFlakeGenerator, DiscordSocketClient discordclient, IServiceProvider serviceProvider)
+        public AdministratorUitilitiesService(
+            TaskQueue taskQueue,
+            SnowFlakeGeneratorService snowFlakeGenerator,
+            DiscordSocketClient discordclient,
+            IServiceProvider serviceProvider,
+            LogService logs)
         {
             TaskQueue = taskQueue;
             SnowFlakeGenerator = snowFlakeGenerator;
@@ -73,6 +79,9 @@ namespace Mummybot.Services
                 GuildID = ctx.Guild.Id
             };
 
+            await ctx.Channel.SendMessageAsync($"Muted {user.GetDisplayName()} for {time.Humanize()}");
+            LogService.LogInformation($"Muted {user.GetDisplayName()} for {time.Humanize()}", Guild: ctx.Guild);
+
             using (var store = ServiceProvider.GetRequiredService<GuildStore>())
             {
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
@@ -92,8 +101,13 @@ namespace Mummybot.Services
 
         public async Task VoiceMuteCallback(VoiceMutedUser args)
         {
-            var user = DiscordClient.GetGuild(args.GuildID).GetUser(args.UserID);
+
+            var guild = DiscordClient.GetGuild(args.GuildID);
+            var user = guild.GetUser(args.UserID);
+
             await user.ModifyAsync(user => user.Mute = false);
+            LogService.LogInformation($"UnMuted {user.GetDisplayName()} after {(args.ExpiresAtUTC-args.SetAtUTC).Humanize()}", Guild: guild);
+
             using (var store = ServiceProvider.GetRequiredService<GuildStore>())
             {
                 var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);

@@ -13,6 +13,7 @@ namespace Mummybot.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly SnowFlakeGeneratorService _snowFlakeGenerator;
+        private readonly LogService LogService;
 
         public StarBoardService(DiscordSocketClient client,SnowFlakeGeneratorService snowFlakeGenerator,LogService logService)
         {

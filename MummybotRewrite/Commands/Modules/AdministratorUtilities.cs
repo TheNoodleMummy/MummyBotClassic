@@ -3,6 +3,7 @@ using Discord;
 using Discord.WebSocket;
 using Mummybot.Attributes.Checks;
 using Mummybot.Enums;
+using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
 using System;
@@ -29,6 +30,7 @@ namespace Mummybot.Commands.Modules
                 public async Task VoiceMute(SocketGuildUser user, TimeSpan howlong)
                 {
                     await AdministratorService.VoiceMute(Context, user, howlong);
+                    Context.Message.AddOkAsync();
                 }
 
                 //[Command("cancel")]

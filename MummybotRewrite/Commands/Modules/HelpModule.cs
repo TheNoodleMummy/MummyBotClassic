@@ -18,47 +18,28 @@ namespace Mummybot.Commands.Modules
         [Command("commands", "help"), Description("All Command for Mummybot")]
         public async Task HelpAsync()
         {
-            try
+            var pages = new List<EmbedBuilder>();
+            foreach(var module in Commands.GetAllModules())
             {
-                var prefixes = GuildConfig.Prefixes;
-
-                var pages = new List<string>();
-                foreach (var module in Commands.GetAllModules())
+                var modulecheck = await module.RunChecksAsync(Context, Services);
+                if(modulecheck.IsSuccessful)
                 {
-                    var modulechecks = await module.RunChecksAsync(Context, Services);
-                    if (modulechecks.IsSuccessful)
-                    {
-                        string description = null;
-                        foreach (var cmd in module.Commands)
-                        {
-                            var commandchecks = await cmd.RunChecksAsync(Context, Services);
-                            if (commandchecks.IsSuccessful)
-                                description += $"{prefixes?.FirstOrDefault()?.Prefix ?? Context.Client.CurrentUser.Mention}{cmd?.FullAliases?.First()}\n";
-                        }
 
-                        if (!string.IsNullOrWhiteSpace(description))
-                        {
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append("**__").Append(module.Name).Append("__\n").Append(module.Description).AppendLine("**");
-                            sb.AppendLine(description);
-                            pages.Add(sb.ToString());
-                        }
-                    }
-                    
+
                 }
+
+            }
+
+
+
 
                 var msg = new PaginatedMessage
                 {
                     Pages = pages,
                     Author = new EmbedAuthorBuilder() { Name = Context.User.GetDisplayName(), IconUrl = Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl() },
-                    Title = "Some Commands you can run"
                 };
                 await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            
         }
 
         [Command("help"), Description("Specific help for a module")]

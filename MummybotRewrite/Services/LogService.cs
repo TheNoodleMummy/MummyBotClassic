@@ -19,6 +19,9 @@ namespace Mummybot.Services
 
 
         public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
+
+        
+
         public Task LogEventAsync(LogMessage log) => LogEventCustomAsync(new Structs.LogMessage(log.Severity, log.Source, log.Message, log.Exception));
         public Task LogEventCustomAsync(Structs.LogMessage log)
         {

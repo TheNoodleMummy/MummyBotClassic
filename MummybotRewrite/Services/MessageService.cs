@@ -41,13 +41,13 @@ namespace Mummybot.Services
 
         private static TimeSpan MessageLifeTime => TimeSpan.FromMinutes(10);
 
-        public MessageService(IServiceProvider services)
+        public MessageService(IServiceProvider services,LogService logs)
         {
             _commands = services.GetRequiredService<CommandService>();
             _client = services.GetRequiredService<DiscordSocketClient>();
-            _logger = services.GetRequiredService<LogService>();
             _scheduler = services.GetRequiredService<TaskQueue>();
             _services = services;
+            _logger = logs;
             _messageCache =
                 new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong,
                     ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>();
