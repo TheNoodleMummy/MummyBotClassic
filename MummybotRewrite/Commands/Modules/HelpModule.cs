@@ -18,8 +18,15 @@ namespace Mummybot.Commands.Modules
         [Command("commands", "help"), Description("All Command for Mummybot")]
         public async Task HelpAsync()
         {
+            var options = PaginatedAppearanceOptions.Default;
+            options.InformationText = "```\n" +
+                "all symbols are just a sign and are not accepted by commands\n" +
+                "<value> optional \n" +
+                "\"value\" Remainders \n" +
+                "**value** required   \n" +
+                "```";
 
-            var msg = new PaginatedMessage {Options = PaginatedAppearanceOptions.Default };
+            var msg = new PaginatedMessage { Options = options };
 
             foreach(var module in Commands.GetAllModules())
             {
@@ -32,7 +39,7 @@ namespace Mummybot.Commands.Modules
                     emb.WithTitle(module.Name);
                     emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
                     var sb = new StringBuilder();
-                    var commands = CommandUtilities.EnumerateAllCommands(module);
+                    var commands = GetAllCommandsIterator(module);
                     foreach (var command in commands)
                     {
                         var checks = await command.RunChecksAsync(Context, Services);
@@ -51,7 +58,7 @@ namespace Mummybot.Commands.Modules
                                 }
                                 else if (!parameter.IsOptional && parameter.IsRemainder) //required remainder
                                 {
-                                    sb.Append($"'{parameter.Name}' ");
+                                    sb.Append($"\"{parameter.Name}\"");
                                 }
                                 else if (!parameter.IsOptional && !parameter.IsRemainder)//required
                                 {
