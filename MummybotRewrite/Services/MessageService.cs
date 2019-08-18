@@ -371,7 +371,7 @@ namespace Mummybot.Services
             return sentMessage;
         }
 
-        //async needed for the cast
+        //async needed for the cast//what cast tho?
         private static async Task<IUserMessage> SendMessageAsync(MummyContext context, MessageProperties properties)
         {
             if (properties.Stream is null)

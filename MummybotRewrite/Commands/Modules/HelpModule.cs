@@ -34,7 +34,7 @@ namespace Mummybot.Commands.Modules
                 if(modulecheck.IsSuccessful)
                 {
                     if (module.Commands.Count == 0)
-                        continue; //skipe module if commands are 0
+                        continue; //skip module if commands are 0
                     var emb = new EmbedBuilder();
                     emb.WithTitle(module.Name);
                     emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
@@ -116,7 +116,7 @@ namespace Mummybot.Commands.Modules
             foreach (var match in result)
             {
                 var cmd = match.Command;
-                if (!(await cmd.RunChecksAsync(Context)).IsSuccessful) return;
+                if (!(await cmd.RunChecksAsync(Context,Services)).IsSuccessful) return;
                 builder.AddField(x =>
                 {
                     x.Name = cmd.Name;
@@ -129,16 +129,14 @@ namespace Mummybot.Commands.Modules
 
             await ReplyAsync(embed: builder);
         }
+
         private static IEnumerable<Command> GetAllCommandsIterator(Module module)
         {
             IEnumerable<Command> GetCommands(Module rModule)
             {
                 for (var i = 0; i < rModule.Commands.Count; i++)
                     yield return rModule.Commands[i];
-
-
             }
-
             foreach (var command in GetCommands(module))
                 yield return command;
         }
