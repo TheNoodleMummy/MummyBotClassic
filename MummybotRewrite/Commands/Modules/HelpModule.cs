@@ -28,10 +28,10 @@ namespace Mummybot.Commands.Modules
 
             var msg = new PaginatedMessage { Options = options };
 
-            foreach(var module in Commands.GetAllModules())
+            foreach (var module in Commands.GetAllModules())
             {
                 var modulecheck = await module.RunChecksAsync(Context, Services);
-                if(modulecheck.IsSuccessful)
+                if (modulecheck.IsSuccessful)
                 {
                     if (module.Commands.Count == 0)
                         continue; //skip module if commands are 0
@@ -63,7 +63,7 @@ namespace Mummybot.Commands.Modules
                                 else if (!parameter.IsOptional && !parameter.IsRemainder)//required
                                 {
                                     sb.Append($"**{parameter.Name}** ");
-                                }                                                              
+                                }
                             }
                             sb.AppendLine();
                         }
@@ -72,8 +72,8 @@ namespace Mummybot.Commands.Modules
                     msg.Pages.Add(emb);
                 }
 
-            }               
-                await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();            
+            }
+            await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
         }
 
         [Command("help"), Description("Specific help for a module")]
@@ -116,7 +116,7 @@ namespace Mummybot.Commands.Modules
             foreach (var match in result)
             {
                 var cmd = match.Command;
-                if (!(await cmd.RunChecksAsync(Context,Services)).IsSuccessful) return;
+                if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
                 builder.AddField(x =>
                 {
                     x.Name = cmd.Name;
