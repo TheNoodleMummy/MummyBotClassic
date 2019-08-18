@@ -284,14 +284,15 @@ namespace Mummybot.Services
         {
             if ((args.Context is MummyContext context))
             {
+                
                 if (args.Result is ExecutionFailedResult failed)
                 {
                     _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
 
 #if !DEBUG
                     var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
-
-                    await c.SendMessageAsync(Format.Sanitize(failed.Exception.ToString().Substring(0, 500)));
+                    await c.SendMessageAsync($"```{context.Command} failed for {context.User.GetDisplayName()}" +
+                        $"message passed {context.Message.Content}```{Format.Sanitize(failed.Exception.ToString().Substring(0, 1000))}");
 #endif
                 }
 

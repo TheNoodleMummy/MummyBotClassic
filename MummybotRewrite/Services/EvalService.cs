@@ -15,10 +15,11 @@ namespace Mummybot.Services
     public class EvalService : BaseService
     {
         public List<string> usings = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("usings.json")).ToList();
+        private readonly object LogSerice;
 
         public EvalService(LogService logs)
-        { 
-            logs.LogInformation("added logservice to eval servce");
+        {
+            LogSerice = logs;
         }
 
         public void SaveUsings()
