@@ -116,7 +116,7 @@ namespace Mummybot.Commands.Modules
             foreach (var match in result)
             {
                 var cmd = match.Command;
-                if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
+                if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) continue;
                 builder.AddField(x =>
                 {
                     x.Name = cmd.Name;
