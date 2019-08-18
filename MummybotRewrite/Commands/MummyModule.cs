@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands
 {
-    public class MummyModule : ModuleBase<MummyContext>
+    public abstract class MummyModule : ModuleBase<MummyContext>
     {
         public MessageService MessageService { get; set; }
         public Guild GuildConfig { get; private set; }

@@ -133,7 +133,9 @@ namespace Discord.Addons.Interactive
         
         protected Embed BuildEmbed()
         {
-            return _pager.Pages[page].Build();
+            var current = _pager.Pages[page];
+            current.WithFooter($"Page {page}/{_pager.Pages.Count}");
+            return current.Build();
         }
         private async Task RenderAsync()
         {

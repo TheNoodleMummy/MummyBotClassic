@@ -15,8 +15,15 @@ namespace Mummybot.Services
 
     public class MusicService : BaseService
     {
+
+        public MusicService(LogService log)
+        {
+            LogService = log;
+        }
         internal LavaSocketClient LavaSocketClient { get; set; }
         internal LavaRestClient LavaRestClient { get; set; }
+        private readonly LogService LogService;
+
 
         public ConcurrentDictionary<ulong, MusicDetails> ConnectedChannels = new ConcurrentDictionary<ulong, MusicDetails>();
 

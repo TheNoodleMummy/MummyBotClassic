@@ -18,28 +18,55 @@ namespace Mummybot.Commands.Modules
         [Command("commands", "help"), Description("All Command for Mummybot")]
         public async Task HelpAsync()
         {
-            var pages = new List<EmbedBuilder>();
+
+            var msg = new PaginatedMessage {Options = PaginatedAppearanceOptions.Default };
+
             foreach(var module in Commands.GetAllModules())
             {
                 var modulecheck = await module.RunChecksAsync(Context, Services);
                 if(modulecheck.IsSuccessful)
                 {
-
-
+                    if (module.Commands.Count == 0)
+                        continue; //skipe module if commands are 0
+                    var emb = new EmbedBuilder();
+                    emb.WithTitle(module.Name);
+                    emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+                    var sb = new StringBuilder();
+                    var commands = CommandUtilities.EnumerateAllCommands(module);
+                    foreach (var command in commands)
+                    {
+                        var checks = await command.RunChecksAsync(Context, Services);
+                        if (checks.IsSuccessful)
+                        {
+                            sb.Append(Context.PrefixUsed).Append(command.Name).Append(" ");
+                            foreach (var parameter in command.Parameters)
+                            {
+                                if (parameter.IsOptional && parameter.IsRemainder)//optional remiander
+                                {
+                                    sb.Append($"<\"{parameter.Name}\"> ");
+                                }
+                                else if (parameter.IsOptional && !parameter.IsRemainder)//optional
+                                {
+                                    sb.Append($"<{parameter.Name}> ");
+                                }
+                                else if (!parameter.IsOptional && parameter.IsRemainder) //required remainder
+                                {
+                                    sb.Append($"'{parameter.Name}' ");
+                                }
+                                else if (!parameter.IsOptional && !parameter.IsRemainder)//required
+                                {
+                                    sb.Append($"**{parameter.Name}** ");
+                                }                                                              
+                            }
+                            sb.AppendLine();
+                        }
+                    }
+                    emb.WithDescription(sb.ToString());
+                    msg.Pages.Add(emb);
                 }
 
-            }
-
-
-
-
-                var msg = new PaginatedMessage
-                {
-                    Pages = pages,
-                    Author = new EmbedAuthorBuilder() { Name = Context.User.GetDisplayName(), IconUrl = Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl() },
-                };
-                await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
-            
+            }               
+                await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();            
         }
 
         [Command("help"), Description("Specific help for a module")]
@@ -94,6 +121,19 @@ namespace Mummybot.Commands.Modules
             }
 
             await ReplyAsync(embed: builder);
+        }
+        private static IEnumerable<Command> GetAllCommandsIterator(Module module)
+        {
+            IEnumerable<Command> GetCommands(Module rModule)
+            {
+                for (var i = 0; i < rModule.Commands.Count; i++)
+                    yield return rModule.Commands[i];
+
+
+            }
+
+            foreach (var command in GetCommands(module))
+                yield return command;
         }
     }
 }

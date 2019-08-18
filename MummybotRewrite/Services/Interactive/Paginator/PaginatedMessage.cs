@@ -4,14 +4,9 @@ namespace Discord.Addons.Interactive
 {
     public class PaginatedMessage
     {
-        public SortedList<int, EmbedBuilder> Pages = new SortedList<int, EmbedBuilder>();
-
-        
+        public SortedList<int, EmbedBuilder> Pages = new SortedList<int, EmbedBuilder>();        
         
         public string Content { get; set; } = "";
-
-        public EmbedAuthorBuilder Author { get; set; } = null;
-
         public PaginatedAppearanceOptions Options { get; set; } = PaginatedAppearanceOptions.Default;
     }
 
