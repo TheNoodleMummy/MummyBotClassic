@@ -133,7 +133,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("SCsearch")]
-        public async Task SearchSCAsync([[Description("the querry to look for on soundcloud"), Remainder]string querry)
+        public async Task SearchSCAsync([Description("the querry to look for on soundcloud"), Remainder]string querry)
         {
             var results = await _musicService.SearchSoundCloudAsync(querry);
             switch (results.LoadType)
