@@ -63,8 +63,8 @@ namespace Mummybot.Services
                     TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, ReminderCallbackAsync);
                 }
             }
-            await GuildStore.SaveChangesAsync();
-
+            var i = await GuildStore.SaveChangesAsync();
+            Console.WriteLine("reminderservice " + i);
         }
 
         public void RegisterReminder(Reminder reminder, ulong id)
@@ -127,8 +127,8 @@ namespace Mummybot.Services
             var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
             guildconfig.Reminders.Remove(reminder);
             GuildStore.Update(guildconfig);
-            await GuildStore.SaveChangesAsync();
-
+            var i = await GuildStore.SaveChangesAsync();
+            Console.WriteLine("reminderservice " + i);
         }
     }
 }

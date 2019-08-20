@@ -58,7 +58,8 @@ namespace Mummybot.Services
             {
                 guildconfig.Birthdays.Add(birthday);
                 guildstore.Update(guildconfig);
-                await guildstore.SaveChangesAsync();
+                var i = await guildstore.SaveChangesAsync();
+                Console.WriteLine("birthdayservice " + i);
                 var dbbday = guildconfig.Birthdays.Find(b => b.Id == id);
                 return new BirthdayResult() { Birthday = dbbday, IsSuccess = true };
             }
@@ -127,7 +128,8 @@ namespace Mummybot.Services
             var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
             bday = birthday;
             guildstore.Update(guildconfig);
-            await guildstore.SaveChangesAsync();
+            var i = await guildstore.SaveChangesAsync();
+            Console.WriteLine("birthdayservice " + i);
         }
 
         /// <summary>
@@ -159,7 +161,8 @@ namespace Mummybot.Services
             var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
             bday = birthday;
             guildstore.Update(guildconfig);
-            await guildstore.SaveChangesAsync();
+            var i = await guildstore.SaveChangesAsync();
+            Console.WriteLine("birthdayservice " + i);
         }
     }
 

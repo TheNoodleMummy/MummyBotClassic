@@ -30,7 +30,8 @@ namespace Mummybot.Commands
         protected override async ValueTask AfterExecutedAsync()
         {
             GuildStore.Update(GuildConfig);
-            await GuildStore.SaveChangesAsync();
+            var i = await GuildStore.SaveChangesAsync();
+            Console.WriteLine("mummycontext "+i);
             GuildStore.Dispose();
         }
     }

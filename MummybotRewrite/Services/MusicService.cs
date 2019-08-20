@@ -5,10 +5,13 @@ namespace Mummybot.Services
 {
     using Discord;
     using Discord.WebSocket;
+    using Microsoft.EntityFrameworkCore.ChangeTracking;
     using Microsoft.Extensions.DependencyInjection;
     using Mummybot.Database;
+    using Mummybot.Database.Entities;
     using Mummybot.Interfaces;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Victoria.Entities;
@@ -120,6 +123,14 @@ namespace Mummybot.Services
             }
         }
 
+        public QueueResult GetQueue(ulong guildid)
+        {
+            if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
+                return new QueueResult() { IsSuccess=true, Queue= musicDetails.Player.Queue };
+            return new QueueResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
+        }
+
+
         public async Task<VolumeResult> SetVolumeAsync(ulong guildid, int volume)
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
@@ -128,10 +139,12 @@ namespace Mummybot.Services
                     return new VolumeResult() { IsSuccess = false, ErrorReason = "Volume must be between 0 and 150" };
 
                 using var guildstore = Services.GetRequiredService<GuildStore>();
+                guildstore.ChangeTracker.AutoDetectChangesEnabled = true;
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
                 guild.Volume = volume;
                 guildstore.Update(guild);
-                await guildstore.SaveChangesAsync();
+                var i = await guildstore.SaveChangesAsync();
+                Console.WriteLine("music service " + i);
 
                 await musicDetails.Player.SetVolumeAsync(volume);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.CurrentVolume };
@@ -156,7 +169,7 @@ namespace Mummybot.Services
                     return new PlayResult() { PlayerWasPlaying = false, Track = track };
                 }
             }
-            return new PlayResult() { PlayerWasPlaying = false, WasConnected = false };
+            return new PlayResult() { PlayerWasPlaying = false, WasConnected = false,ErrorReason= "Im Currently not connected to any voicechannnel in this guild" };
         }
 
         public async Task JoinAsync(IVoiceChannel channel = null)
@@ -190,7 +203,7 @@ namespace Mummybot.Services
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
                 await LavaSocketClient.DisconnectAsync(musicDetails.Player.VoiceChannel);
-                ConnectedChannels.TryRemove(guildid, out var music);
+                ConnectedChannels.TryRemove(guildid, out var _);
             }
         }
 
@@ -273,5 +286,13 @@ namespace Mummybot.Services
 
         public int Volume { get; set; }
         public Exception Exception { get; set; }
+    }
+    public class QueueResult : IMummyResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorReason { get; set; }
+        public Exception Exception { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
+
+        public LavaQueue<IQueueObject> Queue { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Mummybot.Database
     {
         [Obsolete("dont use this ya dummy but use the ctor with snowflake param")]
         public GuildStore() { }
-        
+
         public GuildStore(SnowFlakeGeneratorService snowflakes)
         {
             SnowFlakeGeneratorService = snowflakes;
@@ -26,7 +26,7 @@ namespace Mummybot.Database
 
         private readonly LogService _logservice = new LogService();
 
-        public SemaphoreSlim Slim = new SemaphoreSlim(1, 1);
+        public static SemaphoreSlim Slim = new SemaphoreSlim(1, 1);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #if DEBUG
@@ -105,6 +105,7 @@ namespace Mummybot.Database
                 .Include(g => g.Reminders)
                 .Include(g => g.Stars)
                 .Include(g => g.Tags)
+                .Include(g => g.VoiceMutedUsers)
                 .FirstOrDefaultAsync(x => x.GuildID == id);
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild iguild, Expression<Func<Guild, TProp>> expression)
@@ -116,6 +117,7 @@ namespace Mummybot.Database
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object");
                 return await CreateGuildAsync(iguild.Id, expression);
             }
+            Slim.Release();
             return guild;
         }
 
@@ -128,6 +130,7 @@ namespace Mummybot.Database
                 _logservice.LogInformation($"guild: {guildid} was not found creating new object");
                 return await CreateGuildAsync(guildid, expression);
             }
+            Slim.Release();
             return guild;
         }
 
@@ -140,6 +143,7 @@ namespace Mummybot.Database
                 _logservice.LogInformation($"guild: {guildid} was not found creating new object");
                 return await CreateGuildAsync<ulong>(guildid: guildid, null);
             }
+            Slim.Release();
             return guild;
         }
 
@@ -152,6 +156,7 @@ namespace Mummybot.Database
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object");
                 return await CreateGuildAsync<ulong>(guildid: iguild.Id, null);
             }
+            Slim.Release();
             return guild;
         }
 
@@ -172,7 +177,8 @@ namespace Mummybot.Database
             };
             await Guilds.AddAsync(newguild);
 
-            await SaveChangesAsync();
+            var i = await SaveChangesAsync();
+            Console.WriteLine("guildstore " + i);
             if (expression is null)
             {
                 return await Guilds.FindAsync(guildid);

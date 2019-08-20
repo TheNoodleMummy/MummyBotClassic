@@ -50,6 +50,28 @@ namespace Mummybot.Commands.Modules
             }
         }
 
+        [Command("queue")]
+        public async Task GetQueueAsync()
+        {
+            var result = _musicService.GetQueue(Context.Guild.Id);
+            if (result.IsSuccess)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("```");
+                var i = 1;
+                foreach (LavaTrack item in result.Queue.Items.Take(10))
+                {
+                    sb.Append(i).Append(" [").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length.Humanize()).Append("](").Append(item.Uri).AppendLine(")");
+                }
+                sb.AppendLine().AppendLine("```");
+                await ReplyAsync(embed:new EmbedBuilder().WithDescription( sb.ToString()));
+            }
+            else
+            {
+                await ReplyAsync(result.ErrorReason);
+            }
+        }
+
         [Command("play")]
         public async Task PlayAsync([Remainder]string url)
         {
