@@ -197,6 +197,9 @@ namespace Mummybot.Services
 
                 try
                 {
+                    if (prefix is null)
+                        prefix = _client.CurrentUser.Mention;
+
                     var commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
 
                     var result = await _commands.ExecuteAsync(output, commandContext, _services);

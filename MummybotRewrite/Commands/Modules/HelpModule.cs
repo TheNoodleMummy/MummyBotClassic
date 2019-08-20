@@ -77,9 +77,9 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("help"), Description("Specific help for a module")]
-        public async Task HelpAsync([Description("Command you want the help for")]Module module)
+        public async Task HelpAsync([Description("Command you want the help for"),Remainder]Module module)
         {
-            var prefixes = GuildConfig.Prefixes;
+            var prefix = Context.PrefixUsed;
 
             var builder = new EmbedBuilder()
             {
@@ -91,14 +91,14 @@ namespace Mummybot.Commands.Modules
             foreach (var cmd in module.Commands)
             {
                 if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
-                sb.Append(prefixes[0]).AppendLine(cmd.Name);
+                sb.Append(prefix).AppendLine(cmd.Name);
             }
             builder.AddField("\u200B", sb.ToString());
             await ReplyAsync(embed: builder);
         }
 
         [Command("help"), Description("Specific help for a command")]
-        public async Task HelpAsync([Description("Command you want the help for")]string command)
+        public async Task HelpAsync([Description("Command you want the help for"),Remainder]string command)
         {
             var result = Commands.FindCommands(command).ToArray();
             if (result.Length == 0)
@@ -108,23 +108,38 @@ namespace Mummybot.Commands.Modules
             }
 
             var builder = new EmbedBuilder()
-            {
-                Color = Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed,
-                Description = $"Here are some commands like **{command}**"
-            };
+                .WithAuthor(Context.User)
+                .WithColor(Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed);
+            
 
-            foreach (var match in result)
+            foreach (var match in result.Take(3))
             {
-                var cmd = match.Command;
-                if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) continue;
-                builder.AddField(x =>
+                var sb = new StringBuilder().Append(Context.PrefixUsed).Append(" ").Append(match.Command.Name).Append(" ");
+                foreach (var parameter in match.Command.Parameters)
                 {
-                    x.Name = cmd.Name;
-                    x.Value = $"Alias: {string.Join(",", cmd.Aliases) ?? "none"}\n" +
-                              $"Parameters: {string.Join(", ", cmd.Parameters.Select(p => p.Name)) ?? " none"}\n" +
-                              $"Remarks: {cmd.Description ?? " none"}";
-                    x.IsInline = false;
-                });
+                    if (parameter.IsOptional && parameter.IsRemainder)//optional remiander
+                    {
+                        sb.Append($"<\"{parameter.Name}\"> ");
+                    }
+                    else if (parameter.IsOptional && !parameter.IsRemainder)//optional
+                    {
+                        sb.Append($"<{parameter.Name}> ");
+                    }
+                    else if (!parameter.IsOptional && parameter.IsRemainder) //required remainder
+                    {
+                        sb.Append($"\"{parameter.Name}\"");
+                    }
+                    else if (!parameter.IsOptional && !parameter.IsRemainder)//required
+                    {
+                        sb.Append($"**{parameter.Name}** ");
+                    }
+                }
+                sb.AppendLine();
+                builder.WithDescription(sb.ToString());
+                foreach (var item in match.Command.Parameters)
+                {
+                    builder.AddField(item.Name, item.Description??item.Remarks??"missing info");
+                }
             }
 
             await ReplyAsync(embed: builder);
