@@ -15,6 +15,7 @@ namespace Mummybot.Database.Entities
         public List<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
         public List<VoiceMutedUser> VoiceMutedUsers { get; set; } = new List<VoiceMutedUser>();
+        public List<VoiceDeafUser> VoiceDeafenedUsers { get; set; } = new List<VoiceDeafUser>();
 
         public ulong GuildID { get; set; }
 

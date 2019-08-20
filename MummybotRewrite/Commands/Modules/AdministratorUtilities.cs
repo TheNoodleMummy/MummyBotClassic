@@ -41,6 +41,23 @@ namespace Mummybot.Commands.Modules
                 //}
 
             }
+
+            [Group("deafen")]
+            public class AdministratorDeafenUtilities : MummyModule
+            {
+                public AdministratorUitilitiesService AdministratorService { get; set; }
+
+                [Command]
+                [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
+                public async Task VoiceDeafen(SocketGuildUser user, TimeSpan howlong)
+                {
+                    await AdministratorService.VoiceDeafen(Context, user, howlong);
+                    Context.Message.AddOkAsync();
+                }
+
+                
+
+            }
         }
     }
 }

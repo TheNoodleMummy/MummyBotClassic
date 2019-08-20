@@ -54,12 +54,23 @@ namespace Mummybot.Services
                         await VoiceMuteCallback(vmu);
                         guild.VoiceMutedUsers.Remove(vmu);
                     }
+                    var vdus = guild.VoiceDeafenedUsers.Where(r => r.ExpiresAtUTC < DateTimeOffset.UtcNow).ToList();
+                    LogService.LogInformation($"undeafening {vmus.Count} expired VoiceDeafens.", LogSource.AdministratotUtilService, Guild: socketguild);
+                    foreach (var vdu in vdus)
+                    {
+                        await VoiceDeafCallback(vdu);
+                        guild.VoiceDeafenedUsers.Remove(vdu);
+                    }
 
                     store.Update(guild);
 
+                    foreach (var item in guild.VoiceDeafenedUsers)
+                    {
+                        TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, VoiceDeafCallback,item.Id);
+                    }
                     foreach (var item in guild.VoiceMutedUsers)
                     {
-                        TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, VoiceMuteCallback);
+                        TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, VoiceMuteCallback,item.Id);
                     }
                 }
                 await store.SaveChangesAsync();
@@ -93,10 +104,32 @@ namespace Mummybot.Services
 
         }
 
-        //public async Task CancelMuteAsync(SocketGuildUser user)
-        //{
+        public async Task VoiceDeafen(MummyContext ctx, SocketGuildUser user, TimeSpan time)
+        {
+            var vdu = new VoiceDeafUser()
+            {
+                Id = SnowFlakeGenerator.NextLong(),
+                ChannelID = ctx.Channel.Id,
+                SetAtUTC = DateTimeOffset.UtcNow,
+                ExpiresAtUTC = DateTimeOffset.UtcNow.Add(time),
+                UserID = user.Id,
+                GuildID = ctx.Guild.Id
+            };
 
-        //}
+            await ctx.Channel.SendMessageAsync($"Deafened {user.GetDisplayName()} for {time.Humanize()}");
+            LogService.LogInformation($"Deafened {user.GetDisplayName()} for {time.Humanize()}", Guild: ctx.Guild);
+
+            using (var store = ServiceProvider.GetRequiredService<GuildStore>())
+            {
+                var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
+                config.VoiceDeafenedUsers.Add(vdu);
+                store.Update(config);
+                await store.SaveChangesAsync();
+            }
+            await user.ModifyAsync(user => user.Deaf = true);
+            TaskQueue.ScheduleTask(vdu, time, VoiceDeafCallback, vdu.Id);
+
+        }       
 
         public async Task VoiceMuteCallback(VoiceMutedUser args)
         {
@@ -114,6 +147,21 @@ namespace Mummybot.Services
             await store.SaveChangesAsync();
         }
 
+        public async Task VoiceDeafCallback(VoiceDeafUser args)
+        {
+
+            var guild = DiscordClient.GetGuild(args.GuildID);
+            var user = guild.GetUser(args.UserID);
+
+            await user.ModifyAsync(user => user.Deaf = false);
+            LogService.LogInformation($"Undeafened {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}", Guild: guild);
+
+            using var store = ServiceProvider.GetRequiredService<GuildStore>();
+            var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
+            config.VoiceDeafenedUsers.Remove(args);
+            store.Update(config);
+            await store.SaveChangesAsync();
+        }
 
     }
 }
