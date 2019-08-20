@@ -87,7 +87,7 @@ namespace MummyBot
                     CooldownBucketType.Global => ctx.Command,
                     _ => throw new InvalidOperationException("got unexpected cooldownbuckettype"),
                 };
-            throw new InvalidOperationException($"cooldownbuckettype fail to parse as {typeof(CooldownBucketType)}");
+            throw new InvalidOperationException($"cooldownbuckettype failed to parse as {typeof(CooldownBucketType)}");
         }
     }
 }
