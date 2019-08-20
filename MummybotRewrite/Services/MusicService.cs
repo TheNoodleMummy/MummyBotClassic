@@ -6,6 +6,7 @@ namespace Mummybot.Services
     using Discord;
     using Discord.WebSocket;
     using Microsoft.Extensions.DependencyInjection;
+    using Mummybot.Database;
     using Mummybot.Interfaces;
     using System.Collections.Concurrent;
     using System.Linq;
@@ -20,8 +21,10 @@ namespace Mummybot.Services
         {
             LogService = log;
         }
-        internal LavaSocketClient LavaSocketClient { get; set; }
-        internal LavaRestClient LavaRestClient { get; set; }
+        internal LavaSocketClient LavaSocketClient;
+        internal LavaRestClient LavaRestClient;
+
+        private IServiceProvider Services;
         private readonly LogService LogService;
 
 
@@ -29,8 +32,7 @@ namespace Mummybot.Services
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
-            LogService = services.GetRequiredService<LogService>();
+#if DEBUG
             LavaSocketClient = services.GetRequiredService<LavaSocketClient>();
             LavaSocketClient.StartAsync(services.GetRequiredService<DiscordSocketClient>(), new Configuration()
             {
@@ -43,6 +45,7 @@ namespace Mummybot.Services
                 Password = "youshallnotpass"
             });
             LavaRestClient = services.GetRequiredService<LavaRestClient>();
+            Services = services;
 
             LavaSocketClient.OnSocketClosed += LavaClient_OnSocketClosed;
             LavaSocketClient.OnTrackException += LavaClient_OnTrackException;
@@ -124,6 +127,12 @@ namespace Mummybot.Services
                 if (volume <= 0 && volume >= 150)
                     return new VolumeResult() { IsSuccess = false, ErrorReason = "Volume must be between 0 and 150" };
 
+                using var guildstore = Services.GetRequiredService<GuildStore>();
+                var guild = await guildstore.GetOrCreateGuildAsync(guildid);
+                guild.Volume = volume;
+                guildstore.Update(guild);
+                await guildstore.SaveChangesAsync();
+
                 await musicDetails.Player.SetVolumeAsync(volume);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.CurrentVolume };
             }
@@ -165,6 +174,9 @@ namespace Mummybot.Services
             else
             {
                 var player = await LavaSocketClient.ConnectAsync(channel);
+                using var guildstore = Services.GetRequiredService<GuildStore>();
+                var guild = await guildstore.GetOrCreateGuildAsync(channel.GuildId);
+                await player.SetVolumeAsync(guild.Volume);
                 ConnectedChannels.TryAdd(channel.GuildId, new MusicDetails()
                 {
                     Player = player,
@@ -218,7 +230,7 @@ namespace Mummybot.Services
             if (player.TextChannel is null)
                 return;
             else
-                await player.TextChannel?.SendMessageAsync($"Finished playing: {track.Title}\nNow playing: {nextTrack.Title}");
+                await player.TextChannel?.SendMessageAsync($"Now playing: {nextTrack.Title}");
         }
 
         private Task LavaClient_OnTrackException(LavaPlayer player, LavaTrack track, string error)

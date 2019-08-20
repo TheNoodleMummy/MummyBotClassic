@@ -48,7 +48,7 @@ namespace Mummybot.Services
                 {
                     var socketguild = client.GetGuild(guild.GuildID);
                     var vmus = guild.VoiceMutedUsers.Where(r => r.ExpiresAtUTC < DateTimeOffset.UtcNow).ToList();
-                    LogService.LogInformation($"unmuting {vmus.Count} expired VoiceMutes.", LogSource.AdministratotUtilService,Guild:socketguild);
+                    LogService.LogInformation($"unmuting {vmus.Count} expired VoiceMutes.", LogSource.AdministratotUtilService, Guild: socketguild);
                     foreach (var vmu in vmus)
                     {
                         await VoiceMuteCallback(vmu);
@@ -106,15 +106,14 @@ namespace Mummybot.Services
             var user = guild.GetUser(args.UserID);
 
             await user.ModifyAsync(user => user.Mute = false);
-            LogService.LogInformation($"UnMuted {user.GetDisplayName()} after {(args.ExpiresAtUTC-args.SetAtUTC).Humanize()}", Guild: guild);
+            LogService.LogInformation($"UnMuted {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}", Guild: guild);
 
-            using (var store = ServiceProvider.GetRequiredService<GuildStore>())
-            {
-                var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
-                config.VoiceMutedUsers.Remove(args);
-                store.Update(config);
-                await store.SaveChangesAsync();
-            }
+            using var store = ServiceProvider.GetRequiredService<GuildStore>();
+            var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
+            config.VoiceMutedUsers.Remove(args);
+            store.Update(config);
+            await store.SaveChangesAsync();
+
         }
 
 

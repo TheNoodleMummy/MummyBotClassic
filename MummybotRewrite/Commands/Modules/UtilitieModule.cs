@@ -13,35 +13,43 @@ namespace Mummybot.Commands.Modules
     public class UtilitieModule : MummyModule
     {
         [Command("color")]
-        [RequirePermissions(Enums.PermissionTarget.Bot,GuildPermission.ManageRoles)]
-        public async Task Color(int r,int g,int b,SocketGuildUser user= null)
-        {
-            user ??= Context.User;
-            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r=>r.Name.Equals(Context.User.Username,StringComparison.InvariantCultureIgnoreCase));
-            var color = new Color(r, g, b);
-            if (role is null)
-            {
-                role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: false);
-                await user.AddRoleAsync(role);
-            }
-            else
-                await role.ModifyAsync(r => r.Color = color);            
-        }
+        [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageRoles)]
+        public async Task Color(int red, int green, int blue, SocketGuildUser user = null)
+            => ChangeColorRGB(new Color(red, green, blue), user);       
 
         [Command("color")]
         [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageRoles)]
         public async Task Color(uint rawhex, SocketGuildUser user = null)
+            => ChangeColorRGB(new Color(rawhex), user);
+
+
+        [Command("color")]
+        [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        public async Task Color(uint rawhex)
+           => ChangeColorRGB(new Color(rawhex));
+
+        [Command("color")]
+        [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
+        public async Task Color(int red, int green, int blue)
+            => ChangeColorRGB(new Color(red, green, blue));
+
+        internal async Task ChangeColorRGB(Color color, SocketGuildUser user=null)
         {
             user ??= Context.User;
-            IRole role = user.Roles.OrderBy(r => r.Position).FirstOrDefault(r => r.Name.Equals(Context.User.Username, StringComparison.InvariantCultureIgnoreCase));
-            var color = new Color(rawhex);
+            IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.InvariantCultureIgnoreCase));
             if (role is null)
             {
-                role = await Context.Guild.CreateRoleAsync(Context.User.Username, color: color, isHoisted: false);
+                role = await user.Guild.CreateRoleAsync(user.GetDisplayName(), color: color);
+                await role.ModifyAsync(role => role.Position = user.Roles.OrderByDescending(roles => roles.Position).FirstOrDefault().Position - 1);
                 await user.AddRoleAsync(role);
             }
             else
-                await role.ModifyAsync(r => r.Color = color);
+            {
+                await role.ModifyAsync(r => color = color);
+            }
         }
+
     }
 }
