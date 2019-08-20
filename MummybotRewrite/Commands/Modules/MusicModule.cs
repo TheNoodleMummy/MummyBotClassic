@@ -12,6 +12,7 @@ using Victoria.Entities;
 namespace Mummybot.Commands.Modules
 {
     [RequireVoiceChannel]
+    [RequireMusicAttribute]
     public class MusicModule : MummyModule
     {
         private readonly MusicService _musicService;

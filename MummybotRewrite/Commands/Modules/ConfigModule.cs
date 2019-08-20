@@ -118,6 +118,26 @@ namespace Mummybot.Commands.Modules
                 }
             }
         }
+
+        [Group("voice")]
+        public class musicConfigModule : MummyModule
+        {
+            [Command("music")]
+            public async Task SetmusicOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesMusic = onoff;
+                await Context.Message.AddOkAsync();
+            }
+
+            [Command("trolls")]
+            public async Task SettrollsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesTrolls = onoff;
+                await Context.Message.AddOkAsync();
+            }
+
+
+        }
     }
 }
 

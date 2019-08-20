@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Mummybot.Commands.Modules
 {
     [RequireVoiceChannel]
+    [RequireVoiceTrolls]
     public class VoiceTrollsModule  : MummyModule
     {
         public MusicService _musicService;
