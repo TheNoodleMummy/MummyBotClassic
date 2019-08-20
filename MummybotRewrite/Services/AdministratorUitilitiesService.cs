@@ -62,8 +62,7 @@ namespace Mummybot.Services
                         TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, VoiceMuteCallback);
                     }
                 }
-                var i = await store.SaveChangesAsync();
-                Console.WriteLine("adminutils " + i);
+                await store.SaveChangesAsync();
             }
         }
 
@@ -87,8 +86,7 @@ namespace Mummybot.Services
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
                 config.VoiceMutedUsers.Add(vmu);
                 store.Update(config);
-                var i = await store.SaveChangesAsync();
-                Console.WriteLine("adminutils " + i);
+                await store.SaveChangesAsync();
             }
             await user.ModifyAsync(user => user.Mute = true);
             TaskQueue.ScheduleTask(vmu, time, VoiceMuteCallback, vmu.Id);
@@ -113,8 +111,7 @@ namespace Mummybot.Services
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
             config.VoiceMutedUsers.Remove(args);
             store.Update(config);
-            var i = await store.SaveChangesAsync();
-            Console.WriteLine("adminutilsservice " + i);
+            await store.SaveChangesAsync();
         }
 
 

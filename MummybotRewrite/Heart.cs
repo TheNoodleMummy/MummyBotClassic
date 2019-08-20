@@ -65,10 +65,8 @@ namespace MummyBot
                 await tokenstore.Database.MigrateAsync();
                 await guildstore.Database.MigrateAsync();
 
-                var i = await tokenstore.SaveChangesAsync();
-                Console.WriteLine("tokenstore " + i);
-                i = await guildstore.SaveChangesAsync();
-                Console.WriteLine("guildstore "+i);
+                await tokenstore.SaveChangesAsync();
+                await guildstore.SaveChangesAsync();
             }
 
             var mummybot = new BotStartup(services);
@@ -78,12 +76,12 @@ namespace MummyBot
         public object CoolDownBucketGenerator(object bucketType, CommandContext context, IServiceProvider provider)
         {
             if (!(context is MummyContext ctx))
-                throw new InvalidContextException(context.GetType());            
-           
+                throw new InvalidContextException(context.GetType());
+
             if (bucketType is CooldownBucketType CBT)
                 return CBT switch
                 {
-                    CooldownBucketType.Guilds =>(object) ctx.GuildId,
+                    CooldownBucketType.Guilds => (object)ctx.GuildId,
                     CooldownBucketType.User => ctx.UserId,
                     CooldownBucketType.Channels => ctx.ChannelId,
                     CooldownBucketType.Global => ctx.Command,

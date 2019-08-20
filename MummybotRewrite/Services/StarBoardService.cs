@@ -57,8 +57,7 @@ namespace Mummybot.Services
 
                             star.StarboardMessageId = starboardmsg.Id;
                             guild.Stars.Add(star);
-                            var i = await guildstore.SaveChangesAsync();
-                            Console.WriteLine("starboard " + i);
+                            await guildstore.SaveChangesAsync();
                         }
                         else
                         {
@@ -74,8 +73,7 @@ namespace Mummybot.Services
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
-                            var i = await guildstore.SaveChangesAsync();
-                            Console.WriteLine("starboard " + i);
+                            await guildstore.SaveChangesAsync();
                         }
                     }
                 }
@@ -101,8 +99,8 @@ namespace Mummybot.Services
                                 await starboard.DeleteMessageAsync(star.StarboardMessageId);
                                 guild.Stars.Remove(star);
                                 guildstore.Update(guild);
-                                var idk = await guildstore.SaveChangesAsync();
-                                Console.WriteLine("starboard " + idk); return;
+                                await guildstore.SaveChangesAsync();
+                                return;
                             }
                             var emb = new EmbedBuilder();
 
@@ -115,8 +113,7 @@ namespace Mummybot.Services
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
-                            var i = await guildstore.SaveChangesAsync();
-                            Console.WriteLine("starboard " + i);
+                            await guildstore.SaveChangesAsync();
                         }
                     }
                 }

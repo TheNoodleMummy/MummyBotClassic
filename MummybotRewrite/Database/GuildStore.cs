@@ -177,8 +177,7 @@ namespace Mummybot.Database
             };
             await Guilds.AddAsync(newguild);
 
-            var i = await SaveChangesAsync();
-            Console.WriteLine("guildstore " + i);
+            await SaveChangesAsync();
             if (expression is null)
             {
                 return await Guilds.FindAsync(guildid);
