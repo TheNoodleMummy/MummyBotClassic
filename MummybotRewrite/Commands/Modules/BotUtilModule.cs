@@ -14,6 +14,7 @@ namespace Mummybot.Commands.Modules
         public PingService PingService { get; set; }
 
         [Command("ping")]
+        [Description("get the bots heartbeatping,time it takes to send a message,time to mofify this message")]
         public async Task PingAsync()
         {
             var emb = new EmbedBuilder()

@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
+using Mummybot.Attributes.Checks;
 using Mummybot.Services;
 using Qmmands;
 using System;
@@ -11,6 +13,7 @@ namespace Mummybot.Commands.Modules
     public class BirthdayModule : MummyModule
     {
         [Command("birthdays")]
+        [Description("get all birthdays that are registered in this guild")]
         public async Task GetBirthdays()
         {
             var sb = new StringBuilder();
@@ -26,7 +29,10 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("birthday")]
-        public async Task Birthday(SocketGuildUser user = null)
+        [Description("check a users birthday")]
+        public async Task Birthday(
+            [Description("if not passed it will take the authors as user")]SocketGuildUser user = null
+            )
         {
             var id = user?.Id ?? Context.User.Id;
             var bday = GuildConfig.Birthdays.Find(b => b.UserId == id);
@@ -46,7 +52,9 @@ namespace Mummybot.Commands.Modules
             public BirthdayService BirthdayService { get; set; }
 
             [Command("birthday")]
-            public async Task RegisterBirthday([Remainder]DateTimeOffset dateTimeOffset)
+            [Description("register your birthday with mummybot he will wish ou a happy birthday on the exact time your set")]
+            public async Task RegisterBirthday(
+                [Remainder,Description("the date + time + date format(dmy/mdy) of your bday (ex: 20/10/1994 12:14 dmy")]DateTimeOffset dateTimeOffset)
             {
                 var result = await BirthdayService.RegisterBirthdayAsync(Context, dateTimeOffset);
                 if (result.IsSuccess)
@@ -56,6 +64,7 @@ namespace Mummybot.Commands.Modules
             }
 
             [Command("birthday")]
+            [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.ManageGuild)]
             public async Task RegisterBirthday(ulong userid, [Remainder]DateTimeOffset dateTimeOffset)
             {
                 var result = await BirthdayService.RegisterBirthdayAsync(Context, dateTimeOffset, userid);

@@ -24,6 +24,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("join")]
+        [Description("makes to bot join your voicechannel")]
         public async Task Join()
         {
             await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel);
@@ -31,6 +32,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("leave")]
+        [Description("makes to bot leave your voicechannel")]
         public async Task LeaveAsync()
         {
             await _musicService.LeaveAsync(Context.Guild.Id);
@@ -38,7 +40,8 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("volume")]
-        public async Task SetVolumeAsync(int volume)
+        [Description("sets the bots volume")]
+        public async Task SetVolumeAsync([Description("volule to set")] int volume)
         {
             var result = await _musicService.SetVolumeAsync(Context.Guild.Id, volume);
             if (result.IsSuccess)
@@ -52,6 +55,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("queue")]
+        [Description("get the current queue for this guild")]
         public async Task GetQueueAsync()
         {
             var result = _musicService.GetQueue(Context.Guild.Id);
@@ -74,7 +78,8 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("play")]
-        public async Task PlayAsync([Remainder]string url)
+        [Description("play something? (the bot needs to join first)")]
+        public async Task PlayAsync([Description("a youtube/soundcloud link"), Remainder]string url)
         {
             var playResult = await _musicService.PlayAsync(Context.Guild.Id, url);
             if (playResult.PlayerWasPlaying)
@@ -90,7 +95,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("ytsearch")]
-        public async Task SearchYTAsync([Remainder]string querry)
+        public async Task SearchYTAsync([Description("the querry to look for on youtube"), Remainder]string querry)
         {
             var results = await _musicService.SearchYoutubeAsync(querry);
             switch (results.LoadType)
@@ -128,7 +133,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("SCsearch")]
-        public async Task SearchSCAsync([Remainder]string querry)
+        public async Task SearchSCAsync([[Description("the querry to look for on soundcloud"), Remainder]string querry)
         {
             var results = await _musicService.SearchSoundCloudAsync(querry);
             switch (results.LoadType)

@@ -27,7 +27,10 @@ namespace Mummybot.Commands.Modules
 
                 [Command]
                 [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
-                public async Task VoiceMute(SocketGuildUser user, TimeSpan howlong)
+                public async Task VoiceMute(
+                    [Description("User to mute")]SocketGuildUser user,
+                    [Description("well how long duh..")]TimeSpan howlong
+                    )
                 {
                     await AdministratorService.VoiceMute(Context, user, howlong);
                     Context.Message.AddOkAsync();
@@ -49,7 +52,10 @@ namespace Mummybot.Commands.Modules
 
                 [Command]
                 [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
-                public async Task VoiceDeafen(SocketGuildUser user, TimeSpan howlong)
+                public async Task VoiceDeafen(
+                    [Description("User to mute")]SocketGuildUser user,
+                    [Description("well how long duh..")]TimeSpan howlong
+                    )
                 {
                     await AdministratorService.VoiceDeafen(Context, user, howlong);
                     Context.Message.AddOkAsync();

@@ -13,6 +13,8 @@ namespace Mummybot.Commands.Modules
     public class TagModule : MummyModule
     {
         public SnowFlakeGeneratorService SnowFlakeGenerator { get; set; }
+
+
         [Command]
         public async Task TagAsync(string key)
         {
