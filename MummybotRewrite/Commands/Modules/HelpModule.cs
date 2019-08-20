@@ -114,7 +114,13 @@ namespace Mummybot.Commands.Modules
 
             foreach (var match in result.Take(3))
             {
-                var sb = new StringBuilder().Append(Context.PrefixUsed).Append(" ").Append(match.Command.Name).Append(" ");
+                var sb = new StringBuilder();
+
+                if (Context.PrefixUsed.Length == 1)
+                    sb.Append(Context.PrefixUsed).Append(match.Command.Name).Append(" ");                
+                else
+                    sb.Append(Context.PrefixUsed).Append(" ").Append(match.Command.Name).Append(" ");
+
                 foreach (var parameter in match.Command.Parameters)
                 {
                     if (parameter.IsOptional && parameter.IsRemainder)//optional remiander
