@@ -53,7 +53,7 @@ namespace Mummybot.Commands.Modules
                 [Command]
                 [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
                 public async Task VoiceDeafen(
-                    [Description("User to mute")]SocketGuildUser user,
+                    [Description("User to deafen")]SocketGuildUser user,
                     [Description("well how long duh..")]TimeSpan howlong
                     )
                 {
