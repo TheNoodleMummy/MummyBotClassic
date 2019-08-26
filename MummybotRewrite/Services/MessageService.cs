@@ -212,7 +212,7 @@ namespace Mummybot.Services
                         emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.WithDescription("Could not find any command with that name");
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
-                        _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands);
+                        _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands,Guild:commandContext.Guild);
                     }
                     else if (result is OverloadsFailedResult overloadsFailedResult)
                     {

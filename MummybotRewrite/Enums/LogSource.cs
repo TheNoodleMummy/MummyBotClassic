@@ -17,6 +17,7 @@ namespace Mummybot.Enums
         LavaLink,
         Victoria,
         TaskQueue,
-        AdministratotUtilService
+        AdministratotUtilService,
+        GuildStore
     }
 }

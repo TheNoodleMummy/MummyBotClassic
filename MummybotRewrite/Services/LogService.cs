@@ -9,18 +9,23 @@ using Mummybot.Attributes;
 using Mummybot.Enums;
 using System.Threading;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mummybot.Services
 {
     public class LogService : BaseService
     {
-        public string _logDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));
-        public string _logfile => Path.Combine(_logDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
+        public string LogDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));
+        public string Logfile => Path.Combine(LogDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
 
-
+        public override Task InitialiseAsync(IServiceProvider services)
+        {
+            DiscordSocketClient = services.GetRequiredService<DiscordSocketClient>();
+            return Task.CompletedTask;
+        }
         public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
 
-        
+        public DiscordSocketClient DiscordSocketClient { get; set; }
 
         public Task LogEventAsync(LogMessage log) => LogEventCustomAsync(new Structs.LogMessage(log.Severity, log.Source, log.Message, log.Exception));
         public Task LogEventCustomAsync(Structs.LogMessage log)
@@ -36,30 +41,16 @@ namespace Mummybot.Services
             Console.Write($"{(time.Day < 10 ? "0" : "")}{time.Day}-{(time.Month < 10 ? "0" : "")}{time.Month}-{time.Year} {(time.Hour < 10 ? "0" : "")}{time.Hour}:{(time.Minute < 10 ? "0" : "")}{time.Minute}:{(time.Second < 10 ? "0" : "")}{time.Second}");
 
             Console.Write("[");
-            switch (severity)
+            Console.ForegroundColor = severity switch
             {
-                case LogSeverity.Critical:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    break;
-                case LogSeverity.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case LogSeverity.Warning:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    break;
-                case LogSeverity.Info:
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    break;
-                case LogSeverity.Verbose:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-                case LogSeverity.Debug:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
+                LogSeverity.Critical => ConsoleColor.DarkRed,
+                LogSeverity.Error => ConsoleColor.Red,
+                LogSeverity.Warning => ConsoleColor.DarkYellow,
+                LogSeverity.Info => ConsoleColor.DarkGreen,
+                LogSeverity.Verbose => ConsoleColor.Green,
+                LogSeverity.Debug => ConsoleColor.Magenta,
+                _ => throw new ArgumentOutOfRangeException(),
+            };
             const int sevLength = 8;
             if (severity.ToString().Length < sevLength)
             {
@@ -163,18 +154,18 @@ namespace Mummybot.Services
 #if DEBUG
 #else
 
-            if (!Directory.Exists(_logDirectory))
+            if (!Directory.Exists(LogDirectory))
             {
-                Directory.CreateDirectory(_logDirectory);
+                Directory.CreateDirectory(LogDirectory);
             }
-            if (!File.Exists(_logfile))
+            if (!File.Exists(Logfile))
             {
-                File.Create(_logfile).Dispose();
+                File.Create(Logfile).Dispose();
 
             }
 
             string logText = $"{DateTime.UtcNow.ToString("hh:mm:ss")} [{severity}] {source}: {message} => {exception}";
-            File.AppendAllText(_logfile, logText + Environment.NewLine);  
+            File.AppendAllText(Logfile, logText + Environment.NewLine);  
 #endif
             ss.Release(1);
             return Task.CompletedTask;
@@ -199,6 +190,42 @@ namespace Mummybot.Services
         => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
 
         internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
+       => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
+
+        internal void LogDebug(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception, Guild));
+        }
+
+        internal void LogWarning(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Warning, source.ToString(), Message, exception, Guild));
+        }
+
+        internal void LogVerbose(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Verbose, source.ToString(), Message, exception, Guild));
+        }
+
+        internal void LogCritical(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Critical, source.ToString(), Message, exception, Guild));
+        }
+
+        internal void LogError(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
+        }
+
+        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null, ulong Guildid = 0)
+        {
+            var Guild = DiscordSocketClient?.GetGuild(Guildid);
+            LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
+        }
     }
 }

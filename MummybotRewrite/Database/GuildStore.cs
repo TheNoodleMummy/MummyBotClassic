@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Mummybot.Database.Entities;
 using Mummybot.Services;
@@ -114,7 +115,7 @@ namespace Mummybot.Database
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object");
+                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object",Enums.LogSource.GuildStore,null,iguild as SocketGuild);
                 return await CreateGuildAsync(iguild.Id, expression);
             }
             Slim.Release();
@@ -127,7 +128,7 @@ namespace Mummybot.Database
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == guildid);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {guildid} was not found creating new object");
+                _logservice.LogInformation($"guild: {guildid} was not found creating new object",Enums.LogSource.GuildStore,Guildid: guildid);
                 return await CreateGuildAsync(guildid, expression);
             }
             Slim.Release();
@@ -140,7 +141,7 @@ namespace Mummybot.Database
             var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == guildid);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {guildid} was not found creating new object");
+                _logservice.LogInformation($"guild: {guildid} was not found creating new object", Enums.LogSource.GuildStore, Guildid: guildid);
                 return await CreateGuildAsync<ulong>(guildid: guildid, null);
             }
             Slim.Release();
@@ -153,7 +154,7 @@ namespace Mummybot.Database
             var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object");
+                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, null, iguild as SocketGuild);
                 return await CreateGuildAsync<ulong>(guildid: iguild.Id, null);
             }
             Slim.Release();
