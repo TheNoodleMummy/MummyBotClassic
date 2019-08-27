@@ -84,7 +84,7 @@ namespace Mummybot.Services
 
             var bday = (await guildstore.GetAllGuildsAsync(x => x.Birthdays))
                 .SelectMany(x => x.Birthdays)
-                .OrderByDescending(b => b.NextBdayUTC.ToUniversalTime())
+                .OrderBy(b => b.NextBdayUTC.ToUniversalTime())
                 .FirstOrDefault(b => b.NextBdayUTC > DateTimeOffset.UtcNow);
 
             if (bday is null)
