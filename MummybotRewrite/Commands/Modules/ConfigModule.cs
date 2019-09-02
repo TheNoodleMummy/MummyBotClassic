@@ -14,6 +14,17 @@ namespace Mummybot.Commands.Modules
     [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.ManageGuild,Group = "or")]
     public class ConfigModule : MummyModule
     {
+        [Group("offensive")]
+        public class OffensiveCommands : MummyModule
+        {
+            [Command("commands")]
+            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.AllowOffensiveCommands = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
         [Group("starboard")]
         public class StarboardModule : MummyModule
         {
