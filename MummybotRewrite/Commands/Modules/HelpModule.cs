@@ -79,7 +79,6 @@ namespace Mummybot.Commands.Modules
         [Command("help"), Description("Specific help for a module")]
         public async Task HelpAsync([Description("Command you want the help for"),Remainder]Module module)
         {
-            var prefix = Context.PrefixUsed;
 
             var builder = new EmbedBuilder()
             {
@@ -91,7 +90,7 @@ namespace Mummybot.Commands.Modules
             foreach (var cmd in module.Commands)
             {
                 if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
-                sb.Append(prefix).AppendLine(cmd.Name);
+                sb.Append(Context.PrefixUsed).AppendLine(cmd.Name);
             }
             builder.AddField("\u200B", sb.ToString());
             await ReplyAsync(embed: builder);

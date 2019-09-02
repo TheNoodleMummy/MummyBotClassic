@@ -287,3 +287,7 @@ database.json
 /MummybotRewrite/opus.dll
 /Victoria-4
 /MummybotRewrite/usings.json
+/Discord.Net.Core
+/Discord.Net.Rest
+/Discord.Net.Webhook
+/Discord.Net.WebSocket
