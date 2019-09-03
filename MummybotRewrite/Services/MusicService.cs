@@ -35,7 +35,7 @@ namespace Mummybot.Services
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
-#if DEBUG
+#if !DEBUG
             LavaSocketClient = services.GetRequiredService<LavaSocketClient>();
             LavaSocketClient.StartAsync(services.GetRequiredService<DiscordSocketClient>(), new Configuration()
             {

@@ -6,12 +6,13 @@ using Mummybot.Extentions;
 using System;
 using Mummybot.Commands.TypeReaders;
 using Mummybot.Attributes.Checks;
+using System.Text;
 
 namespace Mummybot.Commands.Modules
 {
     [Group("config")]
-    [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.Administrator,Group = "or")]
-    [RequirePermissions(Enums.PermissionTarget.User,GuildPermission.ManageGuild,Group = "or")]
+    [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.Administrator, Group = "or")]
+    [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageGuild, Group = "or")]
     public class ConfigModule : MummyModule
     {
         [Group("offensive")]
@@ -148,6 +149,20 @@ namespace Mummybot.Commands.Modules
             }
 
 
+        }
+
+
+        [Command]
+        public async Task GetCOnfig()
+        {
+            var emb = new EmbedBuilder();
+            bool idk=false;
+            foreach (var item in GuildConfig.GetType().GetProperties().Where(p => p.PropertyType == typeof(bool)
+                                         && (bool)p.GetValue(idk, null)))
+            {
+                emb.AddField(item.Name, item.GetValue(true));
+            }
+            await ReplyAsync(embed: emb);
         }
     }
 }
