@@ -222,7 +222,9 @@ namespace Mummybot.Services
                     else if (result is ChecksFailedResult checks)
                     {
                         var emb = new EmbedBuilder();
-                        foreach (var (Check, Result) in checks.FailedChecks.Take(25))
+                        emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
+                        emb.WithTitle($"{checks.FailedChecks.Count} checks failed");
+                        foreach (var (Check, Result) in checks.FailedChecks.Take(10))
                         {
                             var attri = Check.GetType().GetCustomAttributes(typeof(Attributes.NameAttribute), false).FirstOrDefault();
                             var nameattri = (attri as Attributes.NameAttribute).Name;
@@ -233,6 +235,7 @@ namespace Mummybot.Services
                     else if (result is TypeParseFailedResult parser)
                     {
                         var emb = new EmbedBuilder();
+                        emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.AddField(parser.Parameter.Name, parser.Value);
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
@@ -247,6 +250,7 @@ namespace Mummybot.Services
                     else if (result is CommandOnCooldownResult ccr)
                     {
                         var emb = new EmbedBuilder();
+                        emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.WithTitle(ccr.Command.Name + " is on cooldown");
                         foreach (var item in ccr.Cooldowns)
                         {
