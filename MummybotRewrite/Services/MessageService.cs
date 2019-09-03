@@ -224,7 +224,9 @@ namespace Mummybot.Services
                         var emb = new EmbedBuilder();
                         foreach (var (Check, Result) in checks.FailedChecks.Take(25))
                         {
-                            emb.AddField(Check.ToString(), Result.Reason, true);
+                            var attri = Check.GetType().GetCustomAttributes(typeof(Attributes.NameAttribute), false).FirstOrDefault();
+                            var nameattri = (attri as Attributes.NameAttribute).Name;
+                            emb.AddField(nameattri, Result.Reason, true);
                         }
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }

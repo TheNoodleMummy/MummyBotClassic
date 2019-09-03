@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require Reminder Service")]
     class RequireReminders : MummyCheckBase
     {
         public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)

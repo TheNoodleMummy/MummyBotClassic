@@ -8,6 +8,7 @@ using Qmmands;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require VoiceChannel")]
     public class RequireVoiceChannel : MummyCheckBase
     {
         public override ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)

@@ -9,6 +9,7 @@ using Qmmands;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require Offensive commands")]
     class RequireOffensiveAttribute : MummyCheckBase
     {
         public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)

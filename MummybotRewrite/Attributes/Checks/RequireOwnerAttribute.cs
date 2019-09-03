@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require Owner")]
     public class RequireOwnerAttribute : MummyCheckBase
     {
         public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)

@@ -9,6 +9,7 @@ using Qmmands;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require Voice Trolls Service")]
     public class RequireVoiceTrollsAttribute : MummyCheckBase
     {
         public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)

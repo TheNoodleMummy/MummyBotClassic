@@ -11,11 +11,14 @@ using PermissionTarget = Mummybot.Enums.PermissionTarget;
 
 namespace Mummybot.Attributes.Checks
 {
+    [Name("Require Permissions")]
+
     public class RequirePermissions : MummyCheckBase
     {
         private readonly PermissionTarget _target;
         private readonly GuildPermission[] _guildPerms;
         private readonly ChannelPermission[] _channelPerms;
+
 
         public RequirePermissions(PermissionTarget target, params GuildPermission[] guildPerms)
         {
