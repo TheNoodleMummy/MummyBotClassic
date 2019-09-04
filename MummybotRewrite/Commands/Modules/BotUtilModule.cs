@@ -14,12 +14,18 @@ namespace Mummybot.Commands.Modules
         public PingService PingService { get; set; }
 
         [Command("ping")]
-        [Description("get the bots heartbeatping,time it takes to send a message,time to mofify this message")]
+        [Description("get the bots heartbeat ping, time it takes to send a message, time to mofify this message")]
         public async Task PingAsync()
         {
-            var emb = new EmbedBuilder()
-                .AddField("My average gateway Ping in the last hour", PingService.HourPing.ToString("##.##"), true)
-                .AddField("My total average ping", PingService.TotalPing.ToString("##.##"), true);
+            var emb = new EmbedBuilder();
+            if (PingService.HourPing != 0)
+            {
+                emb.AddField("My average gateway Ping in the last hour", PingService.HourPing.ToString("##.##") + "ms", true);
+            }
+            if (PingService.TotalPing != 0)
+            {
+                emb.AddField("My total average ping", PingService.TotalPing.ToString("##.##") + "ms", true);
+            }
 
             var latency = Context.Client.Latency;
             var s = Stopwatch.StartNew();
@@ -37,8 +43,6 @@ namespace Mummybot.Commands.Modules
                 x.Content = $"heartbeat: {latency}ms, init: {init}ms, rtt: {s.ElapsedMilliseconds}ms";
                 x.Embed = emb.Build();
             });
-
-           
         }
     }
 }
