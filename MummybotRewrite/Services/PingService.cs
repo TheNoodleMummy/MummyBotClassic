@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +8,11 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
-    public class PingService 
+    public class PingService :BaseService
     {
-
-        private Dictionary<DateTime, int> HourlyPings = new Dictionary<DateTime, int>();
-        private List<int> Pings = new List<int>();
-
-        public double HourPing => HourlyPings.Select(x=>x.Value).Average();
-        public double TotalPing => Pings.Average();
-
-        public PingService(DiscordSocketClient client)
+        public override Task InitialiseAsync(IServiceProvider services)
         {
+            var client = services.GetRequiredService<DiscordSocketClient>();
             client.LatencyUpdated += (_, newping) =>
             {
                 Pings.Add(newping);
@@ -29,6 +24,13 @@ namespace Mummybot.Services
                 }
                 return Task.CompletedTask;
             };
+            return Task.CompletedTask;
         }
+
+        private Dictionary<DateTime, int> HourlyPings = new Dictionary<DateTime, int>();
+        private List<int> Pings = new List<int>();
+
+        public double HourPing => HourlyPings.Select(x=>x.Value).Average();
+        public double TotalPing => Pings.Average();        
     }
 }
