@@ -151,9 +151,7 @@ namespace Mummybot.Services
 
             Console.WriteLine();
 
-#if DEBUG
-#else
-
+#if !DEBUG
             if (!Directory.Exists(LogDirectory))
             {
                 Directory.CreateDirectory(LogDirectory);
