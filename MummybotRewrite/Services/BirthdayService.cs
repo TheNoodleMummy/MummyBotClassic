@@ -89,11 +89,11 @@ namespace Mummybot.Services
 
             if (bday is null)
             {
-                LogService.LogInformation("no birthday found waiting for first add", Enums.LogSource.BirthdayService,null,null);
+                LogService.LogInformation("no birthday found waiting for first add", Enums.LogSource.BirthdayService);
             }
             else
             {
-                LogService.LogInformation($"registered next birthday for {bday.NextBdayUTC} userid: {bday.UserId}",Enums.LogSource.BirthdayService,Guildid: bday.GuildID);
+                LogService.LogInformation($"registered next birthday for {bday.NextBdayUTC} userid: {bday.UserId}",Enums.LogSource.BirthdayService, bday.GuildID);
                 _taskQueue.ScheduleTask(bday, bday.NextBdayUTC, BirthdayCallbackAsync);
             }
            
@@ -115,7 +115,7 @@ namespace Mummybot.Services
             var guild = _discordClient.GetGuild(birthday.GuildID);
             if (guildconfig.BdayChannelId == 0)
             {
-                LogService.LogInformation("no bday channel configured", Enums.LogSource.BirthdayService, null, guild);
+                LogService.LogInformation("no bday channel configured", Enums.LogSource.BirthdayService, guild.Id);
                 var channels = guild.TextChannels.OrderBy(c => c.Position);
                 var channel = channels.FirstOrDefault(c => c.PermissionOverwrites.Any(p => p.Permissions.SendMessages == PermValue.Allow));
                 await channel.SendMessageAsync($"sorry im late by {(DateTimeOffset.UtcNow - birthday.NextBdayUTC).TotalSeconds}seconds please forgive me.{Environment.NewLine}" +

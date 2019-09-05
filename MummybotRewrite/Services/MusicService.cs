@@ -220,7 +220,7 @@ namespace Mummybot.Services
 
         private Task LavaClient_OnTrackStuck(LavaPlayer player, LavaTrack track, long threshold)
         {
-            LogService.LogWarning($"player for {player.VoiceChannel.GuildId} stuck at {threshold}sec.", Enums.LogSource.Victoria,null,player.VoiceChannel.Guild as SocketGuild);
+            LogService.LogWarning($"player for {player.VoiceChannel.GuildId} stuck at {threshold}sec.", Enums.LogSource.Victoria,player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
@@ -247,13 +247,13 @@ namespace Mummybot.Services
 
         private Task LavaClient_OnTrackException(LavaPlayer player, LavaTrack track, string error)
         {
-            LogService.LogError($"Player {player.VoiceChannel.GuildId} {error} for {track.Title}", Enums.LogSource.Victoria,null,Guild: player.VoiceChannel.Guild as SocketGuild);
+            LogService.LogError($"Player {player.VoiceChannel.GuildId} {error} for {track.Title}", Enums.LogSource.Victoria,player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
         private Task LavaClient_OnSocketClosed(int _, string Reason, bool _1)
         {
-            LogService.LogError($"LavaLinkNode Disconnected: {Reason}",Enums.LogSource.LavaLink,null,null);
+            LogService.LogError($"LavaLinkNode Disconnected: {Reason}",Enums.LogSource.LavaLink);
             return Task.CompletedTask;
         }
     }

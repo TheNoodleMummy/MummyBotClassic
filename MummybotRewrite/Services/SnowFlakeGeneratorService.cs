@@ -47,7 +47,7 @@ namespace Mummybot.Services
 
             Array.Reverse(_buffer);
             var id = BitConverter.ToUInt64(_buffer, 0);
-            LogService.LogInformation($"Generated new snowflake: {id}", LogSource.SnowFlakeGenerator,null,null);
+            LogService.LogInformation($"Generated new snowflake: {id}", LogSource.SnowFlakeGenerator);
             return id;
         }
 

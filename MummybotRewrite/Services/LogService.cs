@@ -172,25 +172,7 @@ namespace Mummybot.Services
         }
 
         internal Task LogLavalink(LogMessage arg1)
-        => LogEventAsync(arg1);
-
-        internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null,SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception,Guild));
-
-        internal void LogWarning(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Warning, source.ToString(), Message, exception,Guild));
-
-        internal void LogVerbose(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Verbose, source.ToString(), Message, exception, Guild));
-
-        internal void LogCritical(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Critical, source.ToString(), Message, exception, Guild));
-
-        internal void LogError(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-        => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
-
-        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null, SocketGuild Guild = null)
-       => LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
+        => LogEventAsync(arg1);      
 
         internal void LogDebug(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
         {
@@ -222,7 +204,7 @@ namespace Mummybot.Services
             LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Error, source.ToString(), Message, exception, Guild));
         }
 
-        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null, ulong Guildid = 0)
+        internal void LogInformation(string Message, LogSource source = LogSource.Unkown, ulong Guildid = 0, Exception exception = null)
         {
             var Guild = DiscordSocketClient?.GetGuild(Guildid);
             LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));

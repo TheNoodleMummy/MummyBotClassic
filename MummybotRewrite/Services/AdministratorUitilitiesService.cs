@@ -46,16 +46,15 @@ namespace Mummybot.Services
                 var guildconfigs = await store.GetAllGuildsAsync(x => x.VoiceMutedUsers);
                 foreach (Guild guild in guildconfigs)
                 {
-                    var socketguild = client.GetGuild(guild.GuildID);
                     var vmus = guild.VoiceMutedUsers.Where(r => r.ExpiresAtUTC < DateTimeOffset.UtcNow).ToList();
-                    LogService.LogInformation($"unmuting {vmus.Count} expired VoiceMutes.", LogSource.AdministratotUtilService, Guild: socketguild);
+                    LogService.LogInformation($"unmuting {vmus.Count} expired VoiceMutes.", LogSource.AdministratotUtilService, guild.GuildID);
                     foreach (var vmu in vmus)
                     {
                         await VoiceMuteCallback(vmu);
                         guild.VoiceMutedUsers.Remove(vmu);
                     }
                     var vdus = guild.VoiceDeafenedUsers.Where(r => r.ExpiresAtUTC < DateTimeOffset.UtcNow).ToList();
-                    LogService.LogInformation($"undeafening {vmus.Count} expired VoiceDeafens.", LogSource.AdministratotUtilService, Guild: socketguild);
+                    LogService.LogInformation($"undeafening {vmus.Count} expired VoiceDeafens.", LogSource.AdministratotUtilService, guild.GuildID);
                     foreach (var vdu in vdus)
                     {
                         await VoiceDeafCallback(vdu);
@@ -90,7 +89,7 @@ namespace Mummybot.Services
             };
 
             await ctx.Channel.SendMessageAsync($"Muted {user.GetDisplayName()} for {time.Humanize()}");
-            LogService.LogInformation($"Muted {user.GetDisplayName()} for {time.Humanize()}", Guild: ctx.Guild);
+            LogService.LogInformation($"Muted {user.GetDisplayName()} for {time.Humanize()}", LogSource.AdministratotUtilService, ctx.GuildId);
 
             using (var store = ServiceProvider.GetRequiredService<GuildStore>())
             {
@@ -117,7 +116,7 @@ namespace Mummybot.Services
             };
 
             await ctx.Channel.SendMessageAsync($"Deafened {user.GetDisplayName()} for {time.Humanize()}");
-            LogService.LogInformation($"Deafened {user.GetDisplayName()} for {time.Humanize()}", Guild: ctx.Guild);
+            LogService.LogInformation($"Deafened {user.GetDisplayName()} for {time.Humanize()}", LogSource.AdministratotUtilService, ctx.GuildId);
 
             using (var store = ServiceProvider.GetRequiredService<GuildStore>())
             {
@@ -138,7 +137,7 @@ namespace Mummybot.Services
             var user = guild.GetUser(args.UserID);
 
             await user.ModifyAsync(user => user.Mute = false);
-            LogService.LogInformation($"UnMuted {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}", Guild: guild);
+            LogService.LogInformation($"UnMuted {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}",LogSource.AdministratotUtilService, guild.Id);
 
             using var store = ServiceProvider.GetRequiredService<GuildStore>();
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
@@ -154,7 +153,7 @@ namespace Mummybot.Services
             var user = guild.GetUser(args.UserID);
 
             await user.ModifyAsync(user => user.Deaf = false);
-            LogService.LogInformation($"Undeafened {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}", Guild: guild);
+            LogService.LogInformation($"Undeafened {user.GetDisplayName()} after {(args.ExpiresAtUTC - args.SetAtUTC).Humanize()}",LogSource.AdministratotUtilService, guild.Id);
 
             using var store = ServiceProvider.GetRequiredService<GuildStore>();
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);

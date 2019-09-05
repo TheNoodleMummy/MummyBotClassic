@@ -212,7 +212,7 @@ namespace Mummybot.Services
                         emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.WithDescription("Could not find any command with that name");
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
-                        _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands, Guild: commandContext.Guild);
+                        _logger.LogInformation(notfoundresult.ToString(), LogSource.Commands, commandContext.GuildId);
                     }
                     else if (result is OverloadsFailedResult overloadsFailedResult)
                     {
@@ -285,7 +285,7 @@ namespace Mummybot.Services
 
                     else if (result is ExecutionFailedResult failed)
                     {
-                        _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
+                        _logger.LogError(failed.ToString(), LogSource.Commands, commandContext.GuildId, failed.Exception);
 
 #if !DEBUG
                     var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
@@ -298,7 +298,7 @@ namespace Mummybot.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(string.Empty, LogSource.Commands, ex);
+                    _logger.LogError("Issue with message service", LogSource.Commands,exception: ex);
                 }
             }
         }
@@ -309,7 +309,7 @@ namespace Mummybot.Services
             {
                 if (args.Result is ExecutionFailedResult failed)
                 {
-                    _logger.LogError(failed.ToString(), LogSource.Commands, failed.Exception);
+                    _logger.LogError(failed.ToString(), LogSource.Commands,context.GuildId, failed.Exception);
 
 #if !DEBUG
                     var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
@@ -328,7 +328,7 @@ namespace Mummybot.Services
         {
             if ((args.Context is MummyContext context))
             {
-                _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands, Guild: context.Guild);
+                _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands,context.GuildId);
 
                 return Task.CompletedTask;
             }

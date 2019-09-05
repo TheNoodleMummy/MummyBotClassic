@@ -36,7 +36,7 @@ namespace Mummybot
             CommandService.AddModules(services.GetRequiredService<Assembly>());
             CommandService.AddTypeParser(parser: new UserTypeparser<SocketGuildUser>());
 
-            taskQueue.OnError += (ex) => Task.Run(() => services.GetRequiredService<LogService>().LogError(string.Empty, Enums.LogSource.TaskQueue, ex));
+            taskQueue.OnError += (ex) => Task.Run(() => services.GetRequiredService<LogService>().LogError(string.Empty, Enums.LogSource.TaskQueue, exception:ex));
 
             DiscordClient.Log += services.GetRequiredService<LogService>().LogEventAsync;
         }

@@ -115,7 +115,7 @@ namespace Mummybot.Database
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object",Enums.LogSource.GuildStore,null,iguild as SocketGuild);
+                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object",Enums.LogSource.GuildStore,iguild.Id);
                 return await CreateGuildAsync(iguild.Id, expression);
             }
             Slim.Release();
@@ -154,7 +154,7 @@ namespace Mummybot.Database
             var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, null, iguild as SocketGuild);
+                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, iguild.Id);
                 return await CreateGuildAsync<ulong>(guildid: iguild.Id, null);
             }
             Slim.Release();
