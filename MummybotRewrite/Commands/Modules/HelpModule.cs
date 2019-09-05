@@ -108,10 +108,9 @@ namespace Mummybot.Commands.Modules
 
             var builder = new EmbedBuilder()
                 .WithAuthor(Context.User)
-                .WithColor(Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed);
-            
+                .WithColor(Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed);            
 
-            foreach (var match in result.Take(3))
+            foreach (var match in result.Take(4))
             {
                 var sb = new StringBuilder();
 
@@ -140,10 +139,10 @@ namespace Mummybot.Commands.Modules
                     }
                 }
                 sb.AppendLine();
-                builder.WithDescription(sb.ToString());
+                builder.AddField("\u200B", sb.ToString());
                 foreach (var item in match.Command.Parameters)
                 {
-                    builder.AddField(item.Name, item.Description??item.Remarks??"missing info");
+                    builder.AddField(item.Name, item.Description??item.Remarks??"missing info",true);
                 }
             }
 
