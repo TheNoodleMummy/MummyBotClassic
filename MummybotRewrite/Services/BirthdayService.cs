@@ -96,6 +96,7 @@ namespace Mummybot.Services
                 LogService.LogInformation($"registered next birthday for {bday.NextBdayUTC} userid: {bday.UserId}",Enums.LogSource.BirthdayService,Guildid: bday.GuildID);
                 _taskQueue.ScheduleTask(bday, bday.NextBdayUTC, BirthdayCallbackAsync);
             }
+           
         }
 
         /// <summary>
@@ -163,6 +164,7 @@ namespace Mummybot.Services
             bday = birthday;
             guildstore.Update(guildconfig);
             await guildstore.SaveChangesAsync();
+            await NextBirthday();
         }
     }
 
