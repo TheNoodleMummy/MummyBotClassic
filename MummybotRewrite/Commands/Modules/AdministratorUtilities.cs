@@ -16,7 +16,6 @@ namespace Mummybot.Commands.Modules
 {
     public class AdministratorUtilities : MummyModule
     {
-
         [Group("voice")]
         public class AdministratorVoiceUtilities : MummyModule
         {
@@ -55,6 +54,7 @@ namespace Mummybot.Commands.Modules
             }
 
             [Command("Kick")]
+            [RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.KickMembers)]
             public async Task VoiceKickAsync(SocketGuildUser user)
             {
                 await user.ModifyAsync(u => u.Channel = null);
