@@ -35,14 +35,6 @@ namespace Mummybot.Commands.Modules
                     await AdministratorService.VoiceMute(Context, user, howlong);
                     Context.Message.AddOkAsync();
                 }
-
-                //[Command("cancel")]
-                //[RequirePermissions(Enums.PermissionTarget.Bot, guildPerms: GuildPermission.ManageRoles)]
-                //public async Task VocieMuteCancel(SocketGuildUser user)
-                //{
-                //    await AdministratorService.CancelMuteAsync(user);
-                //}
-
             }
 
             [Group("deafen")]
@@ -60,9 +52,13 @@ namespace Mummybot.Commands.Modules
                     await AdministratorService.VoiceDeafen(Context, user, howlong);
                     Context.Message.AddOkAsync();
                 }
+            }
 
-                
-
+            [Command("Kick")]
+            public async Task VoiceKickAsync(SocketGuildUser user)
+            {
+                await user.ModifyAsync(u => u.Channel = null);
+                await Context.Message.AddOkAsync();
             }
         }
     }
