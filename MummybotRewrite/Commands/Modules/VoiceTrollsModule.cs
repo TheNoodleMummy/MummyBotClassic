@@ -119,7 +119,7 @@ namespace Mummybot.Commands.Modules
             => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\whothehellcares.mp3");
 
 
-        [Command("tmp"), RunMode(RunMode.Parallel)]
+        [Command("Shu-ta", "Shuta"), RunMode(RunMode.Parallel)]
         public Task tmpAsync()
             => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yafc.mp3");
 

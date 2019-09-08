@@ -94,6 +94,13 @@ namespace Mummybot.Commands.Modules
                 await ReplyAsync("im not connected to voice");
         }
 
+        [Command("pause")]
+        [Description("puase the current song")]
+        public async Task PauseAsync()
+        {
+            var pauseresult = await _musicService.PauseAsync(Context.GuildId);
+        }
+
         [Command("ytsearch")]
         public async Task SearchYTAsync([Description("the querry to look for on youtube"), Remainder]string querry)
         {

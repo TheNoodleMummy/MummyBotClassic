@@ -123,11 +123,28 @@ namespace Mummybot.Services
             }
         }
 
+        internal async Task<PauseResult> PauseAsync(ulong guildId)
+        {
+            if (!(ConnectedChannels.TryGetValue(guildId, out var details)))
+                 return new PauseResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannel in this guild" };
+            if (details.Player.IsPaused)
+            {
+                await details.Player.ResumeAsync();
+                return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Resumed"};
+            }
+            else
+            {
+                await details.Player.PauseAsync();
+                return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Paused" };
+            }
+                
+        }
+
         public QueueResult GetQueue(ulong guildid)
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
                 return new QueueResult() { IsSuccess=true, Queue= musicDetails.Player.Queue };
-            return new QueueResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
+            return new QueueResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannnel in this guild" };
         }
 
 
@@ -293,5 +310,12 @@ namespace Mummybot.Services
         public Exception Exception { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
 
         public LavaQueue<IQueueObject> Queue { get; set; }
+    }
+
+    public class PauseResult : IMummyResult
+    {
+        public bool IsSuccess { get; set; }
+        public string ErrorReason { get; set; }
+        public Exception Exception { get; set; }
     }
 }
