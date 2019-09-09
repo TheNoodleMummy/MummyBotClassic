@@ -99,6 +99,13 @@ namespace Mummybot.Commands.Modules
         public async Task PauseAsync()
         {
             var pauseresult = await _musicService.PauseAsync(Context.GuildId);
+            if (pauseresult.IsSuccess)
+            {
+                await ReplyAsync(pauseresult.ErrorReason);
+                await Context.Message.AddOkAsync();
+            }
+            else
+                await Context.Message.AddNotOkAsync();
         }
 
         [Command("ytsearch")]
