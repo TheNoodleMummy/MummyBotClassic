@@ -15,27 +15,15 @@ namespace Mummybot.Commands.Modules
         [Command("color")]
         [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
         [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageRoles)]
-        public async Task Color(int red, int green, int blue, SocketGuildUser user = null)
-            => ChangeColorRGB(new Color(red, green, blue), user);       
+        public Task Color(Color color, SocketGuildUser user = null)
+            => ChangeColorAsync(color, user);       
 
         [Command("color")]
         [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
-        [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageRoles)]
-        public async Task Color(uint rawhex, SocketGuildUser user = null)
-            => ChangeColorRGB(new Color(rawhex), user);
-
-
-        [Command("color")]
-        [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
-        public async Task Color(uint rawhex)
-           => ChangeColorRGB(new Color(rawhex));
-
-        [Command("color")]
-        [RequirePermissions(Enums.PermissionTarget.Bot, GuildPermission.ManageRoles)]
-        public async Task Color(int red, int green, int blue)
-            => ChangeColorRGB(new Color(red, green, blue));
-
-        internal async Task ChangeColorRGB(Color color, SocketGuildUser user=null)
+        public Task Color([Remainder]Color color)
+           => ChangeColorAsync(color);
+       
+        internal async Task ChangeColorAsync(Color color, SocketGuildUser user=null)
         {
             user ??= Context.User;
             IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.InvariantCultureIgnoreCase));
@@ -47,7 +35,7 @@ namespace Mummybot.Commands.Modules
             }
             else
             {
-                await role.ModifyAsync(r => color = color);
+                await role.ModifyAsync(r => r.Color = color);
             }
         }
 
