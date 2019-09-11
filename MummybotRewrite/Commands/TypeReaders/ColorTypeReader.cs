@@ -23,7 +23,7 @@ namespace Mummybot.Commands.TypeReaders
             }
 
             Color color;
-            if (uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var hex))
+            if (uint.TryParse(value, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var hex))
             {
                 color = new Color(hex);
                 return TypeParserResult<Color>.Successful(color);

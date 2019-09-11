@@ -122,7 +122,8 @@ namespace Mummybot.Services
 
             using var GuildStore = _services.GetRequiredService<GuildStore>();
             var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
-            guildconfig.Reminders.Remove(reminder);
+            var remind = guildconfig.Reminders.Find(r => r.Id == reminder.Id);
+            guildconfig.Reminders.Remove(remind);
             GuildStore.Update(guildconfig);
             await GuildStore.SaveChangesAsync();
         }
