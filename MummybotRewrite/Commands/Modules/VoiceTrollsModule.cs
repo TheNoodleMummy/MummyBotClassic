@@ -11,56 +11,62 @@ namespace Mummybot.Commands.Modules
 {
     [RequireVoiceChannel]
     [RequireVoiceTrolls]
-    public class VoiceTrollsModule  : MummyModule
+    public class VoiceTrollsModule : MummyModule
     {
         public MusicService _musicService;
         private readonly Random _rnd;
 
-        public VoiceTrollsModule(MusicService musicService,Random rnd)
+        public VoiceTrollsModule(MusicService musicService, Random rnd)
         {
             _musicService = musicService;
             _rnd = rnd;
         }
 
-        [Command("alah"),RequireOffensive, RunMode(RunMode.Parallel)]
+
+        [Command("bitchpls"), RunMode(RunMode.Parallel)]
+        public Task bitchplsspaceAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\bitchplsspace.mp3");
+
+
+        [Command("alah"), RequireOffensive, RunMode(RunMode.Parallel)]
         public Task alahAsync()
            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\boom.mp3");
 
         [Command("blowen"), RunMode(RunMode.Parallel)]
-        public  Task BlowenAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\blowenopstraat.mp3");
+        public Task BlowenAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\blowenopstraat.mp3");
 
         [Command("byekevin"), RunMode(RunMode.Parallel)]
-        public  Task ByeKevinAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\byekevin.mp3");
+        public Task ByeKevinAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\byekevin.mp3");
 
         [Command("cunt"), RunMode(RunMode.Parallel)]
-        public  Task CuntAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\cunt.mp3");
+        public Task CuntAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\cunt.mp3");
 
         [Command("cuntfree"), RunMode(RunMode.Parallel)]
-        public  Task CuntFreeAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\cuntfree.mp3");
+        public Task CuntFreeAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\cuntfree.mp3");
 
         [Command("deeznuts"), RunMode(RunMode.Parallel)]
-        public  Task DeezNutsAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\deeznuts.mp3");
+        public Task DeezNutsAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\deeznuts.mp3");
 
         [Command("dieoma"), RunMode(RunMode.Parallel)]
-        public  Task DieOmaAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\dieoma.mp3");
+        public Task DieOmaAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\dieoma.mp3");
 
         [Command("getout"), RunMode(RunMode.Parallel)]
-        public  Task GetOutAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\getout.mp3");
+        public Task GetOutAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\getout.mp3");
 
         [Command("gg"), RunMode(RunMode.Parallel)]
-        public  Task GGAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\GG.mp3");
+        public Task GGAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\GG.mp3");
 
         [Command("ididit"), RunMode(RunMode.Parallel)]
-        public  Task IDidItAsync()
-            =>  _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\ididit.mp3");
+        public Task IDidItAsync()
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\ididit.mp3");
 
         [Command("kbai"), RunMode(RunMode.Parallel)]
         public Task KBaiAsync()
@@ -68,7 +74,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("kevincunt"), RunMode(RunMode.Parallel)]
         public Task KevinCuntAsync()
-            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\kevinstopbeingacunt"+_rnd.Next(3)+".mp3");
+            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\kevinstopbeingacunt" + _rnd.Next(3) + ".mp3");
 
         [Command("kickthebass"), RunMode(RunMode.Parallel)]
         public Task KickTheBassAsync()
@@ -118,14 +124,9 @@ namespace Mummybot.Commands.Modules
         public Task WhoCaresAsync()
             => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\whothehellcares.mp3");
 
-
         [Command("Shu-ta", "Shuta"), RunMode(RunMode.Parallel)]
         public Task tmpAsync()
             => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yafc.mp3");
-
-
-
-
 
     }
 }
