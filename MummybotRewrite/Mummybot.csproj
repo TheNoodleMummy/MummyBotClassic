@@ -17,12 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20190825.4" />
-    <PackageReference Include="Discord.Net.Rest" Version="2.2.0-dev-20190825.4" />
-    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190825.4" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20190825.4" />
-    <PackageReference Include="Humanizer.Core" Version="2.6.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.3.0-beta2-final" />
+    <PackageReference Include="Discord.Net.Core" Version="2.2.0-dev-20190914.4" />
+    <PackageReference Include="Discord.Net.Rest" Version="2.2.0-dev-20190914.4" />
+    <PackageReference Include="Discord.Net.Webhook" Version="2.2.0-dev-20190914.4" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0-dev-20190914.4" />
+    <PackageReference Include="Humanizer.Core" Version="2.7.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.3.1-beta3-final" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6">
       <PrivateAssets>all</PrivateAssets>
@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Qmmands" Version="3.0.0-nightly-00206" />
+    <PackageReference Include="Qmmands" Version="3.0.0-nightly-00209" />
     <PackageReference Include="Victoria" Version="4.0.17" />
   </ItemGroup>
 
