@@ -10,7 +10,7 @@ namespace Mummybot.Commands.TypeReaders
     /// </summary>
     public class DateTimeOffsetTypeReader : MummyTypeParser<DateTimeOffset>
     {
-        public override ValueTask<TypeParserResult<DateTimeOffset>> ParseAsync(Parameter parameter, string value, MummyContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<DateTimeOffset>> ParseAsync(Parameter parameter, string value, MummyContext context)
         {
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.MinValue, TimeSpan.Zero);
             if (!value.EndsWith("dmy", StringComparison.CurrentCultureIgnoreCase) && !value.EndsWith("mdy", StringComparison.CurrentCultureIgnoreCase))

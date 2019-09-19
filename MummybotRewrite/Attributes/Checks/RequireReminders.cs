@@ -12,9 +12,9 @@ namespace Mummybot.Attributes.Checks
     [Name("Require Reminder Service")]
     class RequireReminders : MummyCheckBase
     {
-        public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
-            using var guildstore = provider.GetRequiredService<GuildStore>();
+            using var guildstore = context.ServiceProvider.GetRequiredService<GuildStore>();
             var guildconfig = await guildstore.GetOrCreateGuildAsync(context.Guild);
             if (guildconfig.UsesReminders)
                 return CheckResult.Successful;

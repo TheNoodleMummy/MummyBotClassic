@@ -202,7 +202,7 @@ namespace Mummybot.Services
 
                     var commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
 
-                    var result = await _commands.ExecuteAsync(output, commandContext, _services);
+                    var result = await _commands.ExecuteAsync(output, commandContext);
 
 
 

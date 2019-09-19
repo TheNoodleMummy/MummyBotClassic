@@ -14,7 +14,7 @@ namespace Mummybot.Commands.TypeReaders
         [DontAutoAdd]
         public class UserTypeparser<TUser> : MummyTypeParser<TUser> where TUser : SocketGuildUser
         {
-            public override ValueTask<TypeParserResult<TUser>> ParseAsync(Parameter param, string value, MummyContext ctx, IServiceProvider provider)
+            public override ValueTask<TypeParserResult<TUser>> ParseAsync(Parameter param, string value, MummyContext ctx)
             {
                 var type = typeof(TUser);
                 List<TUser> users;

@@ -10,7 +10,7 @@ namespace Mummybot.Commands.TypeReaders
 {
     class ColorTypeReader : MummyTypeParser<Color>
     {
-        public override ValueTask<TypeParserResult<Color>> ParseAsync(Parameter parameter, string value, MummyContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<Color>> ParseAsync(Parameter parameter, string value, MummyContext context)
         {
             if (value.StartsWith("0x", StringComparison.CurrentCultureIgnoreCase) ||
                 value.StartsWith("&H", StringComparison.CurrentCultureIgnoreCase))

@@ -12,9 +12,9 @@ namespace Mummybot.Attributes.Checks
     [Name("Require Offensive commands")]
     class RequireOffensiveAttribute : MummyCheckBase
     {
-        public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
-            using var guildstore = provider.GetRequiredService<GuildStore>();
+            using var guildstore = context.ServiceProvider.GetRequiredService<GuildStore>();
             var guild = await guildstore.GetOrCreateGuildAsync(context.Guild);
 
             if (guild.AllowOffensiveCommands)

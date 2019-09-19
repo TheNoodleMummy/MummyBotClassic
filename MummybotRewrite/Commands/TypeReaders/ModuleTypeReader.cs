@@ -10,16 +10,16 @@ namespace Mummybot.Commands.TypeReaders
 {
     class ModuleTypeReader : MummyTypeParser<Module>
     {
-        public override async ValueTask<TypeParserResult<Module>> ParseAsync(Parameter parameter, string value, MummyContext context, IServiceProvider provider)
+        public override async ValueTask<TypeParserResult<Module>> ParseAsync(Parameter parameter, string value, MummyContext context)
         {
-            CommandService commandService = provider.GetRequiredService<CommandService>();
+            CommandService commandService = context.ServiceProvider.GetRequiredService<CommandService>();
             var module = commandService.GetAllModules().FirstOrDefault(m => m.Name.Contains(value, StringComparison.CurrentCultureIgnoreCase));
 
             if (module == null)
                 return new TypeParserResult<Module>("Could not find a module with that name");
             else
             {
-                var result = await module.RunChecksAsync(context, provider);
+                var result = await module.RunChecksAsync(context);
                 if (result.IsSuccessful)
                 {
                     return new TypeParserResult<Module>(module);

@@ -12,9 +12,9 @@ namespace Mummybot.Attributes.Checks
     [Name("Require Music Service")]
     public class RequireMusicAttribute : MummyCheckBase
     {
-        public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
-            using var guildstore = provider.GetRequiredService<GuildStore>();
+            using var guildstore = context.ServiceProvider.GetRequiredService<GuildStore>();
             var guild = await guildstore.GetOrCreateGuildAsync(context.GuildId);
             if (guild.UsesMusic)
                 return CheckResult.Successful;

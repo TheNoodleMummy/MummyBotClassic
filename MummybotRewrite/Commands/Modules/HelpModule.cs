@@ -30,7 +30,7 @@ namespace Mummybot.Commands.Modules
 
             foreach (var module in Commands.GetAllModules())
             {
-                var modulecheck = await module.RunChecksAsync(Context, Services);
+                var modulecheck = await module.RunChecksAsync(Context);
                 if (modulecheck.IsSuccessful)
                 {
                     if (module.Commands.Count == 0)
@@ -42,7 +42,7 @@ namespace Mummybot.Commands.Modules
                     var commands = GetAllCommandsIterator(module);
                     foreach (var command in commands)
                     {
-                        var checks = await command.RunChecksAsync(Context, Services);
+                        var checks = await command.RunChecksAsync(Context);
                         if (checks.IsSuccessful)
                         {
                             sb.Append(Context.PrefixUsed).Append(command.Name).Append(" ");
@@ -89,7 +89,7 @@ namespace Mummybot.Commands.Modules
             StringBuilder sb = new StringBuilder();
             foreach (var cmd in module.Commands)
             {
-                if (!(await cmd.RunChecksAsync(Context, Services)).IsSuccessful) return;
+                if (!(await cmd.RunChecksAsync(Context)).IsSuccessful) return;
                 sb.Append(Context.PrefixUsed).AppendLine(cmd.Name);
             }
             builder.AddField("\u200B", sb.ToString());

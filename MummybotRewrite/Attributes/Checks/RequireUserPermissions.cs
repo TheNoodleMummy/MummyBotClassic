@@ -34,7 +34,7 @@ namespace Mummybot.Attributes.Checks
             _guildPerms = new GuildPermission[0];
         }
 
-        public override ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)
+        public override ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
             SocketGuildUser user = null;
 

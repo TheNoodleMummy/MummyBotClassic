@@ -9,9 +9,9 @@ namespace Mummybot.Attributes.Checks
 {
     public abstract class MummyCheckBase : CheckAttribute
     {
-        public override ValueTask<CheckResult> CheckAsync(CommandContext context, IServiceProvider provider)
-      => CheckAsync((MummyContext)context, provider);
-        public abstract ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider);
+        public override ValueTask<CheckResult> CheckAsync(CommandContext context)
+      => CheckAsync((MummyContext)context);
+        public abstract ValueTask<CheckResult> CheckAsync(MummyContext context);
         
     }
 }

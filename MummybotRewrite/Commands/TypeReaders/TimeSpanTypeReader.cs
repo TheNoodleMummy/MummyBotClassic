@@ -27,7 +27,7 @@ namespace Mummybot.Commands.TypeReaders
             "%s's'",                //      1s
         };
 
-        public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter parameter, string value, MummyContext context, IServiceProvider provider)
+        public override ValueTask<TypeParserResult<TimeSpan>> ParseAsync(Parameter parameter, string value, MummyContext context)
 
         {
             return (TimeSpan.TryParseExact(value.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out TimeSpan timeSpan))

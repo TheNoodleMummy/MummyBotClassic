@@ -14,15 +14,17 @@ namespace Mummybot.Commands
     public class MummyContext : CommandContext
     {
 
-        public MummyContext(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
+
+        public MummyContext(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider services, string prefixUsed, bool isEdit) : base(services)
         {
             Client = client;
             Message = message;
             HTTP = hTTP;
-            ServiceProvider = serviceProvider;
             PrefixUsed = prefixUsed;
             IsEdit = isEdit;
         }
+
+        
 
         public SocketGuildUser User { get; private set; }
         public SocketTextChannel Channel { get; private set; }
@@ -31,7 +33,6 @@ namespace Mummybot.Commands
 
         public SocketGuild Guild => User.Guild;
         public HttpClient HTTP { get; }
-        public IServiceProvider ServiceProvider { get; }
         public LogService LogService {get;}
         public string PrefixUsed { get; }
 
@@ -63,9 +64,9 @@ namespace Mummybot.Commands
         => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
     
 
-    internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider serviceProvider, string prefixUsed, bool isEdit)
+    internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP,IServiceProvider services, string prefixUsed, bool isEdit)
         {
-            return new MummyContext(client, message, hTTP, serviceProvider, prefixUsed, isEdit)
+            return new MummyContext(client, message, hTTP,services, prefixUsed, isEdit)
             {
                 Channel = message.Channel as SocketTextChannel,
                 User = message.Author as SocketGuildUser

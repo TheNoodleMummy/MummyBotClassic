@@ -8,7 +8,7 @@ namespace Mummybot.Attributes.Checks
     [Name("Require Owner")]
     public class RequireOwnerAttribute : MummyCheckBase
     {
-        public override async ValueTask<CheckResult> CheckAsync(MummyContext context, IServiceProvider provider)
+        public override async ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
             if ((await context.Client.GetApplicationInfoAsync()).Owner.Id == context.User.Id)
                 return CheckResult.Successful;

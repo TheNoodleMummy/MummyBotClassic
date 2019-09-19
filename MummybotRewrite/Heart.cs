@@ -72,7 +72,7 @@ namespace MummyBot
             await mummybot.StartAsync(types);
         }
 
-        public object CoolDownBucketGenerator(object bucketType, CommandContext context, IServiceProvider provider)
+        public object CoolDownBucketGenerator(object bucketType, CommandContext context)
         {
             if (!(context is MummyContext ctx))
                 throw new InvalidContextException(context.GetType());
