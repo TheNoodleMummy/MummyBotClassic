@@ -26,7 +26,7 @@ namespace Mummybot.Commands.Modules
         internal async Task ChangeColorAsync(Color color, SocketGuildUser user=null)
         {
             user ??= Context.User;
-            IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.InvariantCultureIgnoreCase));
+            IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.OrdinalIgnoreCase));
             if (role is null)
             {
                 role = await user.Guild.CreateRoleAsync(user.GetDisplayName(), color: color);
