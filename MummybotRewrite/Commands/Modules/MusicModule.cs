@@ -65,9 +65,9 @@ namespace Mummybot.Commands.Modules
                 var i = 1;
                 foreach (LavaTrack item in result.Queue.Items.Take(10))
                 {
-                    sb.Append(i).Append(" [").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length).Append("](").Append(item.Uri).AppendLine(")");
+                    sb.Append(i).Append("[").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length).Append("](").Append(item.Uri).AppendLine(")");
                 }
-                await ReplyAsync(embed:new EmbedBuilder().WithDescription( sb.ToString()));
+                await ReplyAsync(embed: new EmbedBuilder().WithDescription(sb.ToString()));
             }
             else
             {
@@ -93,7 +93,7 @@ namespace Mummybot.Commands.Modules
         }
 
         [Command("pause")]
-        [Description("puase the current song")]
+        [Description("pause the current song")]
         public async Task PauseAsync()
         {
             var pauseresult = await _musicService.PauseAsync(Context.GuildId);

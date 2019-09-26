@@ -22,6 +22,9 @@ namespace Mummybot.Commands.Modules
             _rnd = rnd;
         }
 
+        [Command("hefuckedup","hfu")]
+        public Task hefuckedupAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\hefuckedup.mp3");
 
         [Command("bitchpls"), RunMode(RunMode.Parallel)]
         public Task bitchplsspaceAsync()

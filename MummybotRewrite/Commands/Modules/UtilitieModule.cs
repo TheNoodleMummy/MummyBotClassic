@@ -23,7 +23,7 @@ namespace Mummybot.Commands.Modules
         public Task Color([Remainder]Color color)
            => ChangeColorAsync(color);
        
-        internal async Task ChangeColorAsync(Color color, SocketGuildUser user=null)
+        private async Task ChangeColorAsync(Color color, SocketGuildUser user=null)
         {
             user ??= Context.User;
             IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.OrdinalIgnoreCase));
@@ -38,6 +38,5 @@ namespace Mummybot.Commands.Modules
                 await role.ModifyAsync(r => r.Color = color);
             }
         }
-
     }
 }
