@@ -8,7 +8,6 @@ init:
   - cmd: git config --global core.autocrlf true
 install:
   # Install repo specific stuff here
-  - cmd: choco install dotnetcore-sdk --pre #required untill appveyor auto comes with core 3.0 this slows down build bad
   - cmd: dotnet tool install --global dotnet-ef --version 3.0.0-* #this is required to be able to push migrations (if i can find a way to do this without exposing the connection string)
 before_build:
   # Display .NET Core version
