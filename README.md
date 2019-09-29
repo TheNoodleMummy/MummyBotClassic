@@ -2,7 +2,7 @@
 
 # MummyBot
 Mummybot makes use of [TheCasino's](https://github.com/TheCasino) [TaskQueue](https://github.com/TheCasino/Casino.Common/tree/master/src/Casino.Common/Entities/TaskQueue)
-and a customized version of [MessageService](https://github.com/TheCasino/Espeon/blob/Rewrite/Espeon/Services/MessageService.cs) 
+and a customized version of 'MessageService.cs' (link was ded so removed)
 plus the required [Utilities](https://github.com/TheCasino/Espeon/tree/Rewrite/Espeon/Utilities).
 
 Mummybot also makes use of [Foxbot's](https://github.com/foxbot) [Discord.Addons.Interactive](https://github.com/foxbot/Discord.Addons.Interactive)

@@ -22,7 +22,28 @@ namespace Mummybot.Commands.Modules
             _rnd = rnd;
         }
 
-        [Command("hefuckedup","hfu")]
+        [Command("stfu", "shutthefuckup"), RunMode(RunMode.Parallel)]
+        public Task ShutTheFuckUpAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\shutthefuckup.mp3");
+
+        [Command("stopscreaming"), RunMode(RunMode.Parallel)]
+        public Task StopScreamingAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\stopscreaming.mp3");
+
+        [Command("fuckingnigga"), RunMode(RunMode.Parallel),RequireOffensive]
+        public Task FuckingNiggasAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\fucking niggas.mp3");
+
+        [Command("booty"), RunMode(RunMode.Parallel)]
+        public Task ItsYourDutyToPleaseThatBootyAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\booty.mp3");
+
+        [Command("niggawhat", "what"), RunMode(RunMode.Parallel),RequireOffensive]
+        public Task NiggaWhatAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\niggawhat.mp3");
+
+
+        [Command("hefuckedup","hfu"),RunMode(RunMode.Parallel)]
         public Task hefuckedupAsync()
            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\hefuckedup.mp3");
 
