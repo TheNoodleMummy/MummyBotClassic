@@ -20,7 +20,7 @@ namespace Mummybot.Commands.Modules
         [Description("set a reminder in the future the bot will then remind you when its time")]
         public async Task RemindAsync(
             [Description("how long it should be before your reminded (ex: 5s, 5min/m, 5hour/h")]TimeSpan time,
-            [Description("the message you want me to tell you when i remind you")]string message
+            [Description("the message you want me to tell you when i remind you"),Remainder]string message
             )
         {
             var reminder = new Reminder
