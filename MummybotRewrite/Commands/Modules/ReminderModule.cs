@@ -80,5 +80,70 @@ namespace Mummybot.Commands.Modules
 
             await ReplyAsync(sb.ToString());
         }
+
+        [Command("remind")]
+        [Description("set a reminder in the future the bot will then remind you when its time")]
+        public async Task RemindAsync(
+           [Description("how long it should be before your reminded (ex: 5s, 5min/m, 5hour/h")]DateTimeOffset time,
+           [Description("the message you want me to tell you when i remind you"), Remainder]string message
+           )
+        {
+            var reminder = new Reminder
+            {
+                ChannelID = Context.Channel.Id,
+                GuildID = Context.Guild.Id,
+                Message = message,
+                SetAtUTC = DateTime.UtcNow,
+                ExpiresAtUTC =time,
+                Id = SnowFlakeGenerator.NextLong(),
+                UserID = Context.User.Id
+            };
+            GuildConfig.Reminders.Add(reminder);
+            ReminderService.RegisterReminder(reminder, reminder.Id);
+
+            StringBuilder sb = new StringBuilder();
+            bool hasdays = false, hashours = false;
+            var timespan = time.ToUniversalTime() - DateTimeOffset.UtcNow;
+            sb.Append("Alright ").Append(Context.User.Mention).Append(", ");
+            if (timespan.Days != 0)
+            {
+                hasdays = true;
+                sb.Append("in ").Append(timespan.Days);
+                if (timespan.Days == 1)
+                    sb.Append("Day, ");
+                else
+                    sb.Append("Days, ");
+            }
+
+            if (timespan.Hours != 0)
+            {
+                hashours = true;
+                if (hasdays)
+                    sb.Append("and ").Append(timespan.Hours);
+                else
+                    sb.Append("in ").Append(timespan.Hours);
+
+                if (timespan.Hours == 1)
+                    sb.Append("Hour, ");
+                else
+                    sb.Append("Hours, ");
+            }
+
+            if (timespan.Minutes != 0)
+            {
+                if (hashours)
+                    sb.Append("and ").Append(timespan.Minutes);
+                else
+                    sb.Append("in ").Append(timespan.Minutes);
+
+                if (timespan.Minutes == 1)
+                    sb.Append("Minute, ");
+                else
+                    sb.Append("minutes, ");
+            }
+            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id).Append(")");
+
+            await ReplyAsync(sb.ToString());
+        }
     }
 }

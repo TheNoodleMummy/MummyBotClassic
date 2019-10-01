@@ -15,7 +15,7 @@ namespace Mummybot.Commands.TypeReaders
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.MinValue, TimeSpan.Zero);
             if (!value.EndsWith("dmy", StringComparison.CurrentCultureIgnoreCase) && !value.EndsWith("mdy", StringComparison.CurrentCultureIgnoreCase))
             {
-                return TypeParserResult<DateTimeOffset>.Unsuccessful("failed to parse expected mdy or dmy (format US or Standart time)");
+                return TypeParserResult<DateTimeOffset>.Unsuccessful("failed to parse expected mdy or dmy");
             }
             if (value.EndsWith("dmy", StringComparison.CurrentCultureIgnoreCase))
             {
