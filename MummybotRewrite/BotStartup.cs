@@ -47,10 +47,10 @@ namespace Mummybot
             using (var tokenstore = Services.GetRequiredService<TokenStore>())
             {
 #if DEBUG
-                var idk = tokenstore.Tokens.FirstOrDefault(t => t.BotName.Equals("dummybot", StringComparison.OrdinalIgnoreCase));
+                var idk = tokenstore.Tokens.FirstOrDefault(t => t.BotName =="dummybot");
                 await DiscordClient.LoginAsync(TokenType.Bot, idk.BotToken);
 #else
-                await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t=>t.BotName.Equals("mummybot",StringComparison.CurrentCultureIgnoreCase)).BotToken);
+                await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t=>t.BotName== "mummybot").BotToken);
 #endif
             }
             await DiscordClient.StartAsync();
