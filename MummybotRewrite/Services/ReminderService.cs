@@ -48,7 +48,7 @@ namespace Mummybot.Services
                 }
                 else
                 {
-                    LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService,socketguild.Id);
+                    LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService, socketguild.Id);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
                     LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService, socketguild.Id);
                     foreach (Reminder reminder in reminders)
@@ -93,10 +93,7 @@ namespace Mummybot.Services
             if (time.Hours != 0)
             {
                 hashours = true;
-                if (hasdays)
-                    sb.Append(time.Hours);
-                else
-                    sb.Append(time.Hours);
+                sb.Append(time.Hours);
 
                 if (time.Hours == 1)
                     sb.Append("Hour, ");
@@ -106,10 +103,8 @@ namespace Mummybot.Services
 
             if (time.Minutes != 0)
             {
-                if (hashours)
-                    sb.Append(time.Minutes);
-                else
-                    sb.Append(time.Minutes);
+
+                sb.Append(time.Minutes);
 
                 if (time.Minutes == 1)
                     sb.Append("Minute, ");

@@ -14,8 +14,9 @@ namespace Mummybot.Services
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Victoria.Entities;
-    using Victoria.Queue;
+    using Victoria.Enums;
+    using Victoria.EventArgs;
+    using Victoria.Responses.Rest;
 
     public class MusicService : BaseService
     {
@@ -24,8 +25,8 @@ namespace Mummybot.Services
         {
             LogService = log;
         }
-        internal LavaSocketClient LavaSocketClient;
-        internal LavaRestClient LavaRestClient;
+        internal LavaNode lavaNode;
+        
 
         private IServiceProvider Services;
         private readonly LogService LogService;
@@ -33,31 +34,22 @@ namespace Mummybot.Services
 
         public ConcurrentDictionary<ulong, MusicDetails> ConnectedChannels = new ConcurrentDictionary<ulong, MusicDetails>();
 
-        public override Task InitialiseAsync(IServiceProvider services)
+        public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
-            LavaSocketClient = services.GetRequiredService<LavaSocketClient>();
-            LavaSocketClient.StartAsync(services.GetRequiredService<DiscordSocketClient>(), new Configuration()
-            {
-                AutoDisconnect = false,
-                SelfDeaf = false,
-                LogSeverity = LogSeverity.Info,
-                ReconnectInterval = TimeSpan.FromSeconds(10),
-                Host = "127.0.0.1",
-                Port = 2333,
-                Password = "youshallnotpass"
-            });
-            LavaRestClient = services.GetRequiredService<LavaRestClient>();
+#if DEBUG
+            lavaNode = services.GetRequiredService<LavaNode>();
+            
             Services = services;
+            
+            lavaNode.OnWebSocketClosed += LavaClient_OnSocketClosed;
+            lavaNode.OnTrackException += LavaClient_OnTrackException;
+            lavaNode.OnTrackEnded += LavaClient_OnTrackFinished;
+            lavaNode.OnTrackStuck += LavaClient_OnTrackStuck;
 
-            LavaSocketClient.OnSocketClosed += LavaClient_OnSocketClosed;
-            LavaSocketClient.OnTrackException += LavaClient_OnTrackException;
-            LavaSocketClient.OnTrackFinished += LavaClient_OnTrackFinished;
-            LavaSocketClient.OnTrackStuck += LavaClient_OnTrackStuck;
-
-            LavaSocketClient.Log += services.GetRequiredService<LogService>().LogLavalink;
+            lavaNode.OnLog += services.GetRequiredService<LogService>().LogLavalink;
+            await lavaNode.ConnectAsync();
 #endif
-            return Task.CompletedTask;
+            return;
         }
 
         public async Task PlayTroll(ulong guildid, IVoiceChannel channel, string location)
@@ -66,35 +58,35 @@ namespace Mummybot.Services
             {
                 TimeSpan position;
                 IVoiceChannel voiceChannel;
-                LavaQueue<IQueueObject> queue;
+                DefaultQueue<LavaTrack> queue;
                 LavaTrack currenttrack;
-                if (musicDetails.Player.IsPlaying)
+                if (musicDetails.Player.PlayerState == PlayerState.Playing)
                 {
-                    position = musicDetails.Player.CurrentTrack.Position;
+                    position = musicDetails.Player.Track.Position;
                     voiceChannel = musicDetails.Player.VoiceChannel;
                     queue = musicDetails.Player.Queue;
-                    currenttrack = musicDetails.Player.CurrentTrack;
+                    currenttrack = musicDetails.Player.Track;
 
                     await musicDetails.Player.PauseAsync();
                     if (channel.Id == musicDetails.Player.VoiceChannel.Id)
                     {
                         var track = (await SearchTrackAsync(location)).Tracks.FirstOrDefault();
                         await musicDetails.Player.PlayAsync(track);
-                        await Task.Delay(track.Length.Add(TimeSpan.FromSeconds(2)));
+                        await Task.Delay(track.Duration.Add(TimeSpan.FromSeconds(2)));
                         await musicDetails.Player.PlayAsync(currenttrack);
                         await musicDetails.Player.SeekAsync(position);
                     }
                     else
                     {
-                        await LavaSocketClient.DisconnectAsync(musicDetails.Player.VoiceChannel);
+                        await lavaNode.LeaveAsync(musicDetails.Player.VoiceChannel);
 
-                        var player = await LavaSocketClient.ConnectAsync(channel);
+                        var player = await lavaNode.JoinAsync(channel);
                         var track = (await SearchTrackAsync(location)).Tracks.FirstOrDefault();
                         await player.PlayAsync(track);
-                        await Task.Delay(track.Length.Add(TimeSpan.FromSeconds(2)));
-                        await LavaSocketClient.DisconnectAsync(channel);
+                        await Task.Delay(track.Duration.Add(TimeSpan.FromSeconds(2)));
+                        await lavaNode.LeaveAsync(channel);
 
-                        musicDetails.Player = await LavaSocketClient.ConnectAsync(voiceChannel);
+                        musicDetails.Player = await lavaNode.JoinAsync(voiceChannel);
                         while (queue.TryDequeue(out var queuetrack))
                         {
                             musicDetails.Player.Queue.Enqueue(queuetrack);
@@ -105,21 +97,21 @@ namespace Mummybot.Services
                 }
                 else
                 {
-                    await LavaSocketClient.DisconnectAsync(musicDetails.Player.VoiceChannel);
-                    var player = await LavaSocketClient.ConnectAsync(channel);
+                    await lavaNode.LeaveAsync(musicDetails.Player.VoiceChannel);
+                    var player = await lavaNode.JoinAsync(channel);
                     var track = (await SearchTrackAsync(location)).Tracks.FirstOrDefault();
                     await player.PlayAsync(track);
-                    await Task.Delay(track.Length.Add(TimeSpan.FromSeconds(2)));
-                    await LavaSocketClient.DisconnectAsync(channel);
+                    await Task.Delay(track.Duration.Add(TimeSpan.FromSeconds(2)));
+                    await lavaNode.LeaveAsync(channel);
                 }
             }
             else
             {
-                var player = await LavaSocketClient.ConnectAsync(channel);
+                var player = await lavaNode.JoinAsync(channel);
                 var track = (await SearchTrackAsync(location)).Tracks.FirstOrDefault();
                 await player.PlayAsync(track);
-                await Task.Delay(track.Length.Add(TimeSpan.FromSeconds(2)));
-                await LavaSocketClient.DisconnectAsync(channel);
+                await Task.Delay(track.Duration.Add(TimeSpan.FromSeconds(2)));
+                await lavaNode.LeaveAsync(channel);
             }
         }
 
@@ -127,7 +119,7 @@ namespace Mummybot.Services
         {
             if (!(ConnectedChannels.TryGetValue(guildId, out var details)))
                  return new PauseResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannel in this guild" };
-            if (details.Player.IsPaused)
+            if (details.Player.PlayerState == PlayerState.Paused)
             {
                 await details.Player.ResumeAsync();
                 return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Resumed"};
@@ -148,7 +140,7 @@ namespace Mummybot.Services
         }
 
 
-        public async Task<VolumeResult> SetVolumeAsync(ulong guildid, int volume)
+        public async Task<VolumeResult> SetVolumeAsync(ulong guildid, ushort volume)
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
@@ -156,14 +148,13 @@ namespace Mummybot.Services
                     return new VolumeResult() { IsSuccess = false, ErrorReason = "Volume must be between 0 and 150" };
 
                 using var guildstore = Services.GetRequiredService<GuildStore>();
-                guildstore.ChangeTracker.AutoDetectChangesEnabled = true;
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
                 guild.Volume = volume;
                 guildstore.Update(guild);
                 await guildstore.SaveChangesAsync();
 
-                await musicDetails.Player.SetVolumeAsync(volume);
-                return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.CurrentVolume };
+                await musicDetails.Player.UpdateVolumeAsync(volume);
+                return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.Volume };
             }
             return new VolumeResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
         }
@@ -172,9 +163,9 @@ namespace Mummybot.Services
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
-                var track = (await LavaRestClient.SearchTracksAsync(url)).Tracks.FirstOrDefault();
+                var track = (await SearchTrackAsync(url)).Tracks.FirstOrDefault();
 
-                if (musicDetails.Player.IsPlaying)
+                if (musicDetails.Player.PlayerState == PlayerState.Playing)
                 {
                     musicDetails.Player.Queue.Enqueue(track);
                     return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Track = track };
@@ -197,15 +188,16 @@ namespace Mummybot.Services
             {
                 if (musicDetails.Player.VoiceChannel != null)
                 {
-                    await LavaSocketClient.MoveChannelsAsync(channel);
+                    await lavaNode.MoveAsync(channel);
+
                 }
             }
             else
             {
-                var player = await LavaSocketClient.ConnectAsync(channel);
+                var player = await lavaNode.JoinAsync(channel);
                 using var guildstore = Services.GetRequiredService<GuildStore>();
                 var guild = await guildstore.GetOrCreateGuildAsync(channel.GuildId);
-                await player.SetVolumeAsync(guild.Volume);
+                await player.UpdateVolumeAsync((ushort)guild.Volume);
                 ConnectedChannels.TryAdd(channel.GuildId, new MusicDetails()
                 {
                     Player = player,
@@ -218,59 +210,59 @@ namespace Mummybot.Services
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
-                await LavaSocketClient.DisconnectAsync(musicDetails.Player.VoiceChannel);
+                await lavaNode.LeaveAsync(musicDetails.Player.VoiceChannel);
                 ConnectedChannels.TryRemove(guildid, out var _);
             }
         }
 
-        public Task<SearchResult> SearchYoutubeAsync(string querry)
-            => LavaRestClient.SearchYouTubeAsync(querry);
+        public Task<SearchResponse> SearchYoutubeAsync(string querry)
+            => lavaNode.SearchYouTubeAsync(querry);
 
-        public Task<SearchResult> SearchSoundCloudAsync(string querry)
-            => LavaRestClient.SearchSoundcloudAsync(querry);
+        public Task<SearchResponse> SearchSoundCloudAsync(string querry)
+            => lavaNode.SearchSoundCloudAsync(querry);
 
-        public Task<SearchResult> SearchTrackAsync(string querry)
-            => LavaRestClient.SearchTracksAsync(querry);
+        public Task<SearchResponse> SearchTrackAsync(string querry)
+            => lavaNode.SearchAsync(querry);
 
-        public Task<SearchResult> SearchPlaylists(string querry)
-            => LavaRestClient.SearchTracksAsync(querry, true);
+        public Task<SearchResponse> SearchPlaylists(string querry)
+            => lavaNode.SearchAsync(querry);
 
-        private Task LavaClient_OnTrackStuck(LavaPlayer player, LavaTrack track, long threshold)
+        private Task LavaClient_OnTrackStuck(TrackStuckEventArgs eventargs)
         {
-            LogService.LogWarning($"player for {player.VoiceChannel.GuildId} stuck at {threshold}sec.", Enums.LogSource.Victoria,player.VoiceChannel.Guild.Id);
+            LogService.LogWarning($"player for {eventargs.Player.VoiceChannel.GuildId} stuck at {eventargs.Threshold}sec.", Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
-        private async Task LavaClient_OnTrackFinished(LavaPlayer player, LavaTrack track, TrackEndReason reason)
+        private async Task LavaClient_OnTrackFinished(TrackEndedEventArgs eventargs)
         {
-            if (!reason.ShouldPlayNext())
+            if (!eventargs.Reason.ShouldPlayNext())
                 return;
 
-            if (!player.Queue.TryDequeue(out var item) || !(item is LavaTrack nextTrack))
+            if (!eventargs.Player.Queue.TryDequeue(out var item) || !(item is LavaTrack nextTrack))
             {
-                if (player.TextChannel is null)
+                if (eventargs.Player.TextChannel is null)
                     return;
                 else
-                    await player.TextChannel?.SendMessageAsync($"There are no more items left in queue.");
+                    await eventargs.Player.TextChannel?.SendMessageAsync($"There are no more items left in queue.");
                 return;
             }
             LogService.LogInformation($"playing next item in queue {nextTrack.Title}");
-            await player.PlayAsync(nextTrack);
-            if (player.TextChannel is null)
+            await eventargs.Player.PlayAsync(nextTrack);
+            if (eventargs.Player.TextChannel is null)
                 return;
             else
-                await player.TextChannel?.SendMessageAsync($"Now playing: {nextTrack.Title}");
+                await eventargs.Player.TextChannel?.SendMessageAsync($"Now playing: {nextTrack.Title}");
         }
 
-        private Task LavaClient_OnTrackException(LavaPlayer player, LavaTrack track, string error)
+        private Task LavaClient_OnTrackException(TrackExceptionEventArgs eventargs)
         {
-            LogService.LogError($"Player {player.VoiceChannel.GuildId} {error} for {track.Title}", Enums.LogSource.Victoria,player.VoiceChannel.Guild.Id);
+            LogService.LogError($"Player {eventargs.Player.VoiceChannel.GuildId} {eventargs.ErrorMessage} for {eventargs.Track.Title}", Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
-        private Task LavaClient_OnSocketClosed(int _, string Reason, bool _1)
+        private Task LavaClient_OnSocketClosed(WebSocketClosedEventArgs eventArgs)
         {
-            LogService.LogError($"LavaLinkNode Disconnected: {Reason}",Enums.LogSource.LavaLink);
+            LogService.LogError($"LavaNode Disconnected: {eventArgs.Reason} by {(eventArgs.ByRemote?"Remote":"Local")}",Enums.LogSource.LavaLink);
             return Task.CompletedTask;
         }
     }
@@ -309,7 +301,7 @@ namespace Mummybot.Services
         public string ErrorReason { get; set; }
         public Exception Exception { get => throw new InvalidOperationException(); set => throw new InvalidOperationException(); }
 
-        public LavaQueue<IQueueObject> Queue { get; set; }
+        public DefaultQueue<LavaTrack> Queue { get; set; }
     }
 
     public class PauseResult : IMummyResult

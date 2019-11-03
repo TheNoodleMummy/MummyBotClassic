@@ -7,7 +7,8 @@ using Qmmands;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Victoria.Entities;
+using Victoria;
+using Victoria.Enums;
 
 namespace Mummybot.Commands.Modules
 {
@@ -41,7 +42,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("volume")]
         [Description("sets the bots volume")]
-        public async Task SetVolumeAsync([Description("volule to set")] int volume)
+        public async Task SetVolumeAsync([Description("volule to set")] ushort volume)
         {
             var result = await _musicService.SetVolumeAsync(Context.Guild.Id, volume);
             if (result.IsSuccess)
@@ -65,7 +66,7 @@ namespace Mummybot.Commands.Modules
                 var i = 1;
                 foreach (LavaTrack item in result.Queue.Items.Take(10))
                 {
-                    sb.Append(i).Append("[").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length).Append("](").Append(item.Uri).AppendLine(")");
+                    sb.Append(i).Append("[").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration).Append("](").Append(item.Url).AppendLine(")");
                 }
                 await ReplyAsync(embed: new EmbedBuilder().WithDescription(sb.ToString()));
             }
@@ -120,7 +121,7 @@ namespace Mummybot.Commands.Modules
                     var emb = new EmbedBuilder();
                     foreach (var item in results.Tracks.Take(5))
                     {
-                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length.Humanize()).Append("](").Append(item.Uri).AppendLine(")");
+                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration.Humanize()).Append("](").Append(item.Url).AppendLine(")");
                     }
                     emb.WithDescription(sb.ToString());
                     await ReplyAsync(embed: emb);
@@ -130,7 +131,7 @@ namespace Mummybot.Commands.Modules
                     emb = new EmbedBuilder();
                     foreach (var item in results.Tracks.Take(5))
                     {
-                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length.Humanize()).Append("](").Append(item.Uri).AppendLine(")");
+                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration.Humanize()).Append("](").Append(item.Url).AppendLine(")");
                     }
                     emb.WithDescription(sb.ToString());
                     await ReplyAsync(embed: emb);
@@ -158,7 +159,7 @@ namespace Mummybot.Commands.Modules
                     var emb = new EmbedBuilder();
                     foreach (var item in results.Tracks.Take(5))
                     {
-                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length.Humanize()).Append("](").Append(item.Uri).AppendLine(")");
+                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration.Humanize()).Append("](").Append(item.Url).AppendLine(")");
                     }
                     emb.WithDescription(sb.ToString());
                     await ReplyAsync(embed: emb);
@@ -168,7 +169,7 @@ namespace Mummybot.Commands.Modules
                     emb = new EmbedBuilder();
                     foreach (var item in results.Tracks.Take(5))
                     {
-                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Length.Humanize()).Append("](").Append(item.Uri).AppendLine(")");
+                        sb.Append('[').Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration.Humanize()).Append("](").Append(item.Url).AppendLine(")");
                     }
                     emb.WithDescription(sb.ToString());
                     await ReplyAsync(embed: emb);
