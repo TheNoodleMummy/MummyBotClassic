@@ -86,16 +86,24 @@ namespace Mummybot.Commands.Modules
         public async Task PlayAsync([Description("a youtube/soundcloud link"), Remainder]string url)
         {
             var playResult = await _musicService.PlayAsync(Context.Guild.Id, url);
-            if (playResult.PlayerWasPlaying)
+            if (playResult.IsSuccess)
             {
-                await ReplyAsync($"Added {playResult.Track.Title} To queue position: {playResult.QueuePosition}");
-            }
-            else if (!playResult.PlayerWasPlaying)
-            {
-                //now playing ....
-            }
+                if (playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"Added {playResult.Track.Title} To queue position: {playResult.QueuePosition}");
+                }
+                else if (!playResult.PlayerWasPlaying)
+                {
+                    //now playing ....
+                }
+                else
+                {
+                    await ReplyAsync($"{playResult.ErrorReason}");
+                }
+            }            
             else if (!playResult.WasConnected)
                 await ReplyAsync("im not connected to voice");
+            
         }
 
         [Command("pause")]

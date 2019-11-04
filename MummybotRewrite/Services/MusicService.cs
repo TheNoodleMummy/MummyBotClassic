@@ -163,18 +163,38 @@ namespace Mummybot.Services
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
-                var track = (await SearchTrackAsync(url)).Tracks.FirstOrDefault();
-
-                if (musicDetails.Player.PlayerState == PlayerState.Playing)
+                var result = (await SearchTrackAsync(url));
+                switch (result.LoadType)
                 {
-                    musicDetails.Player.Queue.Enqueue(track);
-                    return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Track = track };
+                    case LoadType.TrackLoaded:
+                        var track = result.Tracks.FirstOrDefault();
+                        if (musicDetails.Player.PlayerState == PlayerState.Playing)
+                        {
+                            musicDetails.Player.Queue.Enqueue(track);
+                            return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Track = track };
+                        }
+                        else
+                        {
+                            await musicDetails.Player.PlayAsync(track);
+                            return new PlayResult() { PlayerWasPlaying = false, Track = track };
+                        }
+                        break;
+                    case LoadType.PlaylistLoaded:
+                        return new PlayResult() { ErrorReason = "Currently i dont support Playlists", IsSuccess = true };
+                        break;
+                    case LoadType.SearchResult:
+                        break;
+                    case LoadType.NoMatches:
+                        return new PlayResult() { ErrorReason = "No mateches Found", IsSuccess = true };
+                        break;
+                    case LoadType.LoadFailed:
+                        return new PlayResult() { ErrorReason = "Load Failed", IsSuccess = false, Exception = new InvalidOperationException("Lavalink fucked up") };
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    await musicDetails.Player.PlayAsync(track);
-                    return new PlayResult() { PlayerWasPlaying = false, Track = track };
-                }
+                
+                
             }
             return new PlayResult() { PlayerWasPlaying = false, WasConnected = false,ErrorReason= "Im Currently not connected to any voicechannnel in this guild" };
         }
