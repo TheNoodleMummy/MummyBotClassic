@@ -246,7 +246,7 @@ namespace Mummybot.Services
                     await eventargs.Player.TextChannel?.SendMessageAsync($"There are no more items left in queue.");
                 return;
             }
-            LogService.LogInformation($"playing next item in queue {nextTrack.Title}");
+            LogService.LogInformation($"playing next item in queue {nextTrack.Title}",Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
             await eventargs.Player.PlayAsync(nextTrack);
             if (eventargs.Player.TextChannel is null)
                 return;

@@ -64,7 +64,12 @@ namespace Mummybot.Commands.Modules
             {
                 var sb = new StringBuilder();
                 var i = 1;
-                foreach (LavaTrack item in result.Queue.Items.Take(10))
+                if (result.Queue.Count == 0)
+                {
+                    await ReplyAsync("nothing in queue");
+                    return;
+                }
+                foreach (LavaTrack item in result.Queue.Items?.Take(10))
                 {
                     sb.Append(i).Append("[").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration).Append("](").Append(item.Url).AppendLine(")");
                 }
