@@ -288,9 +288,10 @@ namespace Mummybot.Services
                         _logger.LogError(failed.ToString(), LogSource.Commands, commandContext.GuildId, failed.Exception);
 
 #if !DEBUG
+                        var expetionlenght = (failed.Exception?.ToString().Length <= 1000 ? failed.Exception?.ToString().Length : 1000);
                     var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
                     await c.SendMessageAsync($"```{commandContext.Command} failed for {commandContext.User.GetDisplayName()}" +
-                        $"message passed {commandContext.Message.Content}```{Format.Sanitize(failed.Exception.ToString().Substring(0, 1000))}");
+                        $"message passed {commandContext.Message.Content}```{Format.Sanitize(failed.Exception?.ToString().Substring(0,expetionlenght))}");
 #endif
                         await SendAsync(commandContext, x => x.Embed = Utilities.BuildErrorEmbed(failed, commandContext));
 

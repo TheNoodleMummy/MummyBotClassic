@@ -131,7 +131,6 @@ namespace Mummybot
             [typeof(IGuildUser)] = "@user",
             [typeof(TimeSpan)] = "1day3hrs14mins30s",
             [typeof(SocketRole)] = "@role",
-            [typeof(Emote[])] = "<:espeon:491227561385525248>",
             [typeof(SocketTextChannel)] = "#channel",
         };
     }
