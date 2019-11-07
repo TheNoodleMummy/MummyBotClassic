@@ -26,7 +26,7 @@ namespace Mummybot.Services
             LogService = log;
         }
         internal LavaNode lavaNode;
-        
+
 
         private IServiceProvider Services;
         private readonly LogService LogService;
@@ -118,26 +118,28 @@ namespace Mummybot.Services
         internal async Task<PauseResult> PauseAsync(ulong guildId)
         {
             if (!(ConnectedChannels.TryGetValue(guildId, out var details)))
-                 return new PauseResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannel in this guild" };
+                return new PauseResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannel in this guild" };
             if (details.Player.PlayerState == PlayerState.Paused)
             {
                 await details.Player.ResumeAsync();
-                return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Resumed"};
+                return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Resumed" };
             }
             else
             {
                 await details.Player.PauseAsync();
                 return new PauseResult() { IsSuccess = true, ErrorReason = "Succesfully Paused" };
             }
-                
+
         }
 
         public QueueResult GetQueue(ulong guildid)
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
-                return new QueueResult() { IsSuccess=true, Queue= musicDetails.Player.Queue };
+                return new QueueResult() { IsSuccess = true, Queue = musicDetails.Player.Queue };
             return new QueueResult() { IsSuccess = false, ErrorReason = "Im currently not connected to any voicechannnel in this guild" };
         }
+
+       
 
 
         public async Task<VolumeResult> SetVolumeAsync(ulong guildid, ushort volume)
@@ -159,7 +161,7 @@ namespace Mummybot.Services
             return new VolumeResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
         }
 
-        public async Task<PlayResult> PlayAsync(ulong guildid, string url)
+        public async Task<PlayResult> PlayAsync(ulong guildid, string url,bool canplaylist)
         {
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
@@ -167,20 +169,74 @@ namespace Mummybot.Services
                 switch (result.LoadType)
                 {
                     case LoadType.TrackLoaded:
-                        var track = result.Tracks.FirstOrDefault();
+
                         if (musicDetails.Player.PlayerState == PlayerState.Playing)
                         {
-                            musicDetails.Player.Queue.Enqueue(track);
-                            return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Track = track };
+                            musicDetails.Player.Queue.Enqueue(result.Tracks.FirstOrDefault());
+                            return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Tracks = result.Tracks };
                         }
                         else
                         {
-                            await musicDetails.Player.PlayAsync(track);
-                            return new PlayResult() { PlayerWasPlaying = false, Track = track };
+                            await musicDetails.Player.PlayAsync(result.Tracks.FirstOrDefault());
+                            return new PlayResult() { PlayerWasPlaying = false, Tracks = result.Tracks };
                         }
                         break;
                     case LoadType.PlaylistLoaded:
-                        return new PlayResult() { ErrorReason = "Currently i dont support Playlists", IsSuccess = true };
+                        {
+                            if (canplaylist)
+                            {
+                                bool first = false;
+                                int firstposition= 0,lastposition = 0;
+
+                                if (musicDetails.Player.PlayerState == PlayerState.Playing)
+                                {
+                                    foreach (var track in result.Tracks)
+                                    {
+                                        musicDetails.Player.Queue.Enqueue(track);
+                                        if (!first)
+                                        {
+                                            firstposition = musicDetails.Player.Queue.Count;
+                                            first = true;
+                                        }
+                                    }
+                                    lastposition = musicDetails.Player.Queue.Count;
+                                    return new PlayResult()
+                                    {
+                                        IsSuccess = true,
+                                        isPlayList = true,
+                                        Tracks = result.Tracks,
+                                        PlaylistInQueue = (firstposition, lastposition),
+                                        QueuePosition = result.Tracks.Count,
+                                        PlayerWasPlaying = true
+                                    };
+                                }
+                                else
+                                {
+                                    foreach (var track in result.Tracks)
+                                    {
+                                        musicDetails.Player.Queue.Enqueue(track);
+                                        if (!first)
+                                        {
+                                            firstposition = 1;
+                                            first = true;
+                                        }
+                                    }
+                                    lastposition = musicDetails.Player.Queue.Count;
+                                    musicDetails.Player.Queue.TryDequeue(out var qtrack);
+                                    musicDetails.Player.PlayAsync(qtrack);
+                                    return new PlayResult()
+                                    {
+                                        IsSuccess = true,
+                                        isPlayList = true,
+                                        Tracks = result.Tracks,
+                                        PlaylistInQueue = (firstposition, lastposition),
+                                        QueuePosition = result.Tracks.Count
+                                    };
+                                }
+                            }
+                            return new PlayResult() { isPlayList = true, ErrorReason = "user is not whitelisted to request playlists" };
+                        }
+                        return new PlayResult() {IsSuccess = true,isPlayList = true,Tracks = result.Tracks };
                         break;
                     case LoadType.SearchResult:
                         break;
@@ -193,13 +249,13 @@ namespace Mummybot.Services
                     default:
                         break;
                 }
-                
-                
+
+
             }
-            return new PlayResult() { PlayerWasPlaying = false, WasConnected = false,ErrorReason= "Im Currently not connected to any voicechannnel in this guild" };
+            return new PlayResult() { PlayerWasPlaying = false, WasConnected = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
         }
 
-        public async Task JoinAsync(IVoiceChannel channel = null)
+        public async Task JoinAsync(IVoiceChannel channel, SocketTextChannel textchannel = null)
         {
             if (channel is null)
                 return;
@@ -214,7 +270,12 @@ namespace Mummybot.Services
             }
             else
             {
-                var player = await lavaNode.JoinAsync(channel);
+                LavaPlayer player;
+                if (textchannel is null)
+                    player = await lavaNode.JoinAsync(channel);
+                else
+                    player = await lavaNode.JoinAsync(channel,textchannel);
+
                 using var guildstore = Services.GetRequiredService<GuildStore>();
                 var guild = await guildstore.GetOrCreateGuildAsync(channel.GuildId);
                 await player.UpdateVolumeAsync((ushort)guild.Volume);
@@ -249,7 +310,7 @@ namespace Mummybot.Services
 
         private Task LavaClient_OnTrackStuck(TrackStuckEventArgs eventargs)
         {
-            LogService.LogWarning($"player for {eventargs.Player.VoiceChannel.GuildId} stuck at {eventargs.Threshold}sec.", Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
+            LogService.LogWarning($"player for {eventargs.Player.VoiceChannel.GuildId} stuck at {eventargs.Threshold}sec.", Enums.LogSource.Victoria, eventargs.Player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
@@ -266,7 +327,7 @@ namespace Mummybot.Services
                     await eventargs.Player.TextChannel?.SendMessageAsync($"There are no more items left in queue.");
                 return;
             }
-            LogService.LogInformation($"playing next item in queue {nextTrack.Title}",Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
+            LogService.LogInformation($"playing next item in queue {nextTrack.Title}", Enums.LogSource.Victoria, eventargs.Player.VoiceChannel.Guild.Id);
             await eventargs.Player.PlayAsync(nextTrack);
             if (eventargs.Player.TextChannel is null)
                 return;
@@ -276,13 +337,13 @@ namespace Mummybot.Services
 
         private Task LavaClient_OnTrackException(TrackExceptionEventArgs eventargs)
         {
-            LogService.LogError($"Player {eventargs.Player.VoiceChannel.GuildId} {eventargs.ErrorMessage} for {eventargs.Track.Title}", Enums.LogSource.Victoria,eventargs.Player.VoiceChannel.Guild.Id);
+            LogService.LogError($"Player {eventargs.Player.VoiceChannel.GuildId} {eventargs.ErrorMessage} for {eventargs.Track.Title}", Enums.LogSource.Victoria, eventargs.Player.VoiceChannel.Guild.Id);
             return Task.CompletedTask;
         }
 
         private Task LavaClient_OnSocketClosed(WebSocketClosedEventArgs eventArgs)
         {
-            LogService.LogError($"LavaNode Disconnected: {eventArgs.Reason} by {(eventArgs.ByRemote?"Remote":"Local")}",Enums.LogSource.LavaLink);
+            LogService.LogError($"LavaNode Disconnected: {eventArgs.Reason} by {(eventArgs.ByRemote ? "Remote" : "Local")}", Enums.LogSource.LavaLink);
             return Task.CompletedTask;
         }
     }
@@ -296,9 +357,11 @@ namespace Mummybot.Services
 
     public class PlayResult : IMummyResult
     {
+        public bool isPlayList { get; set; } = false;
         public bool PlayerWasPlaying { get; set; }
         public int QueuePosition { get; set; }
-        public LavaTrack Track { get; set; }
+        public (int First, int Last) PlaylistInQueue{get;set;}
+        public ICollection<LavaTrack> Tracks { get; set; } = new List<LavaTrack>();
 
         public bool WasConnected { get; set; } = true;
 
@@ -311,7 +374,6 @@ namespace Mummybot.Services
     {
         public bool IsSuccess { get; set; }
         public string ErrorReason { get; set; }
-
         public int Volume { get; set; }
         public Exception Exception { get; set; }
     }

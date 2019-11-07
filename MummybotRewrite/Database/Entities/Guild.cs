@@ -17,6 +17,8 @@ namespace Mummybot.Database.Entities
         public List<VoiceMutedUser> VoiceMutedUsers { get; set; } = new List<VoiceMutedUser>();
         public List<VoiceDeafUser> VoiceDeafenedUsers { get; set; } = new List<VoiceDeafUser>();
 
+        public List<PlayListWhiteList> PlayListWhiteLists { get; set; } = new List<PlayListWhiteList>();
+
         public ulong GuildID { get; set; }
 
         public bool AutoQuotes { get; set; }

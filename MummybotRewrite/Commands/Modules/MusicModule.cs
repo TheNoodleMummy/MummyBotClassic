@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Humanizer;
 using Mummybot.Attributes.Checks;
 using Mummybot.Extentions;
@@ -24,11 +25,22 @@ namespace Mummybot.Commands.Modules
             LogService = logService;
         }
 
+        [Group("channel")]
+        public class Channel : MummyModule
+        {
+            [Command]
+            public async Task SetChannel(SocketTextChannel channel)
+            {
+
+            }
+
+        }
+
         [Command("join")]
         [Description("makes to bot join your voicechannel")]
-        public async Task Join()
+        public async Task Join(SocketTextChannel textchannel=null)
         {
-            await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel);
+            await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel,textchannel);
             await Context.Message.AddOkAsync();
         }
 
@@ -85,12 +97,14 @@ namespace Mummybot.Commands.Modules
         [Description("play something? (the bot needs to join first)")]
         public async Task PlayAsync([Description("a youtube/soundcloud link"), Remainder]string url)
         {
-            var playResult = await _musicService.PlayAsync(Context.Guild.Id, url);
-            if (playResult.IsSuccess)
+            var canrequestplaylists = GuildConfig.PlayListWhiteLists.Any(x => x.UserId == Context.UserId);
+
+            var playResult = await _musicService.PlayAsync(Context.Guild.Id, url,canrequestplaylists);
+            if (playResult.IsSuccess&& !playResult.isPlayList)
             {
                 if (playResult.PlayerWasPlaying)
                 {
-                    await ReplyAsync($"Added {playResult.Track.Title} To queue position: {playResult.QueuePosition}");
+                    await ReplyAsync($"Added {playResult.Tracks.FirstOrDefault().Title} to the queue position: {playResult.QueuePosition}");
                 }
                 else if (!playResult.PlayerWasPlaying)
                 {
@@ -100,7 +114,19 @@ namespace Mummybot.Commands.Modules
                 {
                     await ReplyAsync($"{playResult.ErrorReason}");
                 }
-            }            
+            }   
+            else if (playResult.IsSuccess && playResult.isPlayList)
+            {
+                if (playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"Added {playResult.QueuePosition} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+
+                }
+                else if (!playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"added {playResult.QueuePosition-1} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+                }
+            }
             else if (!playResult.WasConnected)
                 await ReplyAsync("im not connected to voice");
             

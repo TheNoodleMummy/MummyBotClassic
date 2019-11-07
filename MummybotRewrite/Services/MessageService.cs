@@ -252,7 +252,7 @@ namespace Mummybot.Services
                         var emb = new EmbedBuilder();
                         emb.WithAuthor(commandContext.User.GetDisplayName(), commandContext.User.GetAvatarOrDefaultUrl());
                         emb.WithTitle(ccr.Command.Name + " is on cooldown");
-                        foreach (var item in ccr.Cooldowns)
+                        foreach (var item in ccr.Cooldowns.Take(2))
                         {
                             if (Enum.TryParse<CooldownBucketType>(item.Cooldown.BucketType.ToString(), true, out var enumeration))
                                 switch (enumeration)
@@ -289,8 +289,8 @@ namespace Mummybot.Services
 
 #if !DEBUG
                         var expetionlenght = (failed.Exception?.ToString().Length <= 1000 ? failed.Exception?.ToString().Length : 1000);
-                    var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
-                    await c.SendMessageAsync($"```{commandContext.Command} failed for {commandContext.User.GetDisplayName()}" +
+                        var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
+                        await c.SendMessageAsync($"```{commandContext.Command} failed for {commandContext.User.GetDisplayName()}" +
                         $"message passed {commandContext.Message.Content}```{Format.Sanitize(failed.Exception?.ToString().Substring(0,expetionlenght))}");
 #endif
                         await SendAsync(commandContext, x => x.Embed = Utilities.BuildErrorEmbed(failed, commandContext));
@@ -313,9 +313,10 @@ namespace Mummybot.Services
                     _logger.LogError(failed.ToString(), LogSource.Commands,context.GuildId, failed.Exception);
 
 #if !DEBUG
+                    var expetionlenght = (failed.Exception?.ToString().Length <= 1000 ? failed.Exception?.ToString().Length : 1000);
                     var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
-                    await c.SendMessageAsync($"```{context.Command} failed for {context.User.GetDisplayName()}" +
-                        $"message passed {context.Message.Content}```{Format.Sanitize(failed.Exception.ToString().Substring(0, 1000))}");
+                    await c.SendMessageAsync($"```{commandContext.Command} failed for {commandContext.User.GetDisplayName()}" +
+                    $"message passed {commandContext.Message.Content}```{Format.Sanitize(failed.Exception?.ToString().Substring(0,expetionlenght))}");
 #endif
                 }
 

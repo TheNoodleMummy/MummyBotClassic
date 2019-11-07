@@ -7,6 +7,8 @@ using System;
 using Mummybot.Commands.TypeReaders;
 using Mummybot.Attributes.Checks;
 using System.Text;
+using Discord.WebSocket;
+using Mummybot.Database.Entities;
 
 namespace Mummybot.Commands.Modules
 {
@@ -148,7 +150,24 @@ namespace Mummybot.Commands.Modules
                 await Context.Message.AddOkAsync();
             }
 
+            [Group("whitelist")]
+            public class WhitelistConfigModule : MummyModule
+            {
+                [Command("add")]
+                public async Task SetmusicOnOff(SocketGuildUser user)
+                {
+                    GuildConfig.PlayListWhiteLists.Add(new PlayListWhiteList() { UserId = user.Id, WhiteListedBy = Context.UserId });
+                    await Context.Message.AddOkAsync();
+                }
 
+                [Command("remove")]
+                public async Task SettrollsOnOff(SocketGuildUser user)
+                {
+                    var whitelistentry = GuildConfig.PlayListWhiteLists.FirstOrDefault(x => x.UserId==user.Id);
+                    GuildConfig.PlayListWhiteLists.Remove(whitelistentry);
+                    await Context.Message.AddOkAsync();
+                }
+            }
         }
 
 

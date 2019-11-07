@@ -12,12 +12,7 @@ namespace Mummybot
 {
     public static partial class Utilities
     {
-        public static bool AvailableName(IEnumerable<Command> commands, string name)
-            => !commands.Any(x => x.FullAliases
-                .Any(y => string.Equals(y, name, StringComparison.InvariantCultureIgnoreCase) ||
-                          x.Module.FullAliases.Any(z =>
-                              string.Equals(z, name, StringComparison.InvariantCultureIgnoreCase))));
-
+       
         public static Embed BuildErrorEmbed(FailedResult result, MummyContext context)
         {
             var builder = new EmbedBuilder
