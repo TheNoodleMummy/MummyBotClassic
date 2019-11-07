@@ -38,7 +38,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("join")]
         [Description("makes to bot join your voicechannel")]
-        public async Task Join(SocketTextChannel textchannel=null)
+        public async Task Join(ITextChannel textchannel=null)
         {
             await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel,textchannel);
             await Context.Message.AddOkAsync();
@@ -179,7 +179,7 @@ namespace Mummybot.Commands.Modules
                     await ReplyAsync($"couldnt find anything on Youtube for querry: {querry}");
                     break;
                 case LoadType.LoadFailed:
-                    await ReplyAsync("Something went wrong and i wa sunable to get any results from Youtube");
+                    await ReplyAsync("Something went wrong and i was unable to get any results from Youtube");
                     break;
             }
         }

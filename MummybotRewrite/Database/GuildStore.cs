@@ -185,5 +185,11 @@ namespace Mummybot.Database
             }
             return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.GuildID == guildid);
         }
+
+        public override void Dispose()
+        {
+            SaveChanges();
+            base.Dispose();
+        }
     }
 }

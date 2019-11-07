@@ -36,7 +36,7 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
+#if DEBUG
             lavaNode = services.GetRequiredService<LavaNode>();
             
             Services = services;
@@ -153,7 +153,6 @@ namespace Mummybot.Services
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
                 guild.Volume = volume;
                 guildstore.Update(guild);
-                await guildstore.SaveChangesAsync();
 
                 await musicDetails.Player.UpdateVolumeAsync(volume);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.Volume };
@@ -223,7 +222,7 @@ namespace Mummybot.Services
                                     }
                                     lastposition = musicDetails.Player.Queue.Count;
                                     musicDetails.Player.Queue.TryDequeue(out var qtrack);
-                                    musicDetails.Player.PlayAsync(qtrack);
+                                    await musicDetails.Player.PlayAsync(qtrack);
                                     return new PlayResult()
                                     {
                                         IsSuccess = true,
@@ -255,7 +254,7 @@ namespace Mummybot.Services
             return new PlayResult() { PlayerWasPlaying = false, WasConnected = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
         }
 
-        public async Task JoinAsync(IVoiceChannel channel, SocketTextChannel textchannel = null)
+        public async Task JoinAsync(IVoiceChannel channel, ITextChannel textchannel = null)
         {
             if (channel is null)
                 return;
@@ -327,7 +326,7 @@ namespace Mummybot.Services
                     await eventargs.Player.TextChannel?.SendMessageAsync($"There are no more items left in queue.");
                 return;
             }
-            LogService.LogInformation($"playing next item in queue {nextTrack.Title}", Enums.LogSource.Victoria, eventargs.Player.VoiceChannel.Guild.Id);
+            LogService.LogInformation($"playing {nextTrack.Title}", Enums.LogSource.Victoria, eventargs.Player.VoiceChannel.Guild.Id);
             await eventargs.Player.PlayAsync(nextTrack);
             if (eventargs.Player.TextChannel is null)
                 return;
