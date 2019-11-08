@@ -147,7 +147,10 @@ namespace Mummybot.Services
             if (ConnectedChannels.TryGetValue(guildid, out var musicDetails))
             {
                 if (volume <= 0 && volume >= 150)
+                {
+                    await (musicDetails.Player.TextChannel?.SendMessageAsync("Volume must be between 0 and 150")??Task.CompletedTask);
                     return new VolumeResult() { IsSuccess = false, ErrorReason = "Volume must be between 0 and 150" };
+                }
 
                 using var guildstore = Services.GetRequiredService<GuildStore>();
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
@@ -155,6 +158,7 @@ namespace Mummybot.Services
                 guildstore.Update(guild);
 
                 await musicDetails.Player.UpdateVolumeAsync(volume);
+                await (musicDetails.Player.TextChannel?.SendMessageAsync($"Set volume to {volume}")??Task.CompletedTask);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.Volume };
             }
             return new VolumeResult() { IsSuccess = false, ErrorReason = "Im Currently not connected to any voicechannnel in this guild" };
@@ -172,11 +176,13 @@ namespace Mummybot.Services
                         if (musicDetails.Player.PlayerState == PlayerState.Playing)
                         {
                             musicDetails.Player.Queue.Enqueue(result.Tracks.FirstOrDefault());
-                            return new PlayResult() { IsSuccess = true, PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Tracks = result.Tracks };
+                            await (musicDetails.Player.TextChannel?.SendMessageAsync($"added {result.Tracks.First().Title} to position {musicDetails.Player.Queue.Count}")??Task.CompletedTask);
+                            return new PlayResult() { IsSuccess = true, PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Count, Tracks = result.Tracks };
                         }
                         else
                         {
                             await musicDetails.Player.PlayAsync(result.Tracks.FirstOrDefault());
+                            await (musicDetails.Player.TextChannel?.SendMessageAsync($"now playing {result.Tracks.First().Title} <{result.Tracks.First().Url}>")?? Task.CompletedTask)  ;
                             return new PlayResult() { IsSuccess = true, PlayerWasPlaying = false, Tracks = result.Tracks };
                         }
                         break;
@@ -199,6 +205,8 @@ namespace Mummybot.Services
                                         }
                                     }
                                     lastposition = musicDetails.Player.Queue.Count;
+                                    await (musicDetails.Player.TextChannel?.SendMessageAsync($"added {result.Tracks.Count} to the queue postions {firstposition}-{lastposition}")??Task.CompletedTask);
+
                                     return new PlayResult()
                                     {
                                         IsSuccess = true,
@@ -223,6 +231,7 @@ namespace Mummybot.Services
                                     lastposition = musicDetails.Player.Queue.Count;
                                     musicDetails.Player.Queue.TryDequeue(out var qtrack);
                                     await musicDetails.Player.PlayAsync(qtrack);
+                                    await (musicDetails.Player.TextChannel?.SendMessageAsync($"now playing {qtrack.Title} <{qtrack.Url}> \n and added {result.Tracks.Count} to queue.")??Task.CompletedTask);
                                     return new PlayResult()
                                     {
                                         IsSuccess = true,
@@ -233,6 +242,7 @@ namespace Mummybot.Services
                                     };
                                 }
                             }
+                            await (musicDetails.Player.TextChannel?.SendMessageAsync("you arent whitelisted to request playlists") ?? Task.CompletedTask);
                             return new PlayResult() { isPlayList = true, ErrorReason = "user is not whitelisted to request playlists" };
                         }
                         return new PlayResult() {IsSuccess = true,isPlayList = true,Tracks = result.Tracks };
@@ -240,10 +250,12 @@ namespace Mummybot.Services
                     case LoadType.SearchResult:
                         break;
                     case LoadType.NoMatches:
-                        return new PlayResult() { ErrorReason = "No mateches Found", IsSuccess = true };
+                        await (musicDetails.Player.TextChannel?.SendMessageAsync("no matches found")??Task.CompletedTask);
+                        return new PlayResult() { ErrorReason = "No matches Found", IsSuccess = true };
                         break;
                     case LoadType.LoadFailed:
-                        return new PlayResult() { ErrorReason = "Load Failed", IsSuccess = false, Exception = new InvalidOperationException("Lavalink fucked up") };
+                        await (musicDetails.Player.TextChannel?.SendMessageAsync("something failed please see if your querry is correct or try agian later")??Task.CompletedTask);
+                        return new PlayResult() { ErrorReason = "Load Failed", IsSuccess = false, Exception = new Exception(result.Exception.Message) };
                         break;
                     default:
                         break;
@@ -264,7 +276,6 @@ namespace Mummybot.Services
                 if (musicDetails.Player.VoiceChannel != null)
                 {
                     await lavaNode.MoveAsync(channel);
-
                 }
             }
             else
@@ -278,6 +289,7 @@ namespace Mummybot.Services
                 using var guildstore = Services.GetRequiredService<GuildStore>();
                 var guild = await guildstore.GetOrCreateGuildAsync(channel.GuildId);
                 await player.UpdateVolumeAsync((ushort)guild.Volume);
+                await (player.TextChannel?.SendMessageAsync($"joined {channel.Name} with volume set to {guild.Volume}")?? Task.CompletedTask); 
                 ConnectedChannels.TryAdd(channel.GuildId, new MusicDetails()
                 {
                     Player = player,

@@ -56,14 +56,14 @@ namespace Mummybot.Commands.Modules
         public async Task SetVolumeAsync([Description("volule to set")] ushort volume)
         {
             var result = await _musicService.SetVolumeAsync(Context.Guild.Id, volume);
-            if (result.IsSuccess)
-            {
-                await ReplyAsync($"Changed Volume to {result.Volume}");
-            }
-            else
-            {
-                await ReplyAsync(result.ErrorReason);
-            }
+            //if (result.IsSuccess)
+            //{
+            //    await ReplyAsync($"Changed Volume to {result.Volume}");
+            //}
+            //else
+            //{
+            //    await ReplyAsync(result.ErrorReason);
+            //}
         }
 
         [Command("queue")]
@@ -99,35 +99,35 @@ namespace Mummybot.Commands.Modules
             var canrequestplaylists = GuildConfig.PlayListWhiteLists.Any(x => x.UserId == Context.UserId);
 
             var playResult = await _musicService.PlayAsync(Context.Guild.Id, url,canrequestplaylists);
-            if (playResult.IsSuccess&& !playResult.isPlayList)
-            {
-                if (playResult.PlayerWasPlaying)
-                {
-                    await ReplyAsync($"Added {playResult.Tracks.FirstOrDefault().Title} to the queue position: {playResult.QueuePosition}");
-                }
-                else if (!playResult.PlayerWasPlaying)
-                {
-                    await ReplyAsync($"now palying {playResult.Tracks.FirstOrDefault().Title}");
-                }
-                else
-                {
-                    await ReplyAsync($"{playResult.ErrorReason}");
-                }
-            }   
-            else if (playResult.IsSuccess && playResult.isPlayList)
-            {
-                if (playResult.PlayerWasPlaying)
-                {
-                    await ReplyAsync($"Added {playResult.QueuePosition} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+            //if (playResult.IsSuccess&& !playResult.isPlayList)
+            //{
+            //    if (playResult.PlayerWasPlaying)
+            //    {
+            //        await ReplyAsync($"Added {playResult.Tracks.FirstOrDefault().Title} to the queue position: {playResult.QueuePosition}");
+            //    }
+            //    else if (!playResult.PlayerWasPlaying)
+            //    {
+            //        await ReplyAsync($"now palying {playResult.Tracks.FirstOrDefault().Title}");
+            //    }
+            //    else
+            //    {
+            //        await ReplyAsync($"{playResult.ErrorReason}");
+            //    }
+            //}   
+            //else if (playResult.IsSuccess && playResult.isPlayList)
+            //{
+            //    if (playResult.PlayerWasPlaying)
+            //    {
+            //        await ReplyAsync($"Added {playResult.QueuePosition} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
 
-                }
-                else if (!playResult.PlayerWasPlaying)
-                {
-                    await ReplyAsync($"added {playResult.QueuePosition-1} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
-                }
-            }
-            else if (!playResult.WasConnected)
-                await ReplyAsync("im not connected to voice");
+            //    }
+            //    else if (!playResult.PlayerWasPlaying)
+            //    {
+            //        await ReplyAsync($"added {playResult.QueuePosition-1} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+            //    }
+            //}
+            //else if (!playResult.WasConnected)
+            //    await ReplyAsync("im not connected to voice");
             
         }
 
