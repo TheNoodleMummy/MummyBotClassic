@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Humanizer;
 using Mummybot.Attributes.Checks;
+using Mummybot.Commands.TypeReaders;
 using Mummybot.Extentions;
 using Mummybot.Services;
 using Qmmands;
@@ -23,18 +24,7 @@ namespace Mummybot.Commands.Modules
         {
             _musicService = musicService;
             LogService = logService;
-        }
-
-        [Group("channel")]
-        public class Channel : MummyModule
-        {
-            [Command]
-            public async Task SetChannel(SocketTextChannel channel)
-            {
-
-            }
-
-        }
+        }        
 
         [Command("join")]
         [Description("makes to bot join your voicechannel")]
@@ -43,6 +33,15 @@ namespace Mummybot.Commands.Modules
             await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel,textchannel);
             await Context.Message.AddOkAsync();
         }
+
+        [Command("join")]
+        [Description("makes to bot join your voicechannel")]
+        public async Task Join([OverrideTypeParser(typeof(BoolTypeReader))] bool reportornot =false)
+        {
+            await _musicService.JoinAsync((Context.User as IVoiceState)?.VoiceChannel, Context.Channel);
+            await Context.Message.AddOkAsync();
+        }
+
 
         [Command("leave")]
         [Description("makes to bot leave your voicechannel")]
@@ -83,7 +82,7 @@ namespace Mummybot.Commands.Modules
                 }
                 foreach (LavaTrack item in result.Queue.Items?.Take(10))
                 {
-                    sb.Append(i).Append("[").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration).Append("](").Append(item.Url).AppendLine(")");
+                    sb.Append(i).Append(" [").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration).Append("](").Append(item.Url).AppendLine(")");
                 }
                 await ReplyAsync(embed: new EmbedBuilder().WithDescription(sb.ToString()));
             }
@@ -108,7 +107,7 @@ namespace Mummybot.Commands.Modules
                 }
                 else if (!playResult.PlayerWasPlaying)
                 {
-                    //now playing ....
+                    await ReplyAsync($"now palying {playResult.Tracks.FirstOrDefault().Title}");
                 }
                 else
                 {

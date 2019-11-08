@@ -36,7 +36,7 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
+#if DEBUG
             lavaNode = services.GetRequiredService<LavaNode>();
             
             Services = services;
@@ -172,12 +172,12 @@ namespace Mummybot.Services
                         if (musicDetails.Player.PlayerState == PlayerState.Playing)
                         {
                             musicDetails.Player.Queue.Enqueue(result.Tracks.FirstOrDefault());
-                            return new PlayResult() { PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Tracks = result.Tracks };
+                            return new PlayResult() { IsSuccess = true, PlayerWasPlaying = true, QueuePosition = musicDetails.Player.Queue.Items.Count(), Tracks = result.Tracks };
                         }
                         else
                         {
                             await musicDetails.Player.PlayAsync(result.Tracks.FirstOrDefault());
-                            return new PlayResult() { PlayerWasPlaying = false, Tracks = result.Tracks };
+                            return new PlayResult() { IsSuccess = true, PlayerWasPlaying = false, Tracks = result.Tracks };
                         }
                         break;
                     case LoadType.PlaylistLoaded:
