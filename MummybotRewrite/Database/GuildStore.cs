@@ -45,6 +45,27 @@ namespace Mummybot.Database
                 guild.Property(x => x.AutoQuotes)
                 .HasDefaultValue(false);
 
+                guild.Property(x => x.UsesBirthdays)
+                .HasDefaultValue(false);
+
+                guild.Property(x => x.UsesMusic)
+                .HasDefaultValue(false);
+
+                guild.Property(x => x.UsesReminders)
+                .HasDefaultValue(false);
+
+                guild.Property(x => x.UsesStarBoard)
+                .HasDefaultValue(false);
+
+                guild.Property(x => x.Volume)
+                .HasDefaultValue(20);
+
+                guild.Property(x => x.UsesTags)
+                .HasDefaultValue(false);
+
+                guild.Property(x => x.UsesTrolls)
+                .HasDefaultValue(false);
+
                 guild.HasMany(x => x.Prefixes)
                 .WithOne(y => y.Guild)
                 .HasForeignKey(z => z.guildID);
@@ -58,12 +79,25 @@ namespace Mummybot.Database
                 .HasForeignKey(z => z.GuildID);
 
                 guild.HasMany(x => x.VoiceMutedUsers)
-               .WithOne(y => y.Guild)
-               .HasForeignKey(z => z.GuildID);
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.VoiceDeafenedUsers)
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
 
                 guild.HasMany(x => x.Reminders)
                .WithOne(y => y.Guild)
                .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.Tags)
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
+
+                guild.HasMany(x => x.PlayListWhiteLists)
+                .WithOne(y => y.Guild)
+                .HasForeignKey(z => z.GuildID);
+
             });
             modelBuilder.Entity<Prefixes>(prefix =>
             {
@@ -95,6 +129,18 @@ namespace Mummybot.Database
                 vmu.Property(x => x.Id)
                 .ValueGeneratedNever();
             });
+            modelBuilder.Entity<VoiceDeafUser>(vdu =>
+            {
+                vdu.HasKey(x => x.Id);
+                vdu.Property(x => x.Id)
+                .ValueGeneratedNever();
+            });
+            modelBuilder.Entity<Reminder>(reminder =>
+            {
+                reminder.HasKey(x => x.Id);
+                reminder.Property(x => x.Id)
+                .ValueGeneratedNever();
+            });
         }
 
         public Task<Guild> GetGuildForModule(IGuild guild)
@@ -107,6 +153,8 @@ namespace Mummybot.Database
                 .Include(g => g.Stars)
                 .Include(g => g.Tags)
                 .Include(g => g.VoiceMutedUsers)
+                .Include(g => g.VoiceDeafenedUsers)
+                .Include(g => g.PlayListWhiteLists)
                 .FirstOrDefaultAsync(x => x.GuildID == id);
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild iguild, Expression<Func<Guild, TProp>> expression)
@@ -115,7 +163,7 @@ namespace Mummybot.Database
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object",Enums.LogSource.GuildStore,iguild.Id);
+                _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, iguild.Id);
                 return await CreateGuildAsync(iguild.Id, expression);
             }
             Slim.Release();
@@ -128,7 +176,7 @@ namespace Mummybot.Database
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == guildid);
             if (guild is null)
             {
-                _logservice.LogInformation($"guild: {guildid} was not found creating new object",Enums.LogSource.GuildStore,Guildid: guildid);
+                _logservice.LogInformation($"guild: {guildid} was not found creating new object", Enums.LogSource.GuildStore, Guildid: guildid);
                 return await CreateGuildAsync(guildid, expression);
             }
             Slim.Release();
@@ -178,7 +226,6 @@ namespace Mummybot.Database
             };
             await Guilds.AddAsync(newguild);
 
-            await SaveChangesAsync();
             if (expression is null)
             {
                 return await Guilds.FindAsync(guildid);
@@ -188,7 +235,36 @@ namespace Mummybot.Database
 
         public override void Dispose()
         {
-            SaveChanges();
+            try
+            {
+                var count = SaveChanges();
+                _logservice.LogInformation($"saved {count} items");
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var item in ex.Entries)
+                {
+                    if (item.Entity is Reminder reminder)
+                    {
+                        var current = item.CurrentValues;
+                        var dbvalues = item.GetDatabaseValues();
+                        Console.WriteLine("current values");
+                        foreach (var props in current.Properties)
+                        {
+
+                            Console.WriteLine(props);
+                        }
+
+                        Console.WriteLine("db values");
+                        foreach (var props in dbvalues.Properties)
+                        {
+
+                            Console.WriteLine(props);
+                        }
+                    }
+
+                }
+            }
             base.Dispose();
         }
     }

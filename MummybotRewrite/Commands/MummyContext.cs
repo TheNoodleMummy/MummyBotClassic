@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Enums;
 using Mummybot.Services;
 using Qmmands;
@@ -14,7 +15,6 @@ namespace Mummybot.Commands
     public class MummyContext : CommandContext
     {
 
-
         public MummyContext(DiscordSocketClient client, IUserMessage message, HttpClient hTTP, IServiceProvider services, string prefixUsed, bool isEdit) : base(services)
         {
             Client = client;
@@ -22,9 +22,8 @@ namespace Mummybot.Commands
             HTTP = hTTP;
             PrefixUsed = prefixUsed;
             IsEdit = isEdit;
-        }
-
-        
+            LogService = services.GetRequiredService<LogService>();
+        }       
 
         public SocketGuildUser User { get; private set; }
         public SocketTextChannel Channel { get; private set; }
@@ -42,9 +41,7 @@ namespace Mummybot.Commands
         public ulong ChannelId => Channel.Id;
         public ulong UserId => User.Id;
         public ulong GuildId => Guild.Id;
-
-
-
+        
         internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception, Guild));
 
@@ -63,15 +60,13 @@ namespace Mummybot.Commands
         internal void LogInformation(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
         => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
     
-
-    internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP,IServiceProvider services, string prefixUsed, bool isEdit)
+        internal static MummyContext Create(DiscordSocketClient client, IUserMessage message, HttpClient hTTP,IServiceProvider services, string prefixUsed, bool isEdit)
         {
             return new MummyContext(client, message, hTTP,services, prefixUsed, isEdit)
             {
                 Channel = message.Channel as SocketTextChannel,
                 User = message.Author as SocketGuildUser
             };
-        }
-       
+        }       
     }
 }

@@ -80,9 +80,9 @@ namespace Mummybot.Commands.Modules
                     await ReplyAsync("nothing in queue");
                     return;
                 }
-                foreach (LavaTrack item in result.Queue.Items?.Take(10))
+                foreach (LavaTrack track in result.Queue.Items?.Take(10))
                 {
-                    sb.Append(i).Append(" [").Append(item.Title).Append(" by ").Append(item.Author).Append(" - ").Append(item.Duration).Append("](").Append(item.Url).AppendLine(")");
+                    sb.Append(i).Append(" [").Append(track.Title).Append(" uploaded by ").Append(track.Author).Append(" - ").Append(track.Duration).Append("](").Append(track.Url).AppendLine(")");
                 }
                 await ReplyAsync(embed: new EmbedBuilder().WithDescription(sb.ToString()));
             }

@@ -36,7 +36,7 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if DEBUG
+#if !DEBUG
             lavaNode = services.GetRequiredService<LavaNode>();
             
             Services = services;

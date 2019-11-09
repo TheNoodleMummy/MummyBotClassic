@@ -73,9 +73,7 @@ namespace MummyBot
             using (var guildstore = services.GetRequiredService<GuildStore>())
             {
                 await tokenstore.Database.MigrateAsync();
-                await guildstore.Database.MigrateAsync();
-
-                
+                await guildstore.Database.MigrateAsync();                
             }
             var mummybot = new BotStartup(services);
             await mummybot.StartAsync(types);
