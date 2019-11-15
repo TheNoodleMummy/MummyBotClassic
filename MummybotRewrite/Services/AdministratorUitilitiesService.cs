@@ -72,7 +72,9 @@ namespace Mummybot.Services
                         TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, VoiceMuteCallback,item.Id);
                     }
                 }
+                await store.SaveChangesAsync();
             }
+            
         }
 
         public async Task VoiceMute(MummyContext ctx, SocketGuildUser user, TimeSpan time)
@@ -95,6 +97,7 @@ namespace Mummybot.Services
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
                 config.VoiceMutedUsers.Add(vmu);
                 store.Update(config);
+                await store.SaveChangesAsync();
             }
             await user.ModifyAsync(user => user.Mute = true);
             TaskQueue.ScheduleTask(vmu, time, VoiceMuteCallback, vmu.Id);
@@ -121,6 +124,7 @@ namespace Mummybot.Services
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
                 config.VoiceDeafenedUsers.Add(vdu);
                 store.Update(config);
+                await store.SaveChangesAsync();
             }
             await user.ModifyAsync(user => user.Deaf = true);
             TaskQueue.ScheduleTask(vdu, time, VoiceDeafCallback, vdu.Id);
@@ -140,6 +144,7 @@ namespace Mummybot.Services
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
             config.VoiceMutedUsers.Remove(args);
             store.Update(config);
+            await store.SaveChangesAsync();
         }
 
         public async Task VoiceDeafCallback(VoiceDeafUser args)
@@ -155,6 +160,7 @@ namespace Mummybot.Services
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
             config.VoiceDeafenedUsers.Remove(args);
             store.Update(config);
+            await store.SaveChangesAsync();
         }
 
     }

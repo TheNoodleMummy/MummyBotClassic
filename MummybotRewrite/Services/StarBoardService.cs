@@ -73,6 +73,7 @@ namespace Mummybot.Services
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
                         }
+                        await guildstore.SaveChangesAsync();
                     }
                 }
             };
@@ -110,6 +111,7 @@ namespace Mummybot.Services
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
                             guildstore.Update(guild);
+                            await guildstore.SaveChangesAsync();
                         }
                     }
                 }

@@ -43,6 +43,30 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     b.ToTable("Birthday");
                 });
 
+            modelBuilder.Entity("Mummybot.Database.Entities.DBWord", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Issue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Reported")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("used")
+                        .HasColumnType("int");
+
+                    b.Property<string>("word")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Words");
+                });
+
             modelBuilder.Entity("Mummybot.Database.Entities.Guild", b =>
                 {
                     b.Property<decimal>("GuildID")
@@ -63,6 +87,12 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     b.Property<int>("DefualtVolume")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("HangManChannelID")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("HangManRoleId")
+                        .HasColumnType("decimal(20,0)");
+
                     b.Property<decimal>("StarboardChannelId")
                         .HasColumnType("decimal(20,0)");
 
@@ -70,25 +100,42 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("UsesBirthdays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("UsesHangman")
                         .HasColumnType("bit");
 
                     b.Property<bool>("UsesMusic")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("UsesReminders")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("UsesStarBoard")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("UsesTags")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("UsesTrolls")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("Volume")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(20);
 
                     b.HasKey("GuildID");
 
@@ -141,7 +188,6 @@ namespace Mummybot.Migrations.GuildStoreMigrations
             modelBuilder.Entity("Mummybot.Database.Entities.Reminder", b =>
                 {
                     b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<decimal>("ChannelID")
@@ -220,7 +266,6 @@ namespace Mummybot.Migrations.GuildStoreMigrations
             modelBuilder.Entity("Mummybot.Database.Entities.VoiceDeafUser", b =>
                 {
                     b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
 
                     b.Property<decimal>("ChannelID")

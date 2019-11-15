@@ -30,48 +30,55 @@ namespace Mummybot.Commands.Modules
 
             foreach (var module in Commands.GetAllModules())
             {
-                var modulecheck = await module.RunChecksAsync(Context);
-                if (modulecheck.IsSuccessful)
+                try
                 {
-                    if (module.Commands.Count == 0)
-                        continue; //skip module if commands are 0
-                    var emb = new EmbedBuilder();
-                    emb.WithTitle(module.Name);
-                    emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
-                    var sb = new StringBuilder();
-                    var commands = GetAllCommandsIterator(module);
-                    foreach (var command in commands)
+                    var modulecheck = await module.RunChecksAsync(Context);
+                    if (modulecheck.IsSuccessful)
                     {
-                        var checks = await command.RunChecksAsync(Context);
-                        if (checks.IsSuccessful)
+                        if (module.Commands.Count == 0)
+                            continue; //skip module if commands are 0
+                        var emb = new EmbedBuilder();
+                        emb.WithTitle(module.Name);
+                        emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+                        var sb = new StringBuilder();
+                        var commands = GetAllCommandsIterator(module);
+                        foreach (var command in commands)
                         {
-                            sb.Append(Context.PrefixUsed).Append(command.Name).Append(" ");
-                            foreach (var parameter in command.Parameters)
+                            var checks = await command.RunChecksAsync(Context);
+                            if (checks.IsSuccessful)
                             {
-                                if (parameter.IsOptional && parameter.IsRemainder)//optional remiander
+                                sb.Append(Context.PrefixUsed).Append(command.Name).Append(" ");
+                                foreach (var parameter in command.Parameters)
                                 {
-                                    sb.Append($"<\"{parameter.Name}\"> ");
+                                    if (parameter.IsOptional && parameter.IsRemainder)//optional remiander
+                                    {
+                                        sb.Append($"<\"{parameter.Name}\"> ");
+                                    }
+                                    else if (parameter.IsOptional && !parameter.IsRemainder)//optional
+                                    {
+                                        sb.Append($"<{parameter.Name}> ");
+                                    }
+                                    else if (!parameter.IsOptional && parameter.IsRemainder) //required remainder
+                                    {
+                                        sb.Append($"\"{parameter.Name}\"");
+                                    }
+                                    else if (!parameter.IsOptional && !parameter.IsRemainder)//required
+                                    {
+                                        sb.Append($"**{parameter.Name}** ");
+                                    }
                                 }
-                                else if (parameter.IsOptional && !parameter.IsRemainder)//optional
-                                {
-                                    sb.Append($"<{parameter.Name}> ");
-                                }
-                                else if (!parameter.IsOptional && parameter.IsRemainder) //required remainder
-                                {
-                                    sb.Append($"\"{parameter.Name}\"");
-                                }
-                                else if (!parameter.IsOptional && !parameter.IsRemainder)//required
-                                {
-                                    sb.Append($"**{parameter.Name}** ");
-                                }
+                                sb.AppendLine();
                             }
-                            sb.AppendLine();
                         }
+                        emb.WithDescription(sb.ToString());
+                        msg.Pages.Add(emb);
                     }
-                    emb.WithDescription(sb.ToString());
-                    msg.Pages.Add(emb);
-                }
 
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
             await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
         }

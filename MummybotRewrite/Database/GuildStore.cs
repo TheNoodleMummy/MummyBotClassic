@@ -23,6 +23,8 @@ namespace Mummybot.Database
 
         public DbSet<Guild> Guilds { get; set; }
 
+        public DbSet<DBWord> Words { get; set; }
+
         private readonly SnowFlakeGeneratorService SnowFlakeGeneratorService;
 
         private readonly LogService _logservice = new LogService();
@@ -141,6 +143,13 @@ namespace Mummybot.Database
                 reminder.Property(x => x.Id)
                 .ValueGeneratedNever();
             });
+            modelBuilder.Entity<DBWord>(word =>
+            {
+                word.HasKey(x => x.id);
+                word.Property(x => x.id)
+                .ValueGeneratedOnAdd();
+            });
+           
         }
 
         public Task<Guild> GetGuildForModule(IGuild guild)
@@ -159,53 +168,45 @@ namespace Mummybot.Database
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(IGuild iguild, Expression<Func<Guild, TProp>> expression)
         {
-            await Slim.WaitAsync();
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, iguild.Id);
                 return await CreateGuildAsync(iguild.Id, expression);
             }
-            Slim.Release();
             return guild;
         }
 
         public async Task<Guild> GetOrCreateGuildAsync<TProp>(ulong guildid, Expression<Func<Guild, TProp>> expression)
         {
-            await Slim.WaitAsync();
             var guild = await Guilds.Include(expression).FirstOrDefaultAsync(g => g.GuildID == guildid);
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {guildid} was not found creating new object", Enums.LogSource.GuildStore, Guildid: guildid);
                 return await CreateGuildAsync(guildid, expression);
             }
-            Slim.Release();
             return guild;
         }
 
         public async Task<Guild> GetOrCreateGuildAsync(ulong guildid)
         {
-            await Slim.WaitAsync();
             var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == guildid);
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {guildid} was not found creating new object", Enums.LogSource.GuildStore, Guildid: guildid);
                 return await CreateGuildAsync<ulong>(guildid: guildid, null);
             }
-            Slim.Release();
             return guild;
         }
 
         public async Task<Guild> GetOrCreateGuildAsync(IGuild iguild)
         {
-            await Slim.WaitAsync();
             var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, iguild.Id);
                 return await CreateGuildAsync<ulong>(guildid: iguild.Id, null);
             }
-            Slim.Release();
             return guild;
         }
 
@@ -217,6 +218,7 @@ namespace Mummybot.Database
 
         private async Task<Guild> CreateGuildAsync<TProp>(ulong guildid, Expression<Func<Guild, TProp>> expression)
         {
+            await Slim.WaitAsync();
             var newguild = new Guild()
             {
                 AutoQuotes = false,
@@ -230,42 +232,10 @@ namespace Mummybot.Database
             {
                 return await Guilds.FindAsync(guildid);
             }
+            Slim.Release();
             return await Guilds.Include(expression).FirstOrDefaultAsync(x => x.GuildID == guildid);
         }
 
-        public override void Dispose()
-        {
-            try
-            {
-                var count = SaveChanges();
-                _logservice.LogInformation($"saved {count} items");
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                foreach (var item in ex.Entries)
-                {
-                    if (item.Entity is Reminder reminder)
-                    {
-                        var current = item.CurrentValues;
-                        var dbvalues = item.GetDatabaseValues();
-                        Console.WriteLine("current values");
-                        foreach (var props in current.Properties)
-                        {
-
-                            Console.WriteLine(props);
-                        }
-
-                        Console.WriteLine("db values");
-                        foreach (var props in dbvalues.Properties)
-                        {
-
-                            Console.WriteLine(props);
-                        }
-                    }
-
-                }
-            }
-            base.Dispose();
-        }
+       
     }
 }

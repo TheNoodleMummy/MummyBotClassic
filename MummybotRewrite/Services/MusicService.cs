@@ -156,7 +156,7 @@ namespace Mummybot.Services
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
                 guild.Volume = volume;
                 guildstore.Update(guild);
-
+                await guildstore.SaveChangesAsync();
                 await musicDetails.Player.UpdateVolumeAsync(volume);
                 await (musicDetails.Player.TextChannel?.SendMessageAsync($"Set volume to {volume}")??Task.CompletedTask);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.Volume };

@@ -65,6 +65,10 @@ namespace Mummybot.Services
             {
                 return new BirthdayResult() { Birthday = null, IsSuccess = false, ErrorReason = "Something went wrong", Exception = ex };
             }
+            finally
+            {
+                await guildstore.SaveChangesAsync();
+            }
         }
 
         /// <summary>
@@ -130,6 +134,7 @@ namespace Mummybot.Services
             var dbbirthday = guildconfig.Birthdays.FirstOrDefault(b => b.Id == birthday.Id);
             dbbirthday.NextBdayUTC = dbbirthday.NextBdayUTC.AddYears(1);
             guildstore.Update(guildconfig);
+            guildstore.SaveChangesAsync();
         }
 
         /// <summary>
@@ -161,6 +166,7 @@ namespace Mummybot.Services
             var bday = guildconfig.Birthdays.Find(b => b.Id == birthday.Id);
             bday = birthday;
             guildstore.Update(guildconfig);
+            await guildstore.SaveChangesAsync();
             await NextBirthday();
         }
     }
