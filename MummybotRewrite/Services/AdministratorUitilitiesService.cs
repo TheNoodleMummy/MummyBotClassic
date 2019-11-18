@@ -61,7 +61,6 @@ namespace Mummybot.Services
                         guild.VoiceDeafenedUsers.Remove(vdu);
                     }
 
-                    store.Update(guild);
 
                     foreach (var item in guild.VoiceDeafenedUsers)
                     {
@@ -96,7 +95,6 @@ namespace Mummybot.Services
             {
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
                 config.VoiceMutedUsers.Add(vmu);
-                store.Update(config);
                 await store.SaveChangesAsync();
             }
             await user.ModifyAsync(user => user.Mute = true);
@@ -123,7 +121,6 @@ namespace Mummybot.Services
             {
                 var config = await store.GetOrCreateGuildAsync(ctx.Guild.Id, e => e.VoiceMutedUsers);
                 config.VoiceDeafenedUsers.Add(vdu);
-                store.Update(config);
                 await store.SaveChangesAsync();
             }
             await user.ModifyAsync(user => user.Deaf = true);
@@ -143,7 +140,6 @@ namespace Mummybot.Services
             using var store = ServiceProvider.GetRequiredService<GuildStore>();
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
             config.VoiceMutedUsers.Remove(args);
-            store.Update(config);
             await store.SaveChangesAsync();
         }
 
@@ -159,7 +155,6 @@ namespace Mummybot.Services
             using var store = ServiceProvider.GetRequiredService<GuildStore>();
             var config = await store.GetOrCreateGuildAsync(args.GuildID, e => e.VoiceMutedUsers);
             config.VoiceDeafenedUsers.Remove(args);
-            store.Update(config);
             await store.SaveChangesAsync();
         }
 

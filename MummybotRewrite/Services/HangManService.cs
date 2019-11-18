@@ -450,18 +450,22 @@ namespace Mummybot.Services
                     channel = ctx.Guild.TextChannels.FirstOrDefault(x => x.Id == guildconfig.HangManChannelID);
 
                 }
-                MessageService.SendAsync(ctx, x => x.Content = $"a game has been made please go to {channel.Mention} ");
+                var msg = (await MessageService.SendAsync(ctx, x => x.Content = $"a game has been made please go to {channel.Mention} "));
+                
+                
                 
                 await user.AddRoleAsync(role);
-                ActiveGames[ctx.GuildId] = new HangmanGame() { Channel = channel, User = user, /*Word = GetRandomWord(),*/GuildId = ctx.GuildId };
+                game = new HangmanGame() { Channel = channel, User = user, Word = GetRandomWord(), GuildId = ctx.GuildId };
+                var hangmanmsg = await channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription(HangmanArt[game.State]).AddField("Word", game.Word.MaskedWord).Build());
+                ActiveGames[ctx.GuildId] = game;
+                
             }
             else
             {
                 //game already in progress handle it here
             }
             
-            guildstore.Update(guildconfig);
-            guildstore.SaveChanges();
+            await guildstore.SaveChangesAsync();
         }
 
         public Word GetRandomWord()
@@ -471,9 +475,8 @@ namespace Mummybot.Services
             var rnd = Random.Next(0, maxlenghgt);
             var word = guildstore.Words.FirstOrDefault(x => x.id == rnd);
             word.used++;
-            guildstore.Update(word);
             guildstore.SaveChanges();
-            return new Word() { MaskedWord = word.word };
+            return new Word() { MaskedWord = word.word.ToLower() };
         }
 
         public async Task TaskCallback(HangmanGame game)
@@ -485,6 +488,7 @@ namespace Mummybot.Services
 
     public class HangmanGame
     {
+        IUserMessage Message { get; set; }
         public ushort State { get; set; } = 0;
         public ulong GuildId { get; set; }
 
@@ -500,8 +504,8 @@ namespace Mummybot.Services
         {
             get
             {
-                string strng = "";
-                foreach (var item in word.ToCharArray())
+                string strng = "`";
+                foreach (var item in word.Trim().ToCharArray())
                 {
                     if (GuessedLetters[item])
                     {
@@ -512,6 +516,7 @@ namespace Mummybot.Services
                         strng += "*";
                     }
                 }
+                strng += "`";
                 return strng;
             }
             set
@@ -553,5 +558,19 @@ namespace Mummybot.Services
         }
 
 
+    }
+
+
+    public static class StringExtends
+    {
+        public static IEnumerable<int> AllIndexesOf(this string str, string searchstring)
+        {
+            int minIndex = str.IndexOf(searchstring);
+            while (minIndex != -1)
+            {
+                yield return minIndex;
+                minIndex = str.IndexOf(searchstring, minIndex + searchstring.Length);
+            }
+        }
     }
 }

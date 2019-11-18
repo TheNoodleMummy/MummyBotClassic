@@ -17,6 +17,17 @@ namespace Mummybot.Commands.Modules
     [RequirePermissions(Enums.PermissionTarget.User, GuildPermission.ManageGuild, Group = "or")]
     public class ConfigModule : MummyModule
     {
+        [Group("hangman")]
+        public class hangmanCommands : MummyModule
+        {
+            [Command()]
+            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.UsesHangman = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
         [Group("offensive")]
         public class OffensiveCommands : MummyModule
         {

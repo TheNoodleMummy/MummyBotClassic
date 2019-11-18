@@ -71,7 +71,6 @@ namespace Mummybot.Services
                             var staboardmsg = (await Textchannel.Guild.GetTextChannel(guild.StarboardChannelId).GetMessageAsync(star.StarboardMessageId) as IUserMessage);
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
-                            guildstore.Update(guild);
                         }
                         await guildstore.SaveChangesAsync();
                     }
@@ -97,7 +96,6 @@ namespace Mummybot.Services
                             {
                                 await starboard.DeleteMessageAsync(star.StarboardMessageId);
                                 guild.Stars.Remove(star);
-                                guildstore.Update(guild);
                                 return;
                             }
                             var emb = new EmbedBuilder();
@@ -110,7 +108,6 @@ namespace Mummybot.Services
                             var staboardmsg = (await Textchannel.Guild.GetTextChannel(guild.StarboardChannelId).GetMessageAsync(star.StarboardMessageId) as IUserMessage);
 
                             await staboardmsg.ModifyAsync(x => { x.Content = $"{star.Stars} {guild.StarboardEmote}; in {(msg.Channel as ITextChannel).Mention};"; x.Embed = emb.Build(); });
-                            guildstore.Update(guild);
                             await guildstore.SaveChangesAsync();
                         }
                     }
