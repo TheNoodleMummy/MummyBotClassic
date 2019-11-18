@@ -37,11 +37,14 @@ namespace Mummybot.Commands.Modules
                     {
                         if (module.Commands.Count == 0)
                             continue; //skip module if commands are 0
+                        if (module.Parent != null)
+                            continue;
+
                         var emb = new EmbedBuilder();
                         emb.WithTitle(module.Name);
                         emb.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
                         var sb = new StringBuilder();
-                        var commands = GetAllCommandsIterator(module);
+                        var commands = CommandUtilities.EnumerateAllCommands(module);
                         foreach (var command in commands)
                         {
                             var checks = await command.RunChecksAsync(Context);
