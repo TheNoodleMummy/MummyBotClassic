@@ -412,8 +412,48 @@ namespace Mummybot.Services
         }
 
         private Task Discordclient_MessageReceived(SocketMessage arg)
+        => HandleGuessAsync(arg);
+
+        private async Task HandleGuessAsync(SocketMessage arg)
         {
-            return Task.CompletedTask;
+            var ctx = MummyContext.Create(discordclient, arg as IUserMessage, null, Services, "", false);
+            if (ctx.UserId == discordclient.CurrentUser.Id)
+                return;
+            if (ActiveGames.TryGetValue(ctx.GuildId, out var game))
+            {
+                var result = game.Word.GeussLetter(ctx.Message.Content);
+                if (!result.correct)
+                {
+                    game.State++;
+                    if (game.State == 14)
+                    {
+                        await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
+                        .WithDescription($"```{HangmanArt[game.State]}```")
+                        .AddField("you are dead", ":(")
+                        .AddField("The word was:", game.Word.UnMaskedWord)
+                        .AddField("Word Id:", game.Word.Id)
+                        .Build());
+                        await game.User.RemoveRoleAsync(game.Role);
+                        return;
+                    }
+                    else
+                    {
+                        await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
+                        .WithDescription($"```{HangmanArt[game.State]}```")
+                        .AddField("Word", game.Word.MaskedWord)
+                        .Build());
+                    }
+                }
+                else if (game.Word.MaskedWord == game.Word.UnMaskedWord)
+                {
+                    await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
+                    /*.WithDescription(HangmanArt[game.State])*/
+                    .AddField("Word", game.Word.UnMaskedWord)
+                    .Build()); 
+                    await game.User.RemoveRoleAsync(game.Role);
+                }
+            }
+            await arg.DeleteAsync();
         }
 
         public async Task StartNewGame(SocketGuildUser user, MummyContext ctx)
@@ -456,13 +496,17 @@ namespace Mummybot.Services
                 
                 await user.AddRoleAsync(role);
                 game = new HangmanGame() { Channel = channel, User = user, Word = GetRandomWord(), GuildId = ctx.GuildId };
-                var hangmanmsg = await channel.SendMessageAsync("", embed: new EmbedBuilder().WithDescription(HangmanArt[game.State]).AddField("Word", game.Word.MaskedWord).Build());
+                var hangmanmsg = await channel.SendMessageAsync("", embed: new EmbedBuilder()
+                    .WithDescription($"```{HangmanArt[game.State]}```")
+                    .AddField("Word", game.Word.MaskedWord)
+                    .Build());
+                game.Message = hangmanmsg;
                 ActiveGames[ctx.GuildId] = game;
                 
             }
             else
             {
-                //game already in progress handle it here
+                await MessageService.SendAsync(ctx, x => x.Content = $"{game.User.GetDisplayName()} is already palying a game please try again later");
             }
             
             await guildstore.SaveChangesAsync();
@@ -476,7 +520,7 @@ namespace Mummybot.Services
             var word = guildstore.Words.FirstOrDefault(x => x.id == rnd);
             word.used++;
             guildstore.SaveChanges();
-            return new Word() { MaskedWord = word.word.ToLower() };
+            return new Word() { MaskedWord = word.word.ToLower(),Id = word.id };
         }
 
         public async Task TaskCallback(HangmanGame game)
@@ -488,11 +532,12 @@ namespace Mummybot.Services
 
     public class HangmanGame
     {
-        IUserMessage Message { get; set; }
+        public IUserMessage Message { get; set; }
         public ushort State { get; set; } = 0;
         public ulong GuildId { get; set; }
 
         public DateTimeOffset startedAt = DateTimeOffset.UtcNow;
+        public IRole Role { get; set; }
         public ITextChannel Channel { get; set; }
         public SocketGuildUser User { get; set; }
         public Word Word { get; set; }
@@ -500,14 +545,50 @@ namespace Mummybot.Services
 
     public class Word
     {
+        public Word()
+        {
+            GuessedLetters.Add("a", false);
+            GuessedLetters.Add("b", false);
+            GuessedLetters.Add("c", false);
+            GuessedLetters.Add("d", false);
+            GuessedLetters.Add("e", false);
+            GuessedLetters.Add("f", false);
+            GuessedLetters.Add("g", false);
+            GuessedLetters.Add("h", false);
+            GuessedLetters.Add("i", false);
+            GuessedLetters.Add("j", false);
+            GuessedLetters.Add("k", false);
+            GuessedLetters.Add("l", false);
+            GuessedLetters.Add("m", false);
+            GuessedLetters.Add("n", false);
+            GuessedLetters.Add("o", false);
+            GuessedLetters.Add("p", false);
+            GuessedLetters.Add("q", false);
+            GuessedLetters.Add("r", false);
+            GuessedLetters.Add("s", false);
+            GuessedLetters.Add("t", false);
+            GuessedLetters.Add("u", false);
+            GuessedLetters.Add("v", false);
+            GuessedLetters.Add("w", false);
+            GuessedLetters.Add("x", false);
+            GuessedLetters.Add("y", false);
+            GuessedLetters.Add("z", false);
+        }
+
+        public int Id { get; set; }
+
+        public Dictionary<string, bool> GuessedLetters = new Dictionary<string, bool>();
+
+        public string UnMaskedWord { get; private set; }
+
         public string MaskedWord
         {
             get
             {
                 string strng = "`";
-                foreach (var item in word.Trim().ToCharArray())
+                foreach (char item in UnMaskedWord.Trim())
                 {
-                    if (GuessedLetters[item])
+                    if (GuessedLetters[item.ToString()])
                     {
                         strng += item;
                     }
@@ -521,45 +602,36 @@ namespace Mummybot.Services
             }
             set
             {
-                word = value;
+                UnMaskedWord = value;
             }
         }
-        private string word;
 
-        public Dictionary<char, bool> GuessedLetters = new Dictionary<char, bool>();
-        public Word()
+        public (bool correct,string letter,FailedReasons reason) GeussLetter(string letter)
         {
-            GuessedLetters.Add('a', false);
-            GuessedLetters.Add('b', false);
-            GuessedLetters.Add('c', false);
-            GuessedLetters.Add('d', false);
-            GuessedLetters.Add('e', false);
-            GuessedLetters.Add('f', false);
-            GuessedLetters.Add('g', false);
-            GuessedLetters.Add('h', false);
-            GuessedLetters.Add('i', false);
-            GuessedLetters.Add('j', false);
-            GuessedLetters.Add('k', false);
-            GuessedLetters.Add('l', false);
-            GuessedLetters.Add('m', false);
-            GuessedLetters.Add('n', false);
-            GuessedLetters.Add('o', false);
-            GuessedLetters.Add('p', false);
-            GuessedLetters.Add('q', false);
-            GuessedLetters.Add('r', false);
-            GuessedLetters.Add('s', false);
-            GuessedLetters.Add('t', false);
-            GuessedLetters.Add('u', false);
-            GuessedLetters.Add('v', false);
-            GuessedLetters.Add('w', false);
-            GuessedLetters.Add('x', false);
-            GuessedLetters.Add('y', false);
-            GuessedLetters.Add('z', false);
-        }
+
+            if (GuessedLetters[letter])
+                return (false, letter, FailedReasons.LetterWasAllreadyGuessed);
+
+
+
+
+            GuessedLetters[letter] = true;
+            var indexes = UnMaskedWord.AllIndexesOf(letter);
+            if (!indexes.Any())
+                return (false, letter, FailedReasons.ThisLetterWasNotInTheWord);
+            else
+                return (true, letter, FailedReasons.None);
+        }     
 
 
     }
 
+    public enum FailedReasons
+    {
+        LetterWasAllreadyGuessed,
+        ThisLetterWasNotInTheWord,
+        None
+    }
 
     public static class StringExtends
     {
@@ -569,7 +641,7 @@ namespace Mummybot.Services
             while (minIndex != -1)
             {
                 yield return minIndex;
-                minIndex = str.IndexOf(searchstring, minIndex + searchstring.Length);
+                minIndex = str.IndexOf(searchstring, minIndex,searchstring.Length);
             }
         }
     }
