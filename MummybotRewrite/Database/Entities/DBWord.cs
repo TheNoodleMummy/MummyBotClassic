@@ -11,5 +11,7 @@ namespace Mummybot.Database.Entities
         public string Issue { get; set; }
         public int used { get; set; }
         public bool Reported { get; set; }
+        public ulong ReportedBy { get; set; } 
+        public DateTimeOffset ReportedOn { get; set; }
     }
 }

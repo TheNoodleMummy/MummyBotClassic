@@ -33,6 +33,8 @@ namespace Mummybot.Commands.Modules
             {
                 word.Reported = true;
                 word.Issue = reason;
+                word.ReportedBy = Context.UserId;
+                word.ReportedOn = DateTimeOffset.UtcNow;
             }
         }
 
