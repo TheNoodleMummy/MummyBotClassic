@@ -421,14 +421,17 @@ namespace Mummybot.Services
                 return;
             if (ActiveGames.TryGetValue(ctx.GuildId, out var game))
             {
-                var result = game.Word.GeussLetter(ctx.Message.Content);
+                if (ctx.UserId != game.User.Id)
+                    return;
+
+                    var result = game.Word.GeussLetter(ctx.Message.Content);
                 if (!result.correct)
                 {
                     game.State++;
                     if (game.State == 14)
                     {
                         await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
-                        .WithDescription($"```{HangmanArt[game.State]}```")
+                        .WithDescription($"```{HangmanArt[14]}```")
                         .AddField("you are dead", ":(")
                         .AddField("The word was:", game.Word.UnMaskedWord)
                         .AddField("Word Id:", game.Word.Id)
@@ -452,8 +455,8 @@ namespace Mummybot.Services
                     .Build()); 
                     await game.User.RemoveRoleAsync(game.Role);
                 }
+                await arg.DeleteAsync();
             }
-            await arg.DeleteAsync();
         }
 
         public async Task StartNewGame(SocketGuildUser user, MummyContext ctx)

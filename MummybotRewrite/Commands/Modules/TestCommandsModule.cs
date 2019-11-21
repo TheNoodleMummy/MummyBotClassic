@@ -15,12 +15,6 @@ namespace Mummybot.Commands.Modules
 	public class TestCommandModule : MummyModule
     {
 
-        public HangManService hangman { get; set; }
-
-        [Command("test")]
-		public async Task Test()
-        {
-            await hangman.StartNewGame(Context.User, Context);   
-        }
+        
     }
 }
