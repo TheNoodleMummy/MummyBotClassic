@@ -19,7 +19,7 @@ namespace Mummybot.Services
             {
                 Pings.Add(newping);
                 HourlyPings.Add(DateTime.UtcNow, newping);
-                var toremove = HourlyPings.Where(x => x.Key <= DateTime.UtcNow);
+                var toremove = HourlyPings.Where(x => x.Key <= DateTime.UtcNow.AddHours(-1));
                 foreach (var item in toremove)
                 {
                     HourlyPings.Remove(item.Key);

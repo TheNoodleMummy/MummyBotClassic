@@ -19,21 +19,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                 nullable: false,
                 defaultValue: new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)));
 
-            migrationBuilder.AlterColumn<decimal>(
-                name: "Id",
-                table: "PlayListWhiteList",
-                nullable: false,
-                oldClrType: typeof(decimal),
-                oldType: "decimal(20,0)")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
-
-            migrationBuilder.AlterColumn<decimal>(
-                name: "GuildID",
-                table: "Guilds",
-                nullable: false,
-                oldClrType: typeof(decimal),
-                oldType: "decimal(20,0)")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+            
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

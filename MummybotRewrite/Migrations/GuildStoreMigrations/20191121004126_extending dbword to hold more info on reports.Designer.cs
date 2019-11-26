@@ -49,8 +49,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Issue")
                         .HasColumnType("nvarchar(max)");

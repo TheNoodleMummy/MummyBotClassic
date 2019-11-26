@@ -1,4 +1,5 @@
 ﻿using Mummybot.Attributes.Checks;
+using Mummybot.Database.Entities;
 using Mummybot.Services;
 using Qmmands;
 using System;
@@ -41,7 +42,7 @@ namespace Mummybot.Commands.Modules
         [Command("top")]
         public async Task RecordUses()
         {
-            var words = GuildStore.Words.ToList().OrderByDescending(x => x.used).ThenByDescending(x => x.word).Take(10);
+            var words = GuildStore.Words.OrderByDescending(x => x.used).ThenByDescending(x => x.word).Take(10).ToList();
             var sb = new StringBuilder();
             int lenght = 0;
             foreach (var item in words)

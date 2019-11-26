@@ -1,4 +1,6 @@
-﻿using Casino.Common;
+﻿
+
+using Casino.Common;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +9,6 @@ using Mummybot.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mummybot.Services
@@ -399,6 +400,7 @@ namespace Mummybot.Services
         private MessageService MessageService;
         public Dictionary<ulong, HangmanGame> ActiveGames = new Dictionary<ulong, HangmanGame>();
 
+        public TimeSpan Timeout = TimeSpan.FromMinutes(1);
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
@@ -408,7 +410,7 @@ namespace Mummybot.Services
             taskqueue = services.GetRequiredService<TaskQueue>();
             MessageService = services.GetRequiredService<MessageService>();
             discordclient.MessageReceived += Discordclient_MessageReceived;
-                return Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         private Task Discordclient_MessageReceived(SocketMessage arg)
@@ -424,7 +426,7 @@ namespace Mummybot.Services
                 if (ctx.UserId != game.User.Id)
                     return;
 
-                    var result = game.Word.GeussLetter(ctx.Message.Content);
+                var result = game.Word.GeussLetter(ctx.Message.Content);
                 if (!result.correct)
                 {
                     game.State++;
@@ -436,24 +438,32 @@ namespace Mummybot.Services
                         .AddField("The word was:", game.Word.UnMaskedWord)
                         .AddField("Word Id:", game.Word.Id)
                         .Build());
-                        await game.User.RemoveRoleAsync(game.Role);
-                        return;
+                        _ = Task.Delay(Timeout)
+                                .ContinueWith(async _ => 
+                                { 
+                                    await game.User.RemoveRoleAsync(game.Role);
+                                });
                     }
-                    else
-                    {
-                        await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
-                        .WithDescription($"```{HangmanArt[game.State]}```")
-                        .AddField("Word", game.Word.MaskedWord)
-                        .Build());
-                    }
+                    
                 }
                 else if (game.Word.MaskedWord == game.Word.UnMaskedWord)
                 {
                     await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
                     /*.WithDescription(HangmanArt[game.State])*/
                     .AddField("Word", game.Word.UnMaskedWord)
-                    .Build()); 
-                    await game.User.RemoveRoleAsync(game.Role);
+                    .Build());
+                    _ = Task.Delay(Timeout)
+                            .ContinueWith(async _ =>
+                            {
+                                await game.User.RemoveRoleAsync(game.Role);
+                            });
+                }
+                else
+                {
+                    await game.Message.ModifyAsync(x => x.Embed = new EmbedBuilder()
+                    .WithDescription($"```{HangmanArt[game.State]}```")
+                    .AddField("Word", game.Word.MaskedWord)
+                    .Build());
                 }
                 await arg.DeleteAsync();
             }
@@ -470,11 +480,11 @@ namespace Mummybot.Services
             {
                 IRole role;
                 ITextChannel channel;
-                if (guildconfig.HangManRoleId == 0 )
+                if (guildconfig.HangManRoleId == 0)
                 {
                     role = await ctx.Guild.CreateRoleAsync("hangman");
                     guildconfig.HangManRoleId = role.Id;
-                    var position = ctx.Guild.CurrentUser.Roles.OrderBy(r => r.Position).Last().Position -1;
+                    var position = ctx.Guild.CurrentUser.Roles.OrderBy(r => r.Position).Last().Position - 1;
                     await role.ModifyAsync(r => r.Position = position);
                 }
                 else
@@ -485,8 +495,8 @@ namespace Mummybot.Services
                 {
                     channel = await ctx.Guild.CreateTextChannelAsync("HangMan");
                     guildconfig.HangManChannelID = channel.Id;
-                    await channel.AddPermissionOverwriteAsync(ctx.Guild.EveryoneRole,OverwritePermissions.DenyAll(channel));
-                    await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(viewChannel:PermValue.Allow,sendMessages:PermValue.Allow));
+                    await channel.AddPermissionOverwriteAsync(ctx.Guild.EveryoneRole, OverwritePermissions.DenyAll(channel));
+                    await channel.AddPermissionOverwriteAsync(role, new OverwritePermissions(viewChannel: PermValue.Allow, sendMessages: PermValue.Allow));
                 }
                 else //channel already made
                 {
@@ -494,9 +504,9 @@ namespace Mummybot.Services
 
                 }
                 var msg = (await MessageService.SendAsync(ctx, x => x.Content = $"a game has been made please go to {channel.Mention} "));
-                
-                
-                
+
+
+
                 await user.AddRoleAsync(role);
                 game = new HangmanGame() { Channel = channel, User = user, Word = GetRandomWord(), GuildId = ctx.GuildId };
                 var hangmanmsg = await channel.SendMessageAsync("", embed: new EmbedBuilder()
@@ -505,25 +515,25 @@ namespace Mummybot.Services
                     .Build());
                 game.Message = hangmanmsg;
                 ActiveGames[ctx.GuildId] = game;
-                
+
             }
             else
             {
                 await MessageService.SendAsync(ctx, x => x.Content = $"{game.User.GetDisplayName()} is already palying a game please try again later");
             }
-            
+
             await guildstore.SaveChangesAsync();
         }
 
         public Word GetRandomWord()
         {
             using var guildstore = Services.GetRequiredService<GuildStore>();
-            var maxlenghgt = guildstore.Words.ToList().Where(x => x.Reported == false).Count();
+            var maxlenghgt = guildstore.Words.Where(x => x.Reported == false).Count();
             var rnd = Random.Next(0, maxlenghgt);
-            var word = guildstore.Words.FirstOrDefault(x => x.id == rnd);
+            var word = guildstore.Words.Where(x => x.Reported == false).FirstOrDefault(x => x.id == rnd);
             word.used++;
             guildstore.SaveChanges();
-            return new Word() { MaskedWord = word.word.ToLower(),Id = word.id };
+            return new Word() { MaskedWord = word.word.ToLower(), Id = word.id };
         }
 
         public async Task TaskCallback(HangmanGame game)
@@ -605,11 +615,11 @@ namespace Mummybot.Services
             }
             set
             {
-                UnMaskedWord = value;
+                UnMaskedWord = value.ToLower();
             }
         }
 
-        public (bool correct,string letter,FailedReasons reason) GeussLetter(string letter)
+        public (bool correct, string letter, FailedReasons reason) GeussLetter(string letter)
         {
 
             if (GuessedLetters[letter])
@@ -624,7 +634,7 @@ namespace Mummybot.Services
                 return (false, letter, FailedReasons.ThisLetterWasNotInTheWord);
             else
                 return (true, letter, FailedReasons.None);
-        }     
+        }
 
 
     }
@@ -644,7 +654,7 @@ namespace Mummybot.Services
             while (minIndex != -1)
             {
                 yield return minIndex;
-                minIndex = str.IndexOf(searchstring, minIndex,searchstring.Length);
+                minIndex = str.IndexOf(searchstring, minIndex, searchstring.Length);
             }
         }
     }
