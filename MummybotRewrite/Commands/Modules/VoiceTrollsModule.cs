@@ -22,9 +22,9 @@ namespace Mummybot.Commands.Modules
             _rnd = rnd;
         }
 
-        [Command("stfu", "shutthefuckup"), RunMode(RunMode.Parallel)]
-        public Task ShutTheFuckUpAsync()
-           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\shutthefuckup.mp3");
+        [Command("ded","yourdedfluf"), RunMode(RunMode.Parallel)]
+        public Task yourdedflufbuttAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yourdedflulfbutt.mp3");
 
         [Command("stopscreaming"), RunMode(RunMode.Parallel)]
         public Task StopScreamingAsync()

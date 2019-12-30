@@ -24,7 +24,7 @@ namespace Mummybot.Commands.Modules
             }
             if (PingService.TotalPing != 0)
             {
-                emb.AddField("My total average ping", PingService.TotalPing.ToString("##.##") + "ms", true);
+                emb.AddField("My total average gateway ping", PingService.TotalPing.ToString("##.##") + "ms", true);
             }
 
             var latency = Context.Client.Latency;

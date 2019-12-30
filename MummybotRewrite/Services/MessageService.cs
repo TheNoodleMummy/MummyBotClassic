@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
 using Mummybot.Database;
+using Mummybot.Database.Entities;
 using Mummybot.Enums;
 using Mummybot.Exceptions;
 using Mummybot.Extentions;
@@ -163,11 +164,14 @@ namespace Mummybot.Services
 
             IEnumerable<string> prefixes;
 
-            using var guildStore = _services.GetService<GuildStore>();
+            Guild guild;
+            using (var guildStore = _services.GetService<GuildStore>())
+            {
 
-            var guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
-            prefixes = guild.Prefixes.Select(x => x.Prefix);
-
+                guild = await guildStore.GetOrCreateGuildAsync(textChannel.Guild);
+                prefixes = guild.Prefixes.Select(x => x.Prefix);
+                guildStore.SaveChanges();
+            }
             if (guild.AutoQuotes && !_quoteReactions.ContainsKey(message.Id))
                 _ = Task.Run(async () =>
                 {

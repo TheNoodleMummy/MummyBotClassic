@@ -21,6 +21,10 @@ namespace Mummybot.Database.Entities
 
         public ulong GuildID { get; set; }
 
+        public ulong HangManRoleId { get;  set; }
+        public ulong HangManChannelID { get;  set; }
+        public bool UsesHangman { get;  set; }
+
         public bool AutoQuotes { get; set; }
 
         public ulong StarboardChannelId { get; set; }
@@ -37,5 +41,6 @@ namespace Mummybot.Database.Entities
         public bool AllowOffensiveCommands { get; set; } = false;
         public int Volume { get; set; }
         public int DefualtVolume { get; set; }
+       
     }
 }

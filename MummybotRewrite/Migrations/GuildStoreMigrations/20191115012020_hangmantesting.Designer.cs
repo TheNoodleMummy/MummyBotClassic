@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mummybot.Database;
 
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
     [DbContext(typeof(GuildStore))]
-    partial class GuildStoreModelSnapshot : ModelSnapshot
+    [Migration("20191115012020_hangmantesting")]
+    partial class hangmantesting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,12 +57,6 @@ namespace Mummybot.Migrations.GuildStoreMigrations
 
                     b.Property<bool>("Reported")
                         .HasColumnType("bit");
-
-                    b.Property<decimal>("ReportedBy")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<DateTimeOffset>("ReportedOn")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("used")
                         .HasColumnType("int");

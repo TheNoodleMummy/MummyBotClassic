@@ -36,7 +36,6 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
             lavaNode = services.GetRequiredService<LavaNode>();
             
             Services = services;
@@ -48,7 +47,7 @@ namespace Mummybot.Services
 
             lavaNode.OnLog += services.GetRequiredService<LogService>().LogLavalink;
             await lavaNode.ConnectAsync();
-#endif
+
             return;
         }
 
@@ -155,8 +154,7 @@ namespace Mummybot.Services
                 using var guildstore = Services.GetRequiredService<GuildStore>();
                 var guild = await guildstore.GetOrCreateGuildAsync(guildid);
                 guild.Volume = volume;
-                guildstore.Update(guild);
-
+                await guildstore.SaveChangesAsync();
                 await musicDetails.Player.UpdateVolumeAsync(volume);
                 await (musicDetails.Player.TextChannel?.SendMessageAsync($"Set volume to {volume}")??Task.CompletedTask);
                 return new VolumeResult() { IsSuccess = true, Volume = musicDetails.Player.Volume };
