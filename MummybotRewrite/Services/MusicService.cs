@@ -36,7 +36,6 @@ namespace Mummybot.Services
 
         public override async Task InitialiseAsync(IServiceProvider services)
         {
-#if !DEBUG
             lavaNode = services.GetRequiredService<LavaNode>();
             
             Services = services;
@@ -48,7 +47,7 @@ namespace Mummybot.Services
 
             lavaNode.OnLog += services.GetRequiredService<LogService>().LogLavalink;
             await lavaNode.ConnectAsync();
-#endif
+
             return;
         }
 
