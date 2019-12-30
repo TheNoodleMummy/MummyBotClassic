@@ -24,7 +24,7 @@ namespace Mummybot.Commands.Modules
 
         [Command("ded","yourdedfluf"), RunMode(RunMode.Parallel)]
         public Task yourdedflufbuttAsync()
-           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yourdedflulfbutt.mp3");
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yourdedflufbutt.mp3");
 
         [Command("stopscreaming"), RunMode(RunMode.Parallel)]
         public Task StopScreamingAsync()
