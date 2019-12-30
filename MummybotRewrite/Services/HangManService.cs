@@ -418,11 +418,12 @@ namespace Mummybot.Services
 
         private async Task HandleGuessAsync(SocketMessage arg)
         {
-            var ctx = MummyContext.Create(discordclient, arg as IUserMessage, null, Services, "", false);
-            if (ctx.UserId == discordclient.CurrentUser.Id)
-                return;
-            if (ActiveGames.TryGetValue(ctx.GuildId, out var game))
+
+            if (ActiveGames.TryGetValue((arg.Channel as SocketTextChannel).Guild.Id, out var game))
             {
+                var ctx = MummyContext.Create(discordclient, arg as IUserMessage, null, Services, "", false);
+                if (ctx.UserId == discordclient.CurrentUser.Id)
+                    return;
                 if (ctx.UserId != game.User.Id)
                     return;
 
