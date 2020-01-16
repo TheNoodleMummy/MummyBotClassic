@@ -22,6 +22,10 @@ namespace Mummybot.Commands.Modules
             _rnd = rnd;
         }
 
+        [Command("dishwasher"), RunMode(RunMode.Parallel)]
+        public Task dishwasherAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\dishwasher.mp3");
+
         [Command("ded","yourdedfluf"), RunMode(RunMode.Parallel)]
         public Task yourdedflufbuttAsync()
            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\yourdedflufbutt.mp3");
