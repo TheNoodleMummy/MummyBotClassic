@@ -29,7 +29,7 @@ namespace Mummybot.Commands.Modules
             IRole role = user.Roles.FirstOrDefault(r => r.Name.Contains(user.Username, StringComparison.OrdinalIgnoreCase));
             if (role is null)
             {
-                role = await user.Guild.CreateRoleAsync(user.GetDisplayName(), color: color);
+                role = await user.Guild.CreateRoleAsync(user.GetDisplayName(), color: color,isMentionable: false);
                 await role.ModifyAsync(role => role.Position = user.Roles.OrderByDescending(roles => roles.Position).FirstOrDefault().Position - 1);
                 await user.AddRoleAsync(role);
             }

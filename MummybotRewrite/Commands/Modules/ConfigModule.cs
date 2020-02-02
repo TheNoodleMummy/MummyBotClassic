@@ -39,6 +39,17 @@ namespace Mummybot.Commands.Modules
             }
         }
 
+        [Group("18+")]
+        public class PlusCommands : MummyModule
+        {
+            [Command("commands")]
+            public async Task PlusCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            {
+                GuildConfig.Allow18PlusCommands = onoff;
+                await Context.Message.AddOkAsync();
+            }
+        }
+
         [Group("starboard")]
         public class StarboardModule : MummyModule
         {
@@ -187,10 +198,9 @@ namespace Mummybot.Commands.Modules
         {
             var emb = new EmbedBuilder();
             bool idk=false;
-            foreach (var item in GuildConfig.GetType().GetProperties().Where(p => p.PropertyType == typeof(bool)
-                                         && (bool)p.GetValue(idk, null)))
+            foreach (var item in GuildConfig.GetType().GetProperties().Where(p => p.PropertyType == typeof(bool)))
             {
-                emb.AddField(item.Name, item.GetValue(true));
+                emb.AddField(item.Name, item.GetValue(GuildConfig));
             }
             await ReplyAsync(embed: emb);
         }

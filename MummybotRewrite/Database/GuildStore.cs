@@ -68,6 +68,9 @@ namespace Mummybot.Database
                 guild.Property(x => x.UsesTrolls)
                 .HasDefaultValue(false);
 
+                guild.Property(x => x.Allow18PlusCommands)
+                .HasDefaultValue(false);
+
                 guild.HasMany(x => x.Prefixes)
                 .WithOne(y => y.Guild)
                 .HasForeignKey(z => z.guildID);

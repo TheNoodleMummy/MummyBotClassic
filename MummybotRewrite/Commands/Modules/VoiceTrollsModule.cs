@@ -22,6 +22,10 @@ namespace Mummybot.Commands.Modules
             _rnd = rnd;
         }
 
+        [Command("blowing"), RunMode(RunMode.Parallel),Require18Plus]
+        public Task riverAsync()
+           => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\blowing.mp3");
+
         [Command("river"), RunMode(RunMode.Parallel)]
         public Task ohnoAsync()
            => _musicService.PlayTroll(Context.Guild.Id, (Context.User as IVoiceState)?.VoiceChannel, @"..\hookers.mp3");

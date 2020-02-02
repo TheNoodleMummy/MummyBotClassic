@@ -483,7 +483,7 @@ namespace Mummybot.Services
                 ITextChannel channel;
                 if (guildconfig.HangManRoleId == 0)
                 {
-                    role = await ctx.Guild.CreateRoleAsync("hangman");
+                    role = await ctx.Guild.CreateRoleAsync("hangman", isMentionable: false);
                     guildconfig.HangManRoleId = role.Id;
                     var position = ctx.Guild.CurrentUser.Roles.OrderBy(r => r.Position).Last().Position - 1;
                     await role.ModifyAsync(r => r.Position = position);

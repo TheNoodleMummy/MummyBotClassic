@@ -14,6 +14,9 @@ namespace Mummybot.Commands.Modules
 {
 	public class TestCommandModule : MummyModule
     {
-       
+        [Command("test"),RequireOwner]
+        public async Task TagAsync(string key)
+        {
+        }
     }
 }

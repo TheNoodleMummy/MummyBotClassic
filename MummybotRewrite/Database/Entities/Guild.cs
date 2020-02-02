@@ -39,6 +39,7 @@ namespace Mummybot.Database.Entities
         public bool UsesMusic { get; set; }
         public bool UsesTrolls { get; set; }
         public bool AllowOffensiveCommands { get; set; } = false;
+        public bool Allow18PlusCommands { get; set; } = false;
         public int Volume { get; set; }
         public int DefualtVolume { get; set; }
        
