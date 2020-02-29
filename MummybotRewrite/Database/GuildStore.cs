@@ -128,6 +128,12 @@ namespace Mummybot.Database
                 birthday.Property(x => x.Id)
                 .ValueGeneratedNever();
             });
+            modelBuilder.Entity<PlayListWhiteList>(list =>
+            {
+                list.HasKey(x => x.Id);
+                list.Property(x => x.Id)
+                    .ValueGeneratedNever();
+            });
             modelBuilder.Entity<VoiceMutedUser>(vmu =>
             {
                 vmu.HasKey(x => x.Id);

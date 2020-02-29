@@ -176,14 +176,14 @@ namespace Mummybot.Commands.Modules
             public class WhitelistConfigModule : MummyModule
             {
                 [Command("add")]
-                public async Task SetmusicOnOff(SocketGuildUser user)
+                public async Task addWhitelist(SocketGuildUser user)
                 {
                     GuildConfig.PlayListWhiteLists.Add(new PlayListWhiteList() { UserId = user.Id, WhiteListedBy = Context.UserId });
                     await Context.Message.AddOkAsync();
                 }
 
                 [Command("remove")]
-                public async Task SettrollsOnOff(SocketGuildUser user)
+                public async Task RemoveWhitelist(SocketGuildUser user)
                 {
                     var whitelistentry = GuildConfig.PlayListWhiteLists.FirstOrDefault(x => x.UserId==user.Id);
                     GuildConfig.PlayListWhiteLists.Remove(whitelistentry);

@@ -99,36 +99,36 @@ namespace Mummybot.Commands.Modules
             var canrequestplaylists = GuildConfig.PlayListWhiteLists.Any(x => x.UserId == Context.UserId);
 
             var playResult = await _musicService.PlayAsync(Context.Guild.Id, url,canrequestplaylists);
-            //if (playResult.IsSuccess&& !playResult.isPlayList)
-            //{
-            //    if (playResult.PlayerWasPlaying)
-            //    {
-            //        await ReplyAsync($"Added {playResult.Tracks.FirstOrDefault().Title} to the queue position: {playResult.QueuePosition}");
-            //    }
-            //    else if (!playResult.PlayerWasPlaying)
-            //    {
-            //        await ReplyAsync($"now palying {playResult.Tracks.FirstOrDefault().Title}");
-            //    }
-            //    else
-            //    {
-            //        await ReplyAsync($"{playResult.ErrorReason}");
-            //    }
-            //}   
-            //else if (playResult.IsSuccess && playResult.isPlayList)
-            //{
-            //    if (playResult.PlayerWasPlaying)
-            //    {
-            //        await ReplyAsync($"Added {playResult.QueuePosition} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+            if (playResult.IsSuccess && !playResult.isPlayList)
+            {
+                if (playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"Added {playResult.Tracks.FirstOrDefault().Title} to the queue position: {playResult.QueuePosition}");
+                }
+                else if (!playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"now palying {playResult.Tracks.FirstOrDefault().Title}");
+                }
+                else
+                {
+                    await ReplyAsync($"{playResult.ErrorReason}");
+                }
+            }
+            else if (playResult.IsSuccess && playResult.isPlayList)
+            {
+                if (playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"Added {playResult.QueuePosition} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
 
-            //    }
-            //    else if (!playResult.PlayerWasPlaying)
-            //    {
-            //        await ReplyAsync($"added {playResult.QueuePosition-1} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
-            //    }
-            //}
-            //else if (!playResult.WasConnected)
-            //    await ReplyAsync("im not connected to voice");
-            
+                }
+                else if (!playResult.PlayerWasPlaying)
+                {
+                    await ReplyAsync($"added {playResult.QueuePosition - 1} tracks to the queue positions: {playResult.PlaylistInQueue.First}-{playResult.PlaylistInQueue.Last}");
+                }
+            }
+            else if (!playResult.WasConnected)
+                await ReplyAsync("im not connected to voice");
+
         }
 
         [Command("pause")]
