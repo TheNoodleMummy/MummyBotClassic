@@ -44,18 +44,18 @@ namespace MummyBot
                      MessageCacheSize = 100
                  }))
                  .AddSingleton<InteractiveService>()
-                 .AddSingleton<LavaConfig>(new LavaConfig()
-                 {
+                 //.AddSingleton<LavaConfig>(new LavaConfig()
+                 //{
                      
-                     SelfDeaf = false,
-                     LogSeverity = LogSeverity.Info,
-                     ReconnectDelay = TimeSpan.FromSeconds(10),
-                     ReconnectAttempts = 10,
-                     Hostname = "127.0.0.1",
-                     Port = 2333,
-                     Authorization = "youshallnotpass"
-                 })
-                 .AddSingleton<LavaNode>()
+                 //    SelfDeaf = false,
+                 //    LogSeverity = LogSeverity.Info,
+                 //    ReconnectDelay = TimeSpan.FromSeconds(10),
+                 //    ReconnectAttempts = 10,
+                 //    Hostname = "127.0.0.1",
+                 //    Port = 2333,
+                 //    Authorization = "youshallnotpass"
+                 //})
+                 //.AddSingleton<LavaNode>()
                  .AddSingleton<Random>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {

@@ -155,42 +155,42 @@ namespace Mummybot.Commands.Modules
             }
         }
 
-        [Group("voice")]
-        public class musicConfigModule : MummyModule
-        {
-            [Command("music")]
-            public async Task SetmusicOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
-            {
-                GuildConfig.UsesMusic = onoff;
-                await Context.Message.AddOkAsync();
-            }
+        //[Group("voice")]
+        //public class musicConfigModule : MummyModule
+        //{
+        //    [Command("music")]
+        //    public async Task SetmusicOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+        //    {
+        //        GuildConfig.UsesMusic = onoff;
+        //        await Context.Message.AddOkAsync();
+        //    }
 
-            [Command("trolls")]
-            public async Task SettrollsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
-            {
-                GuildConfig.UsesTrolls = onoff;
-                await Context.Message.AddOkAsync();
-            }
+        //    [Command("trolls")]
+        //    public async Task SettrollsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+        //    {
+        //        GuildConfig.UsesTrolls = onoff;
+        //        await Context.Message.AddOkAsync();
+        //    }
 
-            [Group("whitelist")]
-            public class WhitelistConfigModule : MummyModule
-            {
-                [Command("add")]
-                public async Task addWhitelist(SocketGuildUser user)
-                {
-                    GuildConfig.PlayListWhiteLists.Add(new PlayListWhiteList() { UserId = user.Id, WhiteListedBy = Context.UserId });
-                    await Context.Message.AddOkAsync();
-                }
+        //    [Group("whitelist")]
+        //    public class WhitelistConfigModule : MummyModule
+        //    {
+        //        [Command("add")]
+        //        public async Task addWhitelist(SocketGuildUser user)
+        //        {
+        //            GuildConfig.PlayListWhiteLists.Add(new PlayListWhiteList() { UserId = user.Id, WhiteListedBy = Context.UserId });
+        //            await Context.Message.AddOkAsync();
+        //        }
 
-                [Command("remove")]
-                public async Task RemoveWhitelist(SocketGuildUser user)
-                {
-                    var whitelistentry = GuildConfig.PlayListWhiteLists.FirstOrDefault(x => x.UserId==user.Id);
-                    GuildConfig.PlayListWhiteLists.Remove(whitelistentry);
-                    await Context.Message.AddOkAsync();
-                }
-            }
-        }
+        //        [Command("remove")]
+        //        public async Task RemoveWhitelist(SocketGuildUser user)
+        //        {
+        //            var whitelistentry = GuildConfig.PlayListWhiteLists.FirstOrDefault(x => x.UserId==user.Id);
+        //            GuildConfig.PlayListWhiteLists.Remove(whitelistentry);
+        //            await Context.Message.AddOkAsync();
+        //        }
+        //    }
+        //}
 
 
         [Command]
