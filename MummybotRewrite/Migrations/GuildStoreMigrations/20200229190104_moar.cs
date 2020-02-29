@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
-    public partial class hangmantesting : Migration
+    public partial class moar : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,6 +26,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     UsesMusic = table.Column<bool>(nullable: false, defaultValue: false),
                     UsesTrolls = table.Column<bool>(nullable: false, defaultValue: false),
                     AllowOffensiveCommands = table.Column<bool>(nullable: false),
+                    Allow18PlusCommands = table.Column<bool>(nullable: false, defaultValue: false),
                     Volume = table.Column<int>(nullable: false, defaultValue: 20),
                     DefualtVolume = table.Column<int>(nullable: false)
                 },
@@ -43,7 +44,9 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     word = table.Column<string>(nullable: true),
                     Issue = table.Column<string>(nullable: true),
                     used = table.Column<int>(nullable: false),
-                    Reported = table.Column<bool>(nullable: false)
+                    Reported = table.Column<bool>(nullable: false),
+                    ReportedBy = table.Column<decimal>(nullable: false),
+                    ReportedOn = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,7 +78,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                 name: "PlayListWhiteList",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(nullable: false),
+                    Id = table.Column<int>(nullable: false),
                     GuildID = table.Column<decimal>(nullable: false),
                     UserId = table.Column<decimal>(nullable: false),
                     WhiteListedBy = table.Column<decimal>(nullable: false),

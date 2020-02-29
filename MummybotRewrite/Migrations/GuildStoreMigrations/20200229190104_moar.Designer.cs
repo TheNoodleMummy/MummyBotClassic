@@ -10,14 +10,14 @@ using Mummybot.Database;
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
     [DbContext(typeof(GuildStore))]
-    [Migration("20191121004126_extending dbword to hold more info on reports")]
-    partial class extendingdbwordtoholdmoreinfoonreports
+    [Migration("20200229190104_moar")]
+    partial class moar
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -49,7 +49,8 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Issue")
                         .HasColumnType("nvarchar(max)");
@@ -79,6 +80,11 @@ namespace Mummybot.Migrations.GuildStoreMigrations
                     b.Property<decimal>("GuildID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(20,0)");
+
+                    b.Property<bool>("Allow18PlusCommands")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("AllowOffensiveCommands")
                         .HasColumnType("bit");
@@ -151,9 +157,8 @@ namespace Mummybot.Migrations.GuildStoreMigrations
 
             modelBuilder.Entity("Mummybot.Database.Entities.PlayListWhiteList", b =>
                 {
-                    b.Property<decimal>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("GuildID")
                         .HasColumnType("decimal(20,0)");

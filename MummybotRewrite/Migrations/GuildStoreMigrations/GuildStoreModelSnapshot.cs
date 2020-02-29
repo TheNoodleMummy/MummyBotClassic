@@ -155,8 +155,8 @@ namespace Mummybot.Migrations.GuildStoreMigrations
 
             modelBuilder.Entity("Mummybot.Database.Entities.PlayListWhiteList", b =>
                 {
-                    b.Property<decimal>("Id")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("GuildID")
                         .HasColumnType("decimal(20,0)");
