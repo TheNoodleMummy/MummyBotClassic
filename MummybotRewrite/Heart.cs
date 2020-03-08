@@ -16,7 +16,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Victoria;
 
 namespace MummyBot
 {
@@ -44,18 +43,7 @@ namespace MummyBot
                      MessageCacheSize = 100
                  }))
                  .AddSingleton<InteractiveService>()
-                 //.AddSingleton<LavaConfig>(new LavaConfig()
-                 //{
-                     
-                 //    SelfDeaf = false,
-                 //    LogSeverity = LogSeverity.Info,
-                 //    ReconnectDelay = TimeSpan.FromSeconds(10),
-                 //    ReconnectAttempts = 10,
-                 //    Hostname = "127.0.0.1",
-                 //    Port = 2333,
-                 //    Authorization = "youshallnotpass"
-                 //})
-                 //.AddSingleton<LavaNode>()
+                
                  .AddSingleton<Random>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {

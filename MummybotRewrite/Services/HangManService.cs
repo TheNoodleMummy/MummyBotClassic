@@ -418,8 +418,7 @@ namespace Mummybot.Services
 
         private async Task HandleGuessAsync(SocketMessage arg)
         {
-
-            if (ActiveGames.TryGetValue((arg.Channel as SocketTextChannel).Guild.Id, out var game))
+            if (arg.Channel is SocketTextChannel && ActiveGames.TryGetValue((arg.Channel as SocketTextChannel).Guild.Id, out var game))
             {
                 var ctx = MummyContext.Create(discordclient, arg as IUserMessage, null, Services, "", false);
                 if (ctx.UserId == discordclient.CurrentUser.Id)
@@ -440,12 +439,12 @@ namespace Mummybot.Services
                         .AddField("Word Id:", game.Word.Id)
                         .Build());
                         _ = Task.Delay(Timeout)
-                                .ContinueWith(async _ => 
-                                { 
+                                .ContinueWith(async _ =>
+                                {
                                     await game.User.RemoveRoleAsync(game.Role);
                                 });
                     }
-                    
+
                 }
                 else if (game.Word.MaskedWord == game.Word.UnMaskedWord)
                 {
