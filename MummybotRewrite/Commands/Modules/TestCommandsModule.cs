@@ -1,3 +1,4 @@
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Attributes.Checks;
 using Mummybot.Database;
@@ -18,5 +19,7 @@ namespace Mummybot.Commands.Modules
         public async Task TagAsync(string key)
         {
         }
+
+        
     }
 }
