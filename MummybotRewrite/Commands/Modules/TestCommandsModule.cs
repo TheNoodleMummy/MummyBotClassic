@@ -13,13 +13,11 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
+    [RequireOwner]
 	public class TestCommandModule : MummyModule
     {
-        [Command("test"),RequireOwner]
-        public async Task TagAsync(string key)
-        {
-        }
+       
 
-        
+       
     }
 }

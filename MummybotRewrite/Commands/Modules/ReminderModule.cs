@@ -76,15 +76,15 @@ namespace Mummybot.Commands.Modules
                 else
                     sb.Append("minutes, ");
             }
-            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id);
+            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id).Append(")");
 
             await ReplyAsync(sb.ToString());
         }
 
-        [Command("remind")]
+        [Command("remind"),Priority(1)]
         [Description("set a reminder in the future the bot will then remind you when its time")]
         public async Task RemindAsync(
-           [Description("how long it should be before your reminded (ex: 5s, 5min/m, 5hour/h")]DateTimeOffset time,
+           [Description("when you want me to remind you \n(ex: 4/2/2007 7:23:57 PM 00:00:00 dmy,\n  2/4/2007 7:23:57 PM 00:00:00 mdy )")]DateTimeOffset time,
            [Description("the message you want me to tell you when i remind you"), Remainder]string message
            )
         {

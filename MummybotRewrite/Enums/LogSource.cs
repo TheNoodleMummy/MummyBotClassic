@@ -18,6 +18,7 @@ namespace Mummybot.Enums
         Victoria,
         TaskQueue,
         AdministratotUtilService,
-        GuildStore
+        GuildStore,
+        EventService
     }
 }

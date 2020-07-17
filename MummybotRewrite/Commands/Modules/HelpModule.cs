@@ -86,25 +86,25 @@ namespace Mummybot.Commands.Modules
             await new PaginatedMessageCallback(Iservice, Context, msg).DisplayAsync();
         }
 
-        [Command("help"), Description("Specific help for a module")]
-        public async Task HelpAsync([Description("Command you want the help for"),Remainder]Module module)
-        {
+        //[Command("help"), Description("Specific help for a module")]
+        //public async Task HelpAsync([Description("Command you want the help for"),Remainder]Module module)
+        //{
 
-            var builder = new EmbedBuilder()
-            {
-                Color = Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed,
-                Description = $"Here are some commands in the  **{module.Name}**"
-            };
-            builder.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl());
-            StringBuilder sb = new StringBuilder();
-            foreach (var cmd in module.Commands)
-            {
-                if (!(await cmd.RunChecksAsync(Context)).IsSuccessful) return;
-                sb.Append(Context.PrefixUsed).AppendLine(cmd.Name);
-            }
-            builder.AddField("\u200B", sb.ToString());
-            await ReplyAsync(embed: builder);
-        }
+        //    var builder = new EmbedBuilder()
+        //    {
+        //        Color = Context.User.Roles.FirstOrDefault(x => x.IsHoisted)?.Color ?? Color.DarkRed,
+        //        Description = $"Here are some commands in the  **{module.Name}**"
+        //    };
+        //    builder.WithAuthor(Context.User.GetDisplayName(), Context.User.GetAvatarUrl());
+        //    StringBuilder sb = new StringBuilder();
+        //    foreach (var cmd in module.Commands)
+        //    {
+        //        if (!(await cmd.RunChecksAsync(Context)).IsSuccessful) return;
+        //        sb.Append(Context.PrefixUsed).AppendLine(cmd.Name);
+        //    }
+        //    builder.AddField("\u200B", sb.ToString());
+        //    await ReplyAsync(embed: builder);
+        //}
 
         [Command("help"), Description("Specific help for a command")]
         public async Task HelpAsync([Description("Command you want the help for"),Remainder]string command)
