@@ -1,10 +1,13 @@
 ﻿using Casino.Common;
+using Discord;
+using Discord.Addons.Interactive;
 using Mummybot.Attributes.Checks;
 using Mummybot.Database.Entities;
 using Mummybot.Services;
 using Qmmands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -144,6 +147,51 @@ namespace Mummybot.Commands.Modules
             sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id).Append(")");
 
             await ReplyAsync(sb.ToString());
+        }
+
+        [Command("reminders")]
+        [Description("see all your current reminders")]
+        public async Task RemindersAsync()
+        {
+            var reminders = new SortedList<int, Reminder>();
+            for (int i = 0; i < GuildConfig.Reminders.Where(r => r.UserID == Context.UserId).Count(); i++)
+            {
+                reminders.Add(i, GuildConfig.Reminders[i]);
+            }
+
+            if (reminders.Count() == 0)
+                await ReplyAsync("You currently have no reminders set");
+
+            if (reminders.Count() <= 10)
+            {
+
+                string list = "";
+                foreach (var reminder in reminders.Values)
+                {
+                    string message = "";
+                    if (reminder.Message.Length <= 100)                    
+                        message = reminder.Message;
+                    else
+                        message = reminder.Message.Substring(0, 100) + "...";
+                    
+                    list += $"{reminder.Id.ToString().PadLeft(15)} | {reminder.ExpiresAtUTC}UTC {"".PadRight(10)} | {message}\n";
+                }
+                var eb = new EmbedBuilder().WithAuthor(Context.User).WithDescription($"```{list}```");
+                await ReplyAsync(embed: eb);
+            }
+            //else
+            //{
+            //    for (int i = 0; i < reminders.Count; i++)
+            //    {
+            //        string list = "";
+            //        foreach (var reminder in reminders.Values)
+            //        {
+            //            list += $"{reminder.Id.ToString().PadLeft(5)} | {reminder.ExpiresAtUTC}UTC {"".PadRight(10)} | {reminder.Message.Take(100)}\n";
+            //        }
+            //    }
+
+            //}
+            
         }
     }
 }

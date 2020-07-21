@@ -14,7 +14,7 @@ namespace Casino.Common
     {
         private readonly TimeSpan _maxTime = TimeSpan.FromMilliseconds(int.MaxValue);
 
-        public readonly ConcurrentQueue<IScheduledTask> Queue;
+        public ConcurrentQueue<IScheduledTask> Queue;
         private CancellationTokenSource _cts;
 
         private readonly object _queueLock;

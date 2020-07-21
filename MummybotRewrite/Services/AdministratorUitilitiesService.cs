@@ -3,10 +3,12 @@ using Discord;
 using Discord.WebSocket;
 using Humanizer;
 using Microsoft.Extensions.DependencyInjection;
+using Mummybot.Attributes;
 using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Enums;
+using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace Mummybot.Services
 {
+    [InitilizerPriority(2)]
     public class AdministratorUitilitiesService : BaseService
     {
         private readonly TaskQueue TaskQueue;
@@ -36,7 +39,6 @@ namespace Mummybot.Services
             ServiceProvider = serviceProvider;
             LogService = serviceProvider.GetRequiredService<LogService>();
         }
-
         public override async Task InitialiseAsync(IServiceProvider services)
         {
             var client = services.GetRequiredService<DiscordSocketClient>();

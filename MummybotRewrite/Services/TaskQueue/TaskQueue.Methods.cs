@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Casino.Common
@@ -13,7 +15,7 @@ namespace Casino.Common
         /// <param name="executeIn">How long to wait before execution.</param>
         /// <param name="callback">The task to be executed.</param>
         /// <returns>A <see cref="ScheduledTask{T}"/></returns>
-        public ScheduledTask<T> ScheduleTask<T>(T state, TimeSpan executeIn, Func<T, Task> callback,ulong id = 0)
+        public ScheduledTask<T> ScheduleTask<T>(T state, TimeSpan executeIn, Func<T, Task> callback, ulong id = 0)
         {
             ArgChecks(executeIn);
             return ScheduleTask(state, DateTimeOffset.UtcNow.Add(executeIn), callback, id);
@@ -27,7 +29,7 @@ namespace Casino.Common
         /// <param name="whenToExecute">The time at when this task needs to be ran.</param>
         /// <param name="callback">The task to be executed.</param>
         /// <returns>A <see cref="ScheduledTask{T}"/></returns>
-        public ScheduledTask<T> ScheduleTask<T>(T state, DateTimeOffset whenToExecute, Func<T, Task> callback,ulong id= 0)
+        public ScheduledTask<T> ScheduleTask<T>(T state, DateTimeOffset whenToExecute, Func<T, Task> callback, ulong id = 0)
         {
             ArgChecks(whenToExecute, callback);
 
@@ -165,6 +167,18 @@ namespace Casino.Common
         public void Dispose()
         {
             Dispose(true);
+        }
+
+        public void Remove(IScheduledTask scheduledTask)
+        {
+            lock (_queueLock)
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException(nameof(TaskQueue));
+
+                Queue = new ConcurrentQueue<IScheduledTask>(Queue.Where(task => task.ID != scheduledTask.ID));
+                _cts.Cancel(true);
+            }
         }
 
         internal void Reschedule()

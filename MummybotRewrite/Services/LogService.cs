@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mummybot.Services
 {
+    [InitilizerPriority(1)]
     public class LogService : BaseService
     {
         public string LogDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));

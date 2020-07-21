@@ -5,6 +5,7 @@ using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Enums;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,11 +36,10 @@ namespace Mummybot.Services
             foreach (Guild guild in guildconfigs)
             {
 
-                var socketguild = DiscordClient.GetGuild(guild.GuildID);
                 if (guild.UsesReminders)
                 {
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
-                    LogService.LogInformation($"Executing {reminders.Count} expired reminders.", LogSource.ReminderService, socketguild.Id);
+                    LogService.LogInformation($"Executing {reminders.Count} expired reminders.", LogSource.ReminderService, guild.GuildID);
                     foreach (Reminder reminder in reminders)
                     {
                         await ReminderCallbackAsync(reminder);
@@ -48,15 +48,15 @@ namespace Mummybot.Services
                 }
                 else
                 {
-                    LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService, socketguild.Id);
+                    LogService.LogInformation("Executing Expired reminder but guild has turn off reminder => simply removing.", LogSource.ReminderService, guild.GuildID);
                     var reminders = guild.Reminders.Where(r => r.ExpiresAtUTC < DateTime.UtcNow).ToList();
-                    LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService, socketguild.Id);
+                    LogService.LogInformation($"Removing {reminders.Count} expired reminders", LogSource.ReminderService, guild.GuildID);
                     foreach (Reminder reminder in reminders)
                     {
                         guild.Reminders.Remove(reminder);
+                        await GuildStore.SaveChangesAsync();
                     }
                 }
-                await GuildStore.SaveChangesAsync();
                 foreach (var item in guild.Reminders)
                 {
                     TaskQueue.ScheduleTask(item, item.ExpiresAtUTC, ReminderCallbackAsync);
@@ -77,6 +77,8 @@ namespace Mummybot.Services
             StringBuilder sb = new StringBuilder();
             bool hasdays = false, hashours = false;
             var time = DateTime.UtcNow - reminder.SetAtUTC;
+
+
             sb.Append("yoo ").Append(DiscordClient.GetUser(reminder.UserID).Mention).Append(", ");
             if (time.Days != 0)
             {
@@ -109,8 +111,48 @@ namespace Mummybot.Services
                 else
                     sb.Append("Minutes, ");
             }
-            sb.Append("ago you asked me to remind you about: \n").Append(reminder.Message);
+            sb.AppendLine("ago you asked me to remind you about:").AppendLine(reminder.Message);
+            //if late
+            if (reminder.ExpiresAtUTC.Ticks < DateTime.UtcNow.AddMinutes(5).Ticks)
+            {
+                var late = DateTime.UtcNow - reminder.ExpiresAtUTC;
+                sb.Append("but im sorry, im ");
+                if (late.Days != 0)
+                {
+                    hasdays = true;
+                    sb.Append(late.Days);
+                    if (late.Days == 1)
+                        sb.Append("Day");
+                    else
+                        sb.Append("Days");
+                }
+
+                if (late.Hours != 0)
+                {
+                    sb.Append(", ");
+                    hashours = true;
+                    sb.Append(late.Hours);
+
+                    if (late.Hours == 1)
+                        sb.Append("Hour");
+                    else
+                        sb.Append("Hours");
+                }
+
+                if (late.Minutes != 0)
+                {
+                    sb.Append(", ");
+                    sb.Append(late.Minutes);
+
+                    if (late.Minutes == 1)
+                        sb.Append("Minute");
+                    else
+                        sb.Append("Minutes");
+                }
+                sb.Append(" late.");
+            }
             await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
+
 
 
             using var GuildStore = _services.GetRequiredService<GuildStore>();
@@ -118,6 +160,19 @@ namespace Mummybot.Services
             var remind = guildconfig.Reminders.Find(r => r.Id == reminder.Id);
             guildconfig.Reminders.Remove(remind);
             await GuildStore.SaveChangesAsync();
+        }
+
+        public async Task CancelReminder(ulong id, ulong guildid)
+        {
+            using var guildstore = _services.GetRequiredService<GuildStore>();
+            var guildconfig = await guildstore.GetOrCreateGuildAsync(guildid);
+            var reminder = guildconfig.Reminders.FirstOrDefault(r => r.Id == id);
+            guildconfig.Reminders.Remove(reminder);
+            await guildstore.SaveChangesAsync();
+
+            var task = TaskQueue.Queue.FirstOrDefault(task => task.ID == id);
+            TaskQueue.Remove(task);
+
         }
     }
 }

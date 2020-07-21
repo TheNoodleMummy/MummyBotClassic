@@ -63,8 +63,8 @@ namespace MummyBot
                 //await tokenstore.Database.MigrateAsync();
                 await guildstore.Database.MigrateAsync();
 
-                await guildstore.SaveChangesAsync();
                 //await tokenstore.SaveChangesAsync();
+                await guildstore.SaveChangesAsync();
             }
             var mummybot = new BotStartup(services);
             await mummybot.StartAsync(types);

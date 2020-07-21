@@ -1,5 +1,7 @@
-﻿using Mummybot.Exceptions;
+﻿using Mummybot.Attributes;
+using Mummybot.Exceptions;
 using Mummybot.Services;
+using Qmmands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +15,23 @@ namespace Mummybot.Extentions
     {
         public static async Task RunInitialisersAsync(this IServiceProvider services, IEnumerable<Type> types)
         {
-            foreach (var type in types)
+            var myServices = new Dictionary<int, Type> { };
+            foreach (var item in types)
             {
-                var service = services.GetService(type);
+                var attribute = item.GetCustomAttribute(typeof(InitilizerPriorityAttribute),false);
+                var prio = attribute as InitilizerPriorityAttribute;
+
+                //if (myServices.ContainsKey(prio?.value))
+                //    throw new InvalidPriorityException(prio.value);
+
+                myServices.Add(prio?.value-1??myServices.Count+100, item);
+            }
+
+            var ordered = myServices.OrderBy(i => i.Key);
+
+            foreach (var type in ordered)
+            {
+                var service = services.GetService(type.Value);
 
                 if (!(service is BaseService validService))
                     throw new InvalidServiceException(nameof(type));
