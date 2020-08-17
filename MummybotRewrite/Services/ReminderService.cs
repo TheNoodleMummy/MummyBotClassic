@@ -113,7 +113,7 @@ namespace Mummybot.Services
             }
             sb.AppendLine("ago you asked me to remind you about:").AppendLine(reminder.Message);
             //if late
-            if (reminder.ExpiresAtUTC.Ticks < DateTime.UtcNow.AddMinutes(5).Ticks)
+            if (reminder.ExpiresAtUTC.Ticks > DateTime.UtcNow.AddMinutes(5).Ticks)
             {
                 var late = DateTime.UtcNow - reminder.ExpiresAtUTC;
                 sb.Append("but im sorry, im ");

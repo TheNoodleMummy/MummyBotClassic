@@ -79,7 +79,7 @@ namespace Mummybot.Commands.Modules
                 else
                     sb.Append("minutes, ");
             }
-            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id).Append(")");
+            sb.Append("I will remind you about ").Append(reminder.Message);
 
             await ReplyAsync(sb.ToString());
         }

@@ -21,10 +21,10 @@ namespace Mummybot.Extentions
                 var attribute = item.GetCustomAttribute(typeof(InitilizerPriorityAttribute),false);
                 var prio = attribute as InitilizerPriorityAttribute;
 
-                //if (myServices.ContainsKey(prio?.value))
-                //    throw new InvalidPriorityException(prio.value);
+                if (prio != null && myServices.ContainsKey(prio.value))
+                    throw new InvalidPriorityException(prio.value,item);
 
-                myServices.Add(prio?.value-1??myServices.Count+100, item);
+                myServices.Add(prio?.value??myServices.Count+100, item);
             }
 
             var ordered = myServices.OrderBy(i => i.Key);

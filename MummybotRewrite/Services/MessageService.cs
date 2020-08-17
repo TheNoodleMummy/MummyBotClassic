@@ -28,15 +28,13 @@ namespace Mummybot.Services
         private readonly TaskQueue _scheduler;
         private readonly IServiceProvider _services;
 
-        private readonly
-            ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>>
-            _messageCache;
+        private readonly ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>> _messageCache;
 
         private readonly ConcurrentDictionary<ulong, ulong> _lastJumpUrlQuotes;
 
         private readonly ConcurrentDictionary<ulong, byte> _quoteReactions;
 
-        private const string Regex = @"(?:https://(?:canary.)?discordapp.com/channels/[\d]+/[\d]+/[\d]+)";
+        private const string Regex = @"(?:https://(?:canary.)?discord.com/channels/[\d]+/[\d]+/[\d]+)";
 
         private static readonly Emoji QuoteEmote = new Emoji("🗨");
 
