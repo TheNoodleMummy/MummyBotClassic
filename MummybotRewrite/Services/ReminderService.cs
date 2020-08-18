@@ -1,4 +1,5 @@
 ﻿using Casino.Common;
+using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Database;
@@ -78,6 +79,8 @@ namespace Mummybot.Services
             bool hasdays = false, hashours = false;
             var time = DateTime.UtcNow - reminder.SetAtUTC;
 
+            
+
 
             sb.Append("yoo ").Append(DiscordClient.GetUser(reminder.UserID).Mention).Append(", ");
             if (time.Days != 0)
@@ -116,7 +119,7 @@ namespace Mummybot.Services
             if (reminder.ExpiresAtUTC.Ticks > DateTime.UtcNow.AddMinutes(5).Ticks)
             {
                 var late = DateTime.UtcNow - reminder.ExpiresAtUTC;
-                sb.Append("but im sorry, im ");
+                sb.Append("but sorry, im ");
                 if (late.Days != 0)
                 {
                     hasdays = true;
@@ -151,7 +154,8 @@ namespace Mummybot.Services
                 }
                 sb.Append(" late.");
             }
-            await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString());
+            var emb = new EmbedBuilder().WithDescription(Format.Url("jump!",reminder.JumpUrl));
+            await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString(),embed:emb.Build());
 
 
 

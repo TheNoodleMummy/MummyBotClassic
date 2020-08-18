@@ -87,7 +87,7 @@ namespace Mummybot.Commands.Modules
         [Command("remind"),Priority(1)]
         [Description("set a reminder in the future the bot will then remind you when its time")]
         public async Task RemindAsync(
-           [Description("when you want me to remind you \n(ex: 4/2/2007 7:23:57 PM 00:00:00 dmy,\n  2/4/2007 7:23:57 PM 00:00:00 mdy )")]DateTimeOffset time,
+           [Description("when you want me to remind you \n(ex: 24/2/2007 7:23:57 PM 00:00:00 dmy,\n  2/24/2007 7:23:57 PM 00:00:00 mdy )")]DateTimeOffset time,
            [Description("the message you want me to tell you when i remind you"), Remainder]string message
            )
         {
@@ -99,8 +99,10 @@ namespace Mummybot.Commands.Modules
                 SetAtUTC = DateTime.UtcNow,
                 ExpiresAtUTC =time,
                 Id = SnowFlakeGenerator.NextLong(),
-                UserID = Context.User.Id
+                UserID = Context.User.Id,
+                JumpUrl = Context.Message.GetJumpUrl()
             };
+
             GuildConfig.Reminders.Add(reminder);
             ReminderService.RegisterReminder(reminder, reminder.Id);
 
