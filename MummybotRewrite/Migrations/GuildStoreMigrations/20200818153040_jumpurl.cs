@@ -9,15 +9,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
             migrationBuilder.AddColumn<string>(
                 name: "JumpUrl",
                 table: "Reminder",
-                nullable: true);
-
-            migrationBuilder.AlterColumn<decimal>(
-                name: "GuildID",
-                table: "Guilds",
-                nullable: false,
-                oldClrType: typeof(decimal),
-                oldType: "decimal(20,0)")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+                nullable: true);            
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -25,14 +17,6 @@ namespace Mummybot.Migrations.GuildStoreMigrations
             migrationBuilder.DropColumn(
                 name: "JumpUrl",
                 table: "Reminder");
-
-            migrationBuilder.AlterColumn<decimal>(
-                name: "GuildID",
-                table: "Guilds",
-                type: "decimal(20,0)",
-                nullable: false,
-                oldClrType: typeof(decimal))
-                .Annotation("SqlServer:Identity", "1, 1");
         }
     }
 }
