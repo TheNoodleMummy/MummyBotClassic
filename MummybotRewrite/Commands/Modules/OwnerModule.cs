@@ -132,7 +132,7 @@ namespace Mummybot.Commands.Modules
 
                             var messages = rValue.Inspect();
 
-                            if (type.IsValueType && messages.Count == 0)
+                            if (type.IsValueType && messages.Count() == 0)
                             {
                                 builder.AddField($"{type}", rValue);
                             }
