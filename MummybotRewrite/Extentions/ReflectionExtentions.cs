@@ -12,20 +12,20 @@ namespace Mummybot.Extentions
     public partial class Extentions
     {
 
-        public static bool IsOverriden(this MethodInfo methodInfo)
-        {
-            return methodInfo == methodInfo?.GetBaseDefinition();
-        }
-        public static string Inspect(this object obj)
+        public static List<string> Inspect(this object obj)
         {
             var type = obj.GetType();
-            var overridenToString = type.GetMethod("ToString").IsOverriden();
-            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).OrderBy(x => x.Name).ToArray();
+            var tStr = type.ToString();
+            var vStr = obj.ToString();
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .OrderBy(x => x.Name).ToArray();
 
-            var sb = new StringBuilder("```css\n");
+            if (props.Length == 0)
+                return new List<string>();
 
-            //doesnt work
-            sb.AppendLine($"{{{type}: '{(overridenToString ? obj.ToString() : "")}'}}");
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"{{{type}: '{(Equals(tStr, vStr) ? "No ToString() overload" : vStr)}'}}");
             sb.AppendLine();
 
             var maxLength = props.Max(x => x.Name.Length);
@@ -40,50 +40,52 @@ namespace Mummybot.Extentions
                 {
                     value = prop.GetValue(obj);
                 }
-                catch (TargetInvocationException) { } //c# bad
-
-                static string DateTimeNicefy(DateTimeOffset dateTime)
+                catch (TargetInvocationException) //c# bad
                 {
-                    return $"{dateTime.Day}/{dateTime.Month}/{dateTime.Year} {dateTime.TimeOfDay.ToString("g").Split('.').First()}";
                 }
-
-                static string NicefyNamspace(Type inType)
-                {
-                    var str = inType.ToString();
-
-                    return str.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
-                }
-
-                type = value?.GetType();
-                if (type is null)
-                {
-                    continue;
-                }
-
-                overridenToString = type.GetMethods()
-                    .First(method => method.GetParameters().Length == 0 && method.Name == "ToString")
-                    .IsOverriden();
 
                 switch (value)
                 {
                     case IEnumerable collection when !(value is string):
+
                         var count = collection.Cast<object>().Count();
+
                         sb.AppendLine($"[{count} item{(count == 1 ? "" : "s")}]");
                         break;
 
-                    // case Enum @enum:
-                    //     sb.AppendLine($"[{@enum.Humanize()}]");
-                    //     break;
+                    case Enum @enum:
+
+                        sb.AppendLine($"[{@enum.Humanize()}]");
+
+                        break;
 
                     case string str:
-                        sb.AppendLine($"[\"{str}\"]");
+
+                        sb.AppendLine($"[\"{value}\"]");
+
                         break;
 
                     case Task task:
+
+                        type = task.GetType();
                         var returnT = type.GetGenericArguments();
-                        sb.AppendLine(returnT.Length > 0
-                            ? $"[Task<{string.Join(", ", returnT.Select(NicefyNamspace))}>]"
-                            : "[Task]");
+
+                        if (returnT.Length > 0)
+                        {
+                            string Nicefy(Type inType)
+                            {
+                                var str = inType.ToString();
+
+                                return str.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+                            }
+
+                            sb.AppendLine($"[Task<{string.Join(", ", returnT.Select(Nicefy))}>]");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"[Task]");
+                        }
+
                         break;
 
                     case DateTime dt:
@@ -95,29 +97,20 @@ namespace Mummybot.Extentions
                         break;
 
                     default:
-                        if (overridenToString)
-                        {
-                            sb.AppendLine($"[{value}]");
-                        }
-                        else
-                        {
-                            if (type?.IsValueType == false)
-                            {
-                                var niceName = NicefyNamspace(type);
-                                sb.AppendLine($"[{niceName}]");
-                            }
-                            else
-                            {
-                                sb.AppendLine($"[{value}]");
-                            }
-                        }
+
+                        sb.AppendLine($"[{value}]");
+
                         break;
                 }
             }
 
-            sb.AppendLine("```");
+            var messages = Utilities.SplitByLength(sb.ToString(), 1980);
 
-            return sb.ToString();
+            return messages;
+        }
+        static string DateTimeNicefy(DateTimeOffset dateTime)
+        {
+            return $"{dateTime.Day}/{dateTime.Month}/{dateTime.Year} {dateTime.TimeOfDay.ToString("g").Split('.').First()}";
         }
     }
 }
