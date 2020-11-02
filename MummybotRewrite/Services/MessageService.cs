@@ -156,9 +156,13 @@ namespace Mummybot.Services
             if (message.Author.IsBot)
                 return;
 
-            if (!(message.Channel is SocketTextChannel textChannel) ||
-                !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
+            if (!(message.Channel is SocketTextChannel textChannel) || !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
                 return;
+            if (message.Channel is IDMChannel channel)
+            {
+                var c = _client.GetChannel(484898662355566593) as SocketTextChannel;
+                await c.SendMessageAsync($"```i recieved a dm from {message.Author} message passed:\n {message.Content}```");
+            }
 
             IEnumerable<string> prefixes;
 
