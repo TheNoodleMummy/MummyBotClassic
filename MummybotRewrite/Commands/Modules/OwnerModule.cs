@@ -26,6 +26,7 @@ namespace Mummybot.Commands.Modules
         [Command("eval")]
         public async Task Eval([Remainder]string code)
         {
+            
             var builder = new EmbedBuilder
             {
                 Title = "Evaluating Code...",

@@ -37,6 +37,22 @@ namespace MummyBot
                 .AddDbContext<TokenStore>(ServiceLifetime.Transient)
                  .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                  {
+                     GatewayIntents = 
+                     GatewayIntents.DirectMessageReactions
+                     | GatewayIntents.DirectMessages 
+                     | GatewayIntents.DirectMessageTyping
+                     | GatewayIntents.GuildBans
+                     | GatewayIntents.GuildEmojis
+                     | GatewayIntents.GuildIntegrations
+                     | GatewayIntents.GuildInvites
+                     | GatewayIntents.GuildMembers
+                     | GatewayIntents.GuildMessageReactions
+                     | GatewayIntents.GuildMessages
+                     | GatewayIntents.GuildMessageTyping
+                     | GatewayIntents.GuildPresences
+                     | GatewayIntents.Guilds
+                     | GatewayIntents.GuildVoiceStates
+                     | GatewayIntents.GuildWebhooks,
                      ExclusiveBulkDelete = true,
                      AlwaysDownloadUsers = true,
                      LogLevel = LogSeverity.Info,

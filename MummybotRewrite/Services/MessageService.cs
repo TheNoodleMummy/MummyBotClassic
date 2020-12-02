@@ -26,6 +26,7 @@ namespace Mummybot.Services
         private readonly DiscordSocketClient _client;
         private readonly LogService _logger;
         private readonly TaskQueue _scheduler;
+        private readonly HttpClient _http;
         private readonly IServiceProvider _services;
 
         private readonly ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ConcurrentDictionary<Guid, ScheduledTask<(Guid, CachedMessage)>>>> _messageCache;
@@ -45,6 +46,7 @@ namespace Mummybot.Services
             _commands = services.GetRequiredService<CommandService>();
             _client = services.GetRequiredService<DiscordSocketClient>();
             _scheduler = services.GetRequiredService<TaskQueue>();
+            _http = services.GetRequiredService<HttpClient>();
             _services = services;
             _logger = logs;
             _messageCache =
@@ -159,7 +161,13 @@ namespace Mummybot.Services
             if (message.Channel is IDMChannel channel)
             {
                 var c = _client.GetUser(122520984413667331);
-                await c.SendMessageAsync($"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
+                if (message.Attachments.Count != 0)
+                {
+                    using var stream = await _http.GetStreamAsync(message.Attachments.First().Url);
+                    await c.SendFileAsync(stream, message.Attachments.First().Filename, $"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
+                }
+                else
+                    await c.SendMessageAsync($"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
             }
 
             if (!(message.Channel is SocketTextChannel textChannel) || !textChannel.Guild.CurrentUser.GetPermissions(textChannel).Has(ChannelPermission.SendMessages))
