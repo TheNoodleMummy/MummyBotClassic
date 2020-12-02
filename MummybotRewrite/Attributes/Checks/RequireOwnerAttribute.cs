@@ -13,7 +13,7 @@ namespace Mummybot.Attributes.Checks
             if ((await context.Client.GetApplicationInfoAsync()).Owner.Id == context.User.Id)
                 return CheckResult.Successful;
             else
-                return CheckResult.Unsuccessful("Only my owner can run this command");
+                return CheckResult.Failed("Only my owner can run this command");
         }
     }
 }

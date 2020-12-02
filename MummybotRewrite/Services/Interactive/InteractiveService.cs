@@ -27,13 +27,16 @@ namespace Discord.Addons.Interactive
         public InteractiveService(BaseSocketClient discord, InteractiveServiceConfig config = null)
         {
             Discord = discord;
-            Discord.ReactionAdded += HandleReactionAsync;
+            Discord.ReactionAdded += HandleReactionAsync; 
 
-            config = config ?? new InteractiveServiceConfig();
+            config ??= new InteractiveServiceConfig();
+
             _defaultTimeout = config.DefaultTimeout;
 
             _callbacks = new Dictionary<ulong, IReactionCallback>();
         }
+
+       
 
         public Task<SocketMessage> NextMessageAsync(MummyContext context, 
             bool fromSourceUser = true, 
@@ -114,28 +117,28 @@ namespace Discord.Addons.Interactive
             => _callbacks.Remove(id);
         public void ClearReactionCallbacks()
             => _callbacks.Clear();
-        
-        private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, 
-            ISocketMessageChannel channel, 
-            SocketReaction reaction)
+
+        private async Task HandleReactionAsync(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
         {
-            if (reaction.UserId == Discord.CurrentUser.Id) return;
-            if (!(_callbacks.TryGetValue(message.Id, out var callback))) return;
-            if (!(await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false)))
-                return;
-            switch (callback.RunMode)
             {
-                case RunMode.Parallel:
-                    _ = Task.Run(async () =>
-                    {
+                if (reaction.UserId == Discord.CurrentUser.Id) return;
+                if (!(_callbacks.TryGetValue(message.Id, out var callback))) return;
+                if (!(await callback.Criterion.JudgeAsync(callback.Context, reaction).ConfigureAwait(false)))
+                    return;
+                switch (callback.RunMode)
+                {
+                    case RunMode.Parallel:
+                        _ = Task.Run(async () =>
+                        {
+                            if (await callback.HandleCallbackAsync(reaction).ConfigureAwait(false))
+                                RemoveReactionCallback(message.Id);
+                        });
+                        break;
+                    default:
                         if (await callback.HandleCallbackAsync(reaction).ConfigureAwait(false))
                             RemoveReactionCallback(message.Id);
-                    });
-                    break;
-                default:
-                    if (await callback.HandleCallbackAsync(reaction).ConfigureAwait(false))
-                        RemoveReactionCallback(message.Id);
-                    break;
+                        break;
+                }
             }
         }
 
@@ -143,5 +146,6 @@ namespace Discord.Addons.Interactive
         {
             Discord.ReactionAdded -= HandleReactionAsync;
         }
+        
     }
 }

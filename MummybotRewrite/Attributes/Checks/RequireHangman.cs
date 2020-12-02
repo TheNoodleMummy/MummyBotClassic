@@ -18,7 +18,7 @@ namespace Mummybot.Attributes.Checks
             if (guild.UsesHangman)
                 return CheckResult.Successful;
             else
-                return CheckResult.Unsuccessful("Hangman Service is Currently turn off for this guild");
+                return CheckResult.Failed("Hangman Service is Currently turn off for this guild");
 
 
         }

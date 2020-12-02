@@ -65,7 +65,7 @@ namespace Discord.Addons.Interactive
                 if (options.DisplayInformationIcon)
                     await message.AddReactionAsync(options.Info);
             });
-            if (Timeout.HasValue && Timeout.Value != null)
+            if (Timeout.HasValue)
             {
                 _ = Task.Delay(Timeout.Value).ContinueWith(_ =>
                 {

@@ -27,7 +27,7 @@ namespace Mummybot.Commands.TypeReaders
             {
                 return TypeParserResult<Difficulty>.Successful(Difficulty.Custom);
             }
-            return TypeParserResult<Difficulty>.Unsuccessful($"couldnt parse {value} to a valid Difficulty");
+            return TypeParserResult<Difficulty>.Failed($"couldnt parse {value} to a valid Difficulty");
         }
     }
 }

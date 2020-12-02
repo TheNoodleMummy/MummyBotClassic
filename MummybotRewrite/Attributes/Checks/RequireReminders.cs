@@ -19,7 +19,7 @@ namespace Mummybot.Attributes.Checks
             if (guildconfig.UsesReminders)
                 return CheckResult.Successful;
             else
-                return CheckResult.Unsuccessful("this command can only be used when the ReminderSerivce is active");
+                return CheckResult.Failed("this command can only be used when the ReminderSerivce is active");
 
         }
     }

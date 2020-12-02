@@ -19,7 +19,7 @@ namespace Mummybot.Attributes.Checks
             if (guild.UsesTrolls)
                 return CheckResult.Successful;
             else
-                return CheckResult.Unsuccessful("Voice Troll Service is Currently turn off for this guild");
+                return CheckResult.Failed("Voice Troll Service is Currently turn off for this guild");
         }
     }
 }

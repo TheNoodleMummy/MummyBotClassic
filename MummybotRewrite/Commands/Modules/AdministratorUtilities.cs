@@ -32,7 +32,7 @@ namespace Mummybot.Commands.Modules
                     )
                 {
                     await AdministratorService.VoiceMute(Context, user, howlong);
-                    Context.Message.AddOkAsync();
+                    await Context.Message.AddOkAsync();
                 }
             }
 
@@ -49,7 +49,7 @@ namespace Mummybot.Commands.Modules
                     )
                 {
                     await AdministratorService.VoiceDeafen(Context, user, howlong);
-                    Context.Message.AddOkAsync();
+                    await Context.Message.AddOkAsync();
                 }
             }
 

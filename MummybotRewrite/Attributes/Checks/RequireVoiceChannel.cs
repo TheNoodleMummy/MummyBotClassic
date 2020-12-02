@@ -14,7 +14,7 @@ namespace Mummybot.Attributes.Checks
         public override ValueTask<CheckResult> CheckAsync(MummyContext context)
         {
             if ((context.User as IVoiceState)?.VoiceChannel is null)
-                return CheckResult.Unsuccessful("You are Required to be in a voice channel to run this command");
+                return CheckResult.Failed("You are Required to be in a voice channel to run this command");
             else
                 return CheckResult.Successful;
 

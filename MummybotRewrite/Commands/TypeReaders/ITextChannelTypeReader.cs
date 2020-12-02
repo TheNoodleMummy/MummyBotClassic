@@ -17,7 +17,7 @@ namespace Mummybot.Commands.TypeReaders
             {
                 var chan = ctx.Guild.TextChannels.FirstOrDefault(c => c.Id == id) as ITextChannel;
                 if (chan is null)
-                    return TypeParserResult<ITextChannel>.Unsuccessful($"Could not find channel with id: {id}");
+                    return TypeParserResult<ITextChannel>.Failed($"Could not find channel with id: {id}");
                 else
                     return TypeParserResult<ITextChannel>.Successful(chan);
             }
@@ -25,7 +25,7 @@ namespace Mummybot.Commands.TypeReaders
             {
                 var chan = ctx.Guild.TextChannels.FirstOrDefault(c => c.Name.Equals(value, StringComparison.CurrentCultureIgnoreCase));
                 if (chan is null)
-                    return TypeParserResult<ITextChannel>.Unsuccessful($"Could not find channel with name: {value}");
+                    return TypeParserResult<ITextChannel>. Failed($"Could not find channel with name: {value}");
                 else
                     return TypeParserResult<ITextChannel>.Successful(chan);
             }

@@ -28,7 +28,7 @@ namespace Mummybot.Services
         {
             _client.ReactionAdded += async (chachemessage, channel, reaction) =>
             {
-                if (channel is SocketTextChannel Textchannel)
+                if (channel.Value is SocketTextChannel Textchannel)
                 {
                     using var guildstore = services.GetService<GuildStore>();
                     var guild = await guildstore.GetOrCreateGuildAsync(Textchannel.Guild, g => g.Stars);
@@ -78,7 +78,7 @@ namespace Mummybot.Services
             };
             _client.ReactionRemoved += async (chachemessage, channel, reaction) =>
             {
-                if (channel is SocketTextChannel Textchannel)
+                if (channel.Value is SocketTextChannel Textchannel)
                 {
                     using var guildstore = services.GetService<GuildStore>();
                     var guild = await guildstore.GetOrCreateGuildAsync(Textchannel.Guild, g => g.Stars);

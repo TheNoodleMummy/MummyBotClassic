@@ -15,7 +15,7 @@ namespace Mummybot.Commands.TypeReaders
             else if (value.Equals("off", StringComparison.CurrentCultureIgnoreCase))
                 return TypeParserResult<bool>.Successful(false);
             else
-                return TypeParserResult<bool>.Unsuccessful($"could not parse {parameter.Name} as on/off");
+                return TypeParserResult<bool>.Failed($"could not parse {parameter.Name} as on/off");
         }
 
     }

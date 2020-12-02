@@ -95,7 +95,7 @@ namespace Mummybot.Attributes.Checks
             }
             else
             {
-                return CheckResult.Unsuccessful("You are currently in Timeout.");
+                return CheckResult.Failed("You are currently in Timeout.");
             }
         }
 

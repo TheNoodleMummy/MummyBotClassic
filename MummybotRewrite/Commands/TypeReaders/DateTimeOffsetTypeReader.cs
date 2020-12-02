@@ -15,24 +15,24 @@ namespace Mummybot.Commands.TypeReaders
             DateTimeOffset dateTimeOffset = new DateTimeOffset(DateTime.MinValue, TimeSpan.Zero);
             if (!value.EndsWith("dmy", StringComparison.CurrentCultureIgnoreCase) && !value.EndsWith("mdy", StringComparison.CurrentCultureIgnoreCase))
             {
-                return TypeParserResult<DateTimeOffset>.Unsuccessful("failed to parse expected mdy or dmy");
+                return TypeParserResult<DateTimeOffset>.Failed("failed to parse expected mdy or dmy");
             }
             if (value.EndsWith("dmy", StringComparison.CurrentCultureIgnoreCase))
             {
-                var time = value.Substring(0,value.IndexOf("dmy"));
+                var time = value[..value.IndexOf("dmy")];
                 if (!DateTimeOffset.TryParse(time, CultureInfo.CurrentCulture, styles: DateTimeStyles.AssumeUniversal, out dateTimeOffset))
-                    return TypeParserResult<DateTimeOffset>.Unsuccessful("failed to parse time (something doesnt look right in the time part)");
+                    return TypeParserResult<DateTimeOffset>.Failed("failed to parse time (something doesnt look right in the time part)");
             }
             if (value.EndsWith("mdy", StringComparison.CurrentCultureIgnoreCase))
             {
-                var time = value.Substring(0, value.IndexOf("mdy"));
+                var time = value[..value.IndexOf("mdy")];
                 if (!DateTimeOffset.TryParse(time, CultureInfo.CreateSpecificCulture("en-US"), DateTimeStyles.AssumeUniversal, out dateTimeOffset))
-                    return TypeParserResult<DateTimeOffset>.Unsuccessful("failed to parse time (something doesnt look right in the time part)");
+                    return TypeParserResult<DateTimeOffset>.Failed("failed to parse time (something doesnt look right in the time part)");
             }
             if (dateTimeOffset != new DateTimeOffset(DateTime.MinValue, TimeSpan.Zero))
                 return TypeParserResult<DateTimeOffset>.Successful(dateTimeOffset);
 
-            return TypeParserResult<DateTimeOffset>.Unsuccessful("something went badly wrong and i entirely failed to parse your time");
+            return TypeParserResult<DateTimeOffset>.Failed("something went badly wrong and i entirely failed to parse your time");
         }
     }
 }

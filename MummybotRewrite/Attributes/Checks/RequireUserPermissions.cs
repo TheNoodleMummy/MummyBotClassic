@@ -70,7 +70,7 @@ namespace Mummybot.Attributes.Checks
 
             var target = _target == PermissionTarget.User ? "You" : "I";
 
-            return CheckResult.Unsuccessful($"{target} lack permissions for {sb}");
+            return CheckResult.Failed($"{target} lack permissions for {sb}");
         }
     }
 }

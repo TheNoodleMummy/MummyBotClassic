@@ -19,7 +19,7 @@ namespace Mummybot.Attributes.Checks
             if (guild.UsesMusic)
                 return CheckResult.Successful;
             else
-                return CheckResult.Unsuccessful("Music Service is Currently turn off for this guild");
+                return CheckResult.Failed("Music Service is Currently turn off for this guild");
         }
     }
 }

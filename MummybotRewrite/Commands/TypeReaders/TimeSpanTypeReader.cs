@@ -22,7 +22,7 @@ namespace Mummybot.Commands.TypeReaders
             if (matches.Count == 0)
             {
 
-                return TypeParserResult<TimeSpan>.Unsuccessful("no matches idk");
+                return TypeParserResult<TimeSpan>.Failed("no matches idk");
             }
 
             var result = new TimeSpan();

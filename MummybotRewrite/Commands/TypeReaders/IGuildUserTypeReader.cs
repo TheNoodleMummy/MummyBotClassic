@@ -33,14 +33,14 @@ namespace Mummybot.Commands.TypeReaders
                         x.Username.Equals(value, StringComparison.OrdinalIgnoreCase)
                         || x.Nickname != null && x.Nickname.Equals(value, StringComparison.OrdinalIgnoreCase)).ToList();
                 if (match.Count > 1)
-                    return TypeParserResult<TUser>.Unsuccessful(
+                    return TypeParserResult<TUser>.Failed(
                         "Multiple users found, try mentioning the user or using their ID.");
 
                     user = match.FirstOrDefault();
                 }
 
                 return user is null
-                    ? TypeParserResult<TUser>.Unsuccessful("User not found.")
+                    ? TypeParserResult<TUser>.Failed("User not found.")
                     : TypeParserResult<TUser>.Successful(user);
             }
         }

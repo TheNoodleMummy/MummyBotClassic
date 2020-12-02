@@ -535,12 +535,6 @@ namespace Mummybot.Services
             guildstore.SaveChanges();
             return new Word() { MaskedWord = word.word.ToLower(), Id = word.id };
         }
-
-        public async Task TaskCallback(HangmanGame game)
-        {
-
-        }
-
     }
 
     public class HangmanGame

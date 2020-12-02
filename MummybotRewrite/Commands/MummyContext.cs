@@ -23,6 +23,7 @@ namespace Mummybot.Commands
             PrefixUsed = prefixUsed;
             IsEdit = isEdit;
             LogService = services.GetRequiredService<LogService>();
+            ServiceProvider = services;
         }       
 
         public SocketGuildUser User { get; private set; }
@@ -41,7 +42,9 @@ namespace Mummybot.Commands
         public ulong ChannelId => Channel.Id;
         public ulong UserId => User.Id;
         public ulong GuildId => Guild.Id;
-        
+
+        public IServiceProvider ServiceProvider { get; internal set; }
+
         internal void LogDebug(string Message, LogSource source = LogSource.Unkown, Exception exception = null)
        => LogService.LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Debug, source.ToString(), Message, exception, Guild));
 

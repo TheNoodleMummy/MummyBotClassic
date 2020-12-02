@@ -60,8 +60,8 @@ namespace Mummybot.Services
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
-            _commands.CommandExecutionFailed += CommandErroredAsync; //fires for parralel command that had a exception
-            _commands.CommandExecuted += CommandExecutedAsync;//fires for parralel command that went ok
+            _commands.CommandExecutionFailed += CommandErroredAsync; ; //fires for parralel command that had a exception
+            _commands.CommandExecuted += CommandExecutedAsync; ; ;//fires for parralel command that went ok
             var jumpUrlRegex = new Regex(Regex, RegexOptions.Compiled);
 
             _client.MessageReceived += msg =>
@@ -153,6 +153,8 @@ namespace Mummybot.Services
             return Task.CompletedTask;
         }
 
+       
+
         private async Task HandleReceivedMessageAsync(SocketUserMessage message, bool isEdit)
         {
             if (message.Author.IsBot)
@@ -163,8 +165,17 @@ namespace Mummybot.Services
                 var c = _client.GetUser(122520984413667331);
                 if (message.Attachments.Count != 0)
                 {
+<<<<<<< HEAD
                     using var stream = await _http.GetStreamAsync(message.Attachments.First().Url);
                     await c.SendFileAsync(stream, message.Attachments.First().Filename, $"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
+=======
+                    foreach (var attachment in message.Attachments)
+                    {
+                        using var stream = await _http.GetStreamAsync(message.Attachments.First().Url);
+                        await c.SendFileAsync(stream, message.Attachments.First().Filename, $"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
+                    }
+                    
+>>>>>>> made it so attachments in dms also get forwarded + akk gateway intents cause fuck them + updated stuff
                 }
                 else
                     await c.SendMessageAsync($"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
@@ -213,8 +224,7 @@ namespace Mummybot.Services
 
                 try
                 {
-                    if (prefix is null)
-                        prefix = _client.CurrentUser.Mention;
+                    prefix ??= _client.CurrentUser.Mention;
 
                     var commandContext = MummyContext.Create(_client, message, _services.GetRequiredService<HttpClient>(), _services, prefix, isEdit);
 
@@ -244,7 +254,7 @@ namespace Mummybot.Services
                         {
                             var attri = Check.GetType().GetCustomAttributes(typeof(Attributes.NameAttribute), false).FirstOrDefault();
                             var nameattri = (attri as Attributes.NameAttribute).Name;
-                            emb.AddField(nameattri, Result.Reason, true);
+                            emb.AddField(nameattri, Result.FailureReason, true);
                         }
                         await SendMessageAsync(commandContext, new MessageProperties() { Embed = emb.Build() });
                     }
@@ -320,11 +330,11 @@ namespace Mummybot.Services
             }
         }
 
-        private async Task CommandErroredAsync(CommandExecutionFailedEventArgs args)
+        private async ValueTask CommandErroredAsync(object sender, CommandExecutionFailedEventArgs args)
         {
             if ((args.Context is MummyContext context))
             {
-                if (args.Result is ExecutionFailedResult failed)
+                if (args.Result is CommandExecutionFailedResult failed)
                 {
                     _logger.LogError(failed.ToString(), LogSource.Commands,context.GuildId, failed.Exception);
 
@@ -342,13 +352,13 @@ namespace Mummybot.Services
                 throw new InvalidContextException(args.Context.GetType());
         }
 
-        private Task CommandExecutedAsync(CommandExecutedEventArgs args)
+        private async ValueTask CommandExecutedAsync(object sender, CommandExecutedEventArgs args)
         {
             if ((args.Context is MummyContext context))
             {
                 _logger.LogVerbose($"Successfully executed {{{context.Command.Name}}} for {{{context.User.GetDisplayName()}}}", LogSource.Commands,context.GuildId);
 
-                return Task.CompletedTask;
+                await Task.Delay(1);
             }
             else
                 throw new InvalidContextException(args.Context.GetType());
@@ -442,10 +452,10 @@ namespace Mummybot.Services
 
             _messageCache[message.ChannelId][message.UserId].TryRemove(key, out _);
 
-            if (_messageCache[message.ChannelId][message.UserId].Count == 0)
+            if (_messageCache[message.ChannelId][message.UserId].IsEmpty)
                 _messageCache.Remove(message.UserId, out _);
 
-            if (_messageCache[message.ChannelId].Count == 0)
+            if (_messageCache[message.ChannelId].IsEmpty)
                 _messageCache.Remove(message.ChannelId, out _);
 
             return Task.CompletedTask;
@@ -469,11 +479,11 @@ namespace Mummybot.Services
                 if (found is null)
                     return;
 
-                if (found.Count == 0)
+                if (found.IsEmpty)
                 {
                     _messageCache[context.Channel.Id].Remove(context.User.Id, out _);
 
-                    if (_messageCache[context.Channel.Id].Count == 0)
+                    if (_messageCache[context.Channel.Id].IsEmpty)
                         _messageCache.Remove(context.Channel.Id, out _);
 
                     return;

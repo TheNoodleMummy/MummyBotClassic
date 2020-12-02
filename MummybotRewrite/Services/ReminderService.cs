@@ -76,7 +76,6 @@ namespace Mummybot.Services
 
             LogService.LogInformation("Executing reminder callback", Enums.LogSource.ReminderService, reminder.GuildID);
             StringBuilder sb = new StringBuilder();
-            bool hasdays = false, hashours = false;
             var time = DateTime.UtcNow - reminder.SetAtUTC;
 
             
@@ -85,7 +84,6 @@ namespace Mummybot.Services
             sb.Append("yoo ").Append(DiscordClient.GetUser(reminder.UserID).Mention).Append(", ");
             if (time.Days != 0)
             {
-                hasdays = true;
                 sb.Append(time.Days);
                 if (time.Days == 1)
                     sb.Append("Day, ");
@@ -95,7 +93,6 @@ namespace Mummybot.Services
 
             if (time.Hours != 0)
             {
-                hashours = true;
                 sb.Append(time.Hours);
 
                 if (time.Hours == 1)
@@ -122,7 +119,6 @@ namespace Mummybot.Services
                 sb.Append("but sorry, im ");
                 if (late.Days != 0)
                 {
-                    hasdays = true;
                     sb.Append(late.Days);
                     if (late.Days == 1)
                         sb.Append("Day");
@@ -133,7 +129,6 @@ namespace Mummybot.Services
                 if (late.Hours != 0)
                 {
                     sb.Append(", ");
-                    hashours = true;
                     sb.Append(late.Hours);
 
                     if (late.Hours == 1)

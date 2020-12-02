@@ -132,7 +132,7 @@ namespace Mummybot.Services
 
             var dbbirthday = guildconfig.Birthdays.FirstOrDefault(b => b.Id == birthday.Id);
             dbbirthday.NextBdayUTC = dbbirthday.NextBdayUTC.AddYears(1);
-            guildstore.SaveChangesAsync();
+            await guildstore.SaveChangesAsync();
         }
 
         /// <summary>

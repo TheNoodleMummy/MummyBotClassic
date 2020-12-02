@@ -75,9 +75,9 @@ namespace Mummybot
 
                 case ChecksFailedResult checksFailedResult:
                     message = string.Concat(
-                        result.Reason,
+                        result.FailureReason,
                         '\n',
-                        string.Join('\n', checksFailedResult.FailedChecks.Select(x => x.Result.Reason)));
+                        string.Join('\n', checksFailedResult.FailedChecks.Select(x => x.Result.FailureReason)));
 
                     builder.WithDescription(message);
                     break;
@@ -87,34 +87,34 @@ namespace Mummybot
                         "You are currently on cooldown for this command",
                         '\n',
                         "Retry in: ",
-                        commandOnCooldownResult.Cooldowns.First().RetryAfter.Humanize(1)
+                        commandOnCooldownResult.Cooldowns[0].RetryAfter.Humanize(1)
                         );
 
                     builder.WithDescription(message);
                     break;
                                     
-                case ExecutionFailedResult _:
+                case CommandExecutionFailedResult _:
                     builder.WithDescription("Something went horribly wrong... " +
                                             "The problem has been forwarded to the appropiate authorities");
                     break;
 
                 case OverloadsFailedResult overloadsFailedResult:
-                    message = overloadsFailedResult.FailedOverloads.OrderBy(x => x.Key.Priority).Last().Value.Reason;
+                    message = overloadsFailedResult.FailedOverloads.OrderBy(x => x.Key.Priority).Last().Value.FailureReason;
 
                     builder.WithDescription(message);
                     break;
 
                 case ParameterChecksFailedResult parameterChecksFailedResult:
                     message = string.Concat(
-                        result.Reason,
+                        result.FailureReason,
                         "\n",
-                        string.Join('\n', parameterChecksFailedResult.FailedChecks.Select(x => x.Result.Reason)));
+                        string.Join('\n', parameterChecksFailedResult.FailedChecks.Select(x => x.Result.FailureReason)));
 
                     builder.WithDescription(message);
                     break;
 
                 case TypeParseFailedResult typeParseFailedResult:
-                    builder.WithDescription(typeParseFailedResult.Reason);
+                    builder.WithDescription(typeParseFailedResult.FailureReason);
                     break;
             }
 

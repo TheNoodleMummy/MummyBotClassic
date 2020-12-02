@@ -18,7 +18,7 @@ namespace Mummybot.Commands.Modules
     public class ConfigModule : MummyModule
     {
         [Group("hangman")]
-        public class hangmanCommands : MummyModule
+        public class HangmanCommands : MummyModule
         {
             [Command()]
             public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
@@ -197,7 +197,6 @@ namespace Mummybot.Commands.Modules
         public async Task GetCOnfig()
         {
             var emb = new EmbedBuilder();
-            bool idk=false;
             foreach (var item in GuildConfig.GetType().GetProperties().Where(p => p.PropertyType == typeof(bool)))
             {
                 emb.AddField(item.Name, item.GetValue(GuildConfig));

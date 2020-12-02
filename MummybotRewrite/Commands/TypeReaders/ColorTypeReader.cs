@@ -35,7 +35,7 @@ namespace Mummybot.Commands.TypeReaders
                 return TypeParserResult<Color>.Successful(color);
             }
             else
-                return TypeParserResult<Color>.Unsuccessful("Could not parse color");
+                return TypeParserResult<Color>.Failed("Could not parse color");
         }
 
         private bool IsRGB(string value, out (int red, int green, int blue) rgb)
