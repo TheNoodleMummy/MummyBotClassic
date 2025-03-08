@@ -11,7 +11,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
 {
     [DbContext(typeof(GuildStore))]
     [Migration("20200818153040_jumpurl")]
-    partial class jumpurl
+    partial class Jumpurl
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

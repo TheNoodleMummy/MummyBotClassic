@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
-    public partial class moar : Migration
+    public partial class Moar : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

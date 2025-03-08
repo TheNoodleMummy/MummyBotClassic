@@ -10,7 +10,7 @@ namespace Discord.Addons.Interactive
         public PaginatedAppearanceOptions Options { get; set; } = PaginatedAppearanceOptions.Default;
     }
 
-    public static class paginatedmessageextensions
+    public static class PaginatedMessageExtensions
     {
         public static void Add(this SortedList<int, EmbedBuilder> pages, EmbedBuilder embedBuilder)
         {

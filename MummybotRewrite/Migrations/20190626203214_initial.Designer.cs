@@ -10,7 +10,7 @@ namespace Mummybot.Migrations
 {
     [DbContext(typeof(TokenStore))]
     [Migration("20190626203214_initial")]
-    partial class initial
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

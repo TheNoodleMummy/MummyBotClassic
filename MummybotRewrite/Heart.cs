@@ -52,11 +52,7 @@ namespace MummyBot
                      | GatewayIntents.GuildPresences
                      | GatewayIntents.Guilds
                      | GatewayIntents.GuildVoiceStates
-                     | GatewayIntents.GuildWebhooks,
-<<<<<<< HEAD
-                     ExclusiveBulkDelete = true,
-=======
->>>>>>> made it so attachments in dms also get forwarded + akk gateway intents cause fuck them + updated stuff
+                     | GatewayIntents.GuildWebhooks,  
                      AlwaysDownloadUsers = true,
                      LogLevel = LogSeverity.Info,
                      MessageCacheSize = 100
@@ -70,7 +66,6 @@ namespace MummyBot
                      CooldownBucketKeyGenerator = CoolDownBucketGenerator
                  })
                  .AddTypeParsers(assembly))
-                 .AddSingleton<Random>()
                  .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
 

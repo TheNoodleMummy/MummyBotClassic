@@ -50,7 +50,7 @@ namespace Mummybot
                 var idk = tokenstore.Tokens.FirstOrDefault(t => t.BotName =="dummybot");
                 await DiscordClient.LoginAsync(TokenType.Bot, idk.BotToken);
 #else
-                await DiscordClient.LoginAsync(TokenType.Bot, tokenstore.Tokens.FirstOrDefault(t=>t.BotName== "mummybot").BotToken);
+                await DiscordClient.LoginAsync(TokenType.Bot," tokenstore.Tokens.FirstOrDefault(t=>t.BotName== "mummybot").BotToken");
 #endif
             }
             await DiscordClient.StartAsync();

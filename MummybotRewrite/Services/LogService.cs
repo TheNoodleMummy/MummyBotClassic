@@ -10,11 +10,13 @@ using Mummybot.Enums;
 using System.Threading;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Mummybot.Services
 {
     [InitilizerPriority(1)]
     public class LogService : BaseService
+
     {
         public string LogDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));
         public string Logfile => Path.Combine(LogDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");

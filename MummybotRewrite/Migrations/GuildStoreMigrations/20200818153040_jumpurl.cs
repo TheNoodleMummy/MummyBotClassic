@@ -2,7 +2,7 @@
 
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
-    public partial class jumpurl : Migration
+    public partial class Jumpurl : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

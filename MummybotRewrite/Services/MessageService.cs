@@ -164,18 +164,13 @@ namespace Mummybot.Services
             {
                 var c = _client.GetUser(122520984413667331);
                 if (message.Attachments.Count != 0)
-                {
-<<<<<<< HEAD
-                    using var stream = await _http.GetStreamAsync(message.Attachments.First().Url);
-                    await c.SendFileAsync(stream, message.Attachments.First().Filename, $"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
-=======
+                {                    
                     foreach (var attachment in message.Attachments)
                     {
                         using var stream = await _http.GetStreamAsync(message.Attachments.First().Url);
                         await c.SendFileAsync(stream, message.Attachments.First().Filename, $"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");
                     }
                     
->>>>>>> made it so attachments in dms also get forwarded + akk gateway intents cause fuck them + updated stuff
                 }
                 else
                     await c.SendMessageAsync($"```i recieved a dm from {message.Author} message passed:\n{message.Content}```");

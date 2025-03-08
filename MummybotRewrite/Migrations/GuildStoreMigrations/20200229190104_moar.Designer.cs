@@ -11,7 +11,7 @@ namespace Mummybot.Migrations.GuildStoreMigrations
 {
     [DbContext(typeof(GuildStore))]
     [Migration("20200229190104_moar")]
-    partial class moar
+    partial class Moar
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
