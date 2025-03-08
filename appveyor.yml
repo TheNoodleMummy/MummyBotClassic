@@ -1,5 +1,5 @@
 version: '2.{build}'
-image: Visual Studio 2019
+image: Visual Studio 2022
 branches:
   only:
   - master
@@ -8,7 +8,6 @@ init:
   - cmd: git config --global core.autocrlf true
 install:
   # Install repo specific stuff here
-  - cmd: dotnet tool install --global dotnet-ef --version 3.0.0-* #this is required to be able to push migrations (if i can find a way to do this without exposing the connection string)
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
@@ -32,12 +31,12 @@ deploy:
   name: DeployMummyBot
   
 on_success:
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/BuildSuccess
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
 
 # on build failure
 on_failure:
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/Buildfailed
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
     
 after_deploy:
   - ps: start-sleep -s 60 #delay 60sec as appveyor doesnt relize its still transfering the files and already report deployment sucessfull
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.tk:22555/api/deployment/deploy
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/deploy
