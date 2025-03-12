@@ -18,13 +18,7 @@ build_script:
   - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release 
 after_build:
   # For once the build has completed
-artifacts:
- - path: 'MummybotRewrite\bin\release\net9.0\publish\'
-   name: MummyBot
-   type: WebDeployPackage
-clone_depth: 1
-test_script:
-   
+  
 deploy:
 - provider: FTP
   host: thenoodlemummy.com
