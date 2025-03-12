@@ -1,42 +1,23 @@
-version: '2.{build}'
+version: 2.1.{build}
+pull_requests:
+  do_not_increment_build_number: true
 image: Visual Studio 2022
-branches:
-  only:
-  - master
-init:
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
-install:
-  # Install repo specific stuff here
-before_build:
-  # Display .NET Core version
-  - cmd: dotnet --version
-  # Display minimal restore text
-  - cmd: dotnet restore ./MummybotRewrite/Mummybot.csproj --verbosity m
-build_script:
-  # output will be in ./src/bin/release/netcoreapp3.0/publish
-  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release
-after_build:
-  # For once the build has completed
-artifacts:
- - path: 'MummybotRewrite\bin\release\net9.0\publish\'
-   name: MummyBot
-   type: WebDeployPackage
-clone_depth: 1
-test_script:
-   
-
-deploy: 
-- provider: Environment
-  name: DeployMummyBot
-  
-on_success:
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
-
-# on build failure
-on_failure:
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
-    
+build:
+  verbosity: minimal
+deploy:
+- provider: FTP
+  host: thenoodlemummy.com
+  protocol: ftp
+  username: Appveyor
+  password:
+    secure: PYK20u4YC+/u5AT+RheK5w==
+  folder: /Mummybot
+  artifact: MummybotRewrite\bin\release\net9.0\MummyBot.zip
 after_deploy:
-  - ps: start-sleep -s 60 #delay 60sec as appveyor doesnt relize its still transfering the files and already report deployment sucessfull
-  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/deploy
+- ps: Invoke-RestMethod -Method 'Get' -Uri https://thenoodlemummy.com:22554/api/deployment/deploy
+on_success:
+- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
+on_failure:
+- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
+on_finish:
+- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildFinished
