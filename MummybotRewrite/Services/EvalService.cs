@@ -14,11 +14,16 @@ namespace Mummybot.Services
 {
     public class EvalService : BaseService
     {
-        public List<string> usings = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("usings.json")).ToList();
+        public List<string> usings = new List<string>();
         private readonly object LogSerice;
 
         public EvalService(LogService logs)
         {
+            if (!File.Exists("usings.json"))
+            {
+                var file=File.Create("usings.json");
+                File.WriteAllText("usings.json", JsonConvert.SerializeObject(usings.ToArray()));
+            }
             LogSerice = logs;
         }
 
