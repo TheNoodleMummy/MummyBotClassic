@@ -33,7 +33,7 @@ deploy:
   password:
     secure: PYK20u4YC+/u5AT+RheK5w==
   folder: /Mummybot
-  artifact: MummybotRewrite\bin\release\net9.0\MummyBot.zip
+  artifact: MummyBot.zip
 
 after_deploy:
 - ps: Invoke-RestMethod -Method 'Get' -Uri https://thenoodlemummy.com:22554/api/deployment/deploy
