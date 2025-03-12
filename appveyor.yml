@@ -1,4 +1,6 @@
-version: '2.1.{build}'
+version: '2.{build}'
+
+
 image: Visual Studio 2022
 branches:
   only:
@@ -15,25 +17,28 @@ before_build:
   - cmd: dotnet restore ./MummybotRewrite/Mummybot.csproj --verbosity m
 build_script:
   # output will be in ./src/bin/release/netcoreapp3.0/publish
-  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release 
+  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release
 after_build:
   # For once the build has completed
-  
-deploy:
-- provider: FTP
-  host: thenoodlemummy.com
-  protocol: ftp
-  username: Appveyor
-  password:
-    secure: PYK20u4YC+/u5AT+RheK5w==
-  folder: mummybot
-  artifact: MummybotRewrite\bin\release\net9.0\publish\MummyBot.zip
+artifacts:
+ - path: 'MummybotRewrite\bin\release\net9.0\publish\'
+   name: MummyBot
+   type: WebDeployPackage
+clone_depth: 1
+test_script:
+   
 
-after_deploy:
-- ps: Invoke-RestMethod -Method 'Get' -Uri https://thenoodlemummy.com:22554/api/deployment/deploy
+deploy: 
+- provider: Environment
+  name: DeployMummyBot
+  
 on_success:
-- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
+
+# on build failure
 on_failure:
-- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
-on_finish:
-- pwsh: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildFinished
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
+    
+after_deploy:
+  - ps: start-sleep -s 60 #delay 60sec as appveyor doesnt relize its still transfering the files and already report deployment sucessfull
+  - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/deploy
