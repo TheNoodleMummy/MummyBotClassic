@@ -16,11 +16,11 @@ before_build:
   # Display minimal restore text
 build_script:
   # output will be in ./src/bin/release/netcoreapp3.0/publish
-  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release -o "../"
+  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release -o "publish"
 after_build:
   # For once the build has completed
 artifacts:
- - path: '../'
+ - path: 'publish'
    name: MummyBot
    type: WebDeployPackage
 clone_depth: 1
@@ -34,7 +34,7 @@ deploy:
   username: Appveyor
   password:
     secure: PYK20u4YC+/u5AT+RheK5w==
-  artifact: $MummyBot.zip
+  artifact: MummyBot.zip
   
 on_success:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
