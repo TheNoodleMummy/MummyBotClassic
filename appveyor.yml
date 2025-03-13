@@ -35,7 +35,7 @@ deploy:
   username: Appveyor
   password:
     secure: PYK20u4YC+/u5AT+RheK5w==
-  artifact: MummybotRewrite\bin\release\net9.0\MummyBot.zip
+  artifact: MummyBot.zip
   
 on_success:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/BuildSuccess
