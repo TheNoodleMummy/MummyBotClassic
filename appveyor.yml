@@ -44,5 +44,5 @@ on_failure:
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/Buildfailed
     
 after_deploy:
-  - ps: start-sleep -s 60 #delay 60sec as appveyor doesnt relize its still transfering the files and already report deployment sucessfull
+  - ps: start-sleep -s 5 #delay 60sec as appveyor doesnt relize its still transfering the files and already report deployment sucessfull
   - ps: Invoke-RestMethod -Method 'Get' -Uri http://thenoodlemummy.com:22554/api/deployment/deploy
