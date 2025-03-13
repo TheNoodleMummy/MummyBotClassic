@@ -16,7 +16,7 @@ before_build:
   # Display minimal restore text
 build_script:
   # output will be in ./src/bin/release/netcoreapp3.0/publish
-  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release -o ""
+  - cmd: dotnet publish ./MummybotRewrite/Mummybot.csproj -c release -o "../"
 after_build:
   # For once the build has completed
 artifacts:
