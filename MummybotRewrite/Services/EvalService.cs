@@ -24,7 +24,12 @@ namespace Mummybot.Services
                 var file=File.Create("usings.json");
                 File.WriteAllText("usings.json", JsonConvert.SerializeObject(usings.ToArray()));
             }
-            LogSerice = logs;
+            else
+            {
+                var file = File.ReadAllText("usings.json");
+                usings = (List<string>) JsonConvert.DeserializeObject(file);
+            }
+                LogSerice = logs;
         }
 
         public void SaveUsings()
