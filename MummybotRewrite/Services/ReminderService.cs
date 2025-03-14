@@ -46,6 +46,7 @@ namespace Mummybot.Services
                         await ReminderCallbackAsync(reminder);
                         guild.Reminders.Remove(reminder);
                     }
+                    await GuildStore.SaveChangesAsync();
                 }
                 else
                 {
@@ -55,8 +56,9 @@ namespace Mummybot.Services
                     foreach (Reminder reminder in reminders)
                     {
                         guild.Reminders.Remove(reminder);
-                        await GuildStore.SaveChangesAsync();
+                        
                     }
+                    await GuildStore.SaveChangesAsync();
                 }
                 foreach (var item in guild.Reminders)
                 {

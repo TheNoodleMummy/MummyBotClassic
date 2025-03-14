@@ -34,7 +34,8 @@ namespace Mummybot.Commands.Modules
                 SetAtUTC = DateTime.UtcNow,
                 ExpiresAtUTC = DateTime.UtcNow + time,
                 Id = SnowFlakeGenerator.NextLong(),
-                UserID = Context.User.Id
+                UserID = Context.User.Id,
+                JumpUrl = Context.Message.GetJumpUrl()
             };
             GuildConfig.Reminders.Add(reminder);
             ReminderService.RegisterReminder(reminder, reminder.Id);
