@@ -17,7 +17,7 @@ namespace Mummybot.Database.Entities
 
         public override string ToString()
         {
-            return $"{Id} at {BDay}";
+            return $"{UserId} at {BDay}";
         }
     }
 }

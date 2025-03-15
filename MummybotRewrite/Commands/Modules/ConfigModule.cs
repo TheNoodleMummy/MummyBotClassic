@@ -1,14 +1,14 @@
 ﻿using Discord;
-using Qmmands;
-using System.Threading.Tasks;
-using System.Linq;
-using Mummybot.Extentions;
-using System;
-using Mummybot.Commands.TypeReaders;
-using Mummybot.Attributes.Checks;
-using System.Text;
 using Discord.WebSocket;
+using Mummybot.Attributes.Checks;
+using Mummybot.Commands.TypeReaders;
 using Mummybot.Database.Entities;
+using Mummybot.Extentions;
+using Qmmands;
+using System;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Mummybot.Commands.Modules
 {
@@ -21,7 +21,7 @@ namespace Mummybot.Commands.Modules
         public class HangmanCommands : MummyModule
         {
             [Command()]
-            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.UsesHangman = onoff;
                 await Context.Message.AddOkAsync();
@@ -32,7 +32,7 @@ namespace Mummybot.Commands.Modules
         public class OffensiveCommands : MummyModule
         {
             [Command("commands")]
-            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task OffensiveCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.AllowOffensiveCommands = onoff;
                 await Context.Message.AddOkAsync();
@@ -43,7 +43,7 @@ namespace Mummybot.Commands.Modules
         public class PlusCommands : MummyModule
         {
             [Command("commands")]
-            public async Task PlusCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task PlusCommandsOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.Allow18PlusCommands = onoff;
                 await Context.Message.AddOkAsync();
@@ -89,7 +89,7 @@ namespace Mummybot.Commands.Modules
             }
 
             [Command]
-            public async Task SetStarBoardOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SetStarBoardOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.UsesStarBoard = onoff;
                 await Context.Message.AddOkAsync();
@@ -100,7 +100,7 @@ namespace Mummybot.Commands.Modules
         public class AutoQuotes : MummyModule
         {
             [Command]
-            public async Task SetQuotesOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SetQuotesOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.AutoQuotes = onoff;
                 await Context.Message.AddOkAsync();
@@ -111,7 +111,7 @@ namespace Mummybot.Commands.Modules
         public class ReminderConfigModule : MummyModule
         {
             [Command]
-            public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SetReminderOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.UsesReminders = onoff;
                 await Context.Message.AddOkAsync();
@@ -122,7 +122,7 @@ namespace Mummybot.Commands.Modules
         public class TagsConfigModule : MummyModule
         {
             [Command]
-            public async Task SettagOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SettagOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.UsesTags = onoff;
                 await Context.Message.AddOkAsync();
@@ -133,7 +133,7 @@ namespace Mummybot.Commands.Modules
         public class BirthdaysConfigModule : MummyModule
         {
             [Command]
-            public async Task SetBirthdaysOnOff([OverrideTypeParser(typeof(BoolTypeReader))]bool onoff)
+            public async Task SetBirthdaysOnOff([OverrideTypeParser(typeof(BoolTypeReader))] bool onoff)
             {
                 GuildConfig.UsesBirthdays = onoff;
                 await Context.Message.AddOkAsync();
@@ -154,6 +154,29 @@ namespace Mummybot.Commands.Modules
                 }
             }
         }
+
+        [Group("prefix")]
+        public class Prefixes : MummyModule
+        {
+            [Command]
+            public async Task SetBirthdaysOnOff()
+            {
+                var prefixes = GuildConfig.Prefixes;
+                var sb = new StringBuilder();
+                sb.AppendLine("```");
+                for (int i = 0; i < prefixes.Count; i++)
+                {
+                    sb.AppendLine($"{i + 1} - {prefixes[i]}");
+                }
+
+                sb.AppendLine("```");
+                await ReplyAsync(sb.ToString());
+
+
+            }
+        }
+
+
 
         //[Group("voice")]
         //public class musicConfigModule : MummyModule
