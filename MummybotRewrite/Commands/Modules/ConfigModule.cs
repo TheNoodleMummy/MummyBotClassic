@@ -4,6 +4,7 @@ using Mummybot.Attributes.Checks;
 using Mummybot.Commands.TypeReaders;
 using Mummybot.Database.Entities;
 using Mummybot.Extentions;
+using Mummybot.Services;
 using Qmmands;
 using System;
 using System.Linq;
@@ -158,20 +159,41 @@ namespace Mummybot.Commands.Modules
         [Group("prefix")]
         public class Prefixes : MummyModule
         {
+            public Prefixes(SnowFlakeGeneratorService snowflakes)
+            {
+                SnowFlakeService = snowflakes;
+            }
+            public SnowFlakeGeneratorService SnowFlakeService { get; set; }
+
             [Command]
-            public async Task SetBirthdaysOnOff()
+            public async Task Prefix()
             {
                 var prefixes = GuildConfig.Prefixes;
                 var sb = new StringBuilder();
                 sb.AppendLine("```");
                 for (int i = 0; i < prefixes.Count; i++)
                 {
-                    sb.AppendLine($"{i + 1} - {prefixes[i]}");
+                    sb.AppendLine($"{i + 1} - {prefixes[i].Prefix}");
                 }
 
                 sb.AppendLine("```");
                 await ReplyAsync(sb.ToString());
+            }
 
+            [Command("add")]
+            public async Task PrefixAdd([Remainder] string prefix)
+            {
+                var toadd = new Database.Entities.Prefixes(SnowFlakeService.NextLong(), GuildConfig, Context.GuildId, prefix);
+                GuildConfig.Prefixes.Add(toadd);
+                await Context.Message.AddOkAsync();
+
+            }
+            [Command("remove")]
+            public async Task PrefixRemove([Remainder] string prefix)
+            {
+                var toremove = GuildConfig.Prefixes.FirstOrDefault(x => x.Prefix== prefix);
+                GuildConfig.Prefixes.Remove(toremove);
+                await Context.Message.AddOkAsync();
 
             }
         }

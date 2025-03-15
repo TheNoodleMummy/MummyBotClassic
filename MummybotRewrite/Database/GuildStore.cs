@@ -210,7 +210,15 @@ namespace Mummybot.Database
 
         public async Task<Guild> GetOrCreateGuildAsync(IGuild iguild)
         {
-            var guild = await Guilds.FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
+            var guild = await Guilds.Include(g => g.Birthdays)
+                .Include(g => g.Prefixes)
+                .Include(g => g.Reminders)
+                .Include(g => g.Stars)
+                .Include(g => g.Tags)
+                .Include(g => g.VoiceMutedUsers)
+                .Include(g => g.VoiceDeafenedUsers)
+                .Include(g => g.PlayListWhiteLists)
+                .FirstOrDefaultAsync(g => g.GuildID == iguild.Id);
             if (guild is null)
             {
                 _logservice.LogInformation($"guild: {iguild.Id} was not found creating new object", Enums.LogSource.GuildStore, iguild.Id);
