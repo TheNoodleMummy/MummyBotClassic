@@ -3,6 +3,7 @@ using Discord.Addons.Interactive;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Mummybot;
 using Mummybot.Commands;
 using Mummybot.Database;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Victoria;
 
 namespace MummyBot
 {
@@ -31,22 +33,19 @@ namespace MummyBot
                 .Where(x => typeof(BaseService).IsAssignableFrom(x) && !x.IsAbstract).ToArray();
 
             var services = new ServiceCollection()
+
                 .AddServices(types)
                 .AddSingleton(assembly)
                 .AddDbContext<GuildStore>(ServiceLifetime.Transient)
                 .AddDbContext<TokenStore>(ServiceLifetime.Transient)
                  .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
                  {
-                     GatewayIntents = 
-                     GatewayIntents.DirectMessageReactions
-                     | GatewayIntents.All,
-                     
+                     GatewayIntents = GatewayIntents.All,
                      AlwaysDownloadUsers = true,
                      LogLevel = LogSeverity.Info,
                      MessageCacheSize = 100
                  }))
                  .AddSingleton<InteractiveService>()
-                
                  .AddSingleton<Random>()
                  .AddSingleton(new CommandService(new CommandServiceConfiguration()
                  {
@@ -55,7 +54,7 @@ namespace MummyBot
                  })
                  .AddTypeParsers(assembly))
                  .AddSingleton<HttpClient>()
-                .BuildServiceProvider();
+                 .BuildServiceProvider();
 
             services.GetRequiredService<MessageService>();
 

@@ -61,6 +61,7 @@ namespace Mummybot
 
         private async Task DiscordClient_ReadyAsync()
         {
+            
             Console.Title = DiscordClient.CurrentUser.Username;
             await Services.RunInitialisersAsync(Types);
             DiscordClient.Ready -= DiscordClient_ReadyAsync;
