@@ -337,9 +337,10 @@
             }
         }
 
-        private async Task LavaClient_OnTrackException(TrackExceptionEventArg eventargs)
+        private Task LavaClient_OnTrackException(TrackExceptionEventArg eventargs)
         {
             LogService.LogInformation($"Player {eventargs.GuildId} {eventargs.Exception.Message} for {eventargs.Track.Title}", Enums.LogSource.Victoria, eventargs.GuildId);
+            return Task.CompletedTask;
         }
 
         private Task LavaClient_OnSocketClosed(WebSocketClosedEventArg eventargs)
