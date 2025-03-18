@@ -11,24 +11,30 @@ using System.Threading;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mummybot;
+using Mummybot.Services;
+using Mummybot.Services.Logging;
 
-namespace Mummybot.Services
+namespace Mummybot.Services.Logging
 {
     [InitilizerPriority(1)]
     public class LogService : BaseService
 
     {
+
         public string LogDirectory => Path.Combine(DateTime.Now.Year.ToString(), DateTime.Now.ToString("MMM"));
         public string Logfile => Path.Combine(LogDirectory, $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.txt");
+
+        public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
+        public DiscordSocketClient DiscordSocketClient { get; set; }
 
         public override Task InitialiseAsync(IServiceProvider services)
         {
             DiscordSocketClient = services.GetRequiredService<DiscordSocketClient>();
             return Task.CompletedTask;
+           
         }
-        public static SemaphoreSlim ss = new SemaphoreSlim(1, 1);
 
-        public DiscordSocketClient DiscordSocketClient { get; set; }
 
         public Task LogEventAsync(LogMessage log) => LogEventCustomAsync(new Structs.LogMessage(log.Severity, log.Source, log.Message, log.Exception));
         public Task LogEventCustomAsync(Structs.LogMessage log)
@@ -210,5 +216,7 @@ namespace Mummybot.Services
             var Guild = DiscordSocketClient?.GetGuild(Guildid);
             LogEventCustomAsync(new Structs.LogMessage(LogSeverity.Info, source.ToString(), Message, exception, Guild));
         }
+
+        
     }
 }

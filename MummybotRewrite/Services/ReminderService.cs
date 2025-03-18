@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Enums;
+using Mummybot.Services.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;

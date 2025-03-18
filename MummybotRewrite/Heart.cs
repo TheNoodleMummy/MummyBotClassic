@@ -54,11 +54,17 @@ namespace MummyBot
                  })
                  .AddTypeParsers(assembly))
                  .AddSingleton<HttpClient>()
+                 .AddLogging(builder =>
+                 {
+                     builder.ClearProviders();
+                     builder.AddMyConsole();
+                 })
+                 .AddLavaNode()
                  .BuildServiceProvider();
 
             services.GetRequiredService<MessageService>();
 
-           // using (var tokenstore = services.GetRequiredService<TokenStore>())
+            // using (var tokenstore = services.GetRequiredService<TokenStore>())
             using (var guildstore = services.GetRequiredService<GuildStore>())
             {
                 //await tokenstore.Database.MigrateAsync();

@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
+using Mummybot.Services.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

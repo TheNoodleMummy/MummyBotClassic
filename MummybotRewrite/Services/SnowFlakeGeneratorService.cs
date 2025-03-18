@@ -1,4 +1,5 @@
 ﻿using Mummybot.Enums;
+using Mummybot.Services.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;

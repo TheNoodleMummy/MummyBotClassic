@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Enums;
 using Mummybot.Services;
+using Mummybot.Services.Logging;
 using Qmmands;
 using System;
 using System.Collections.Generic;

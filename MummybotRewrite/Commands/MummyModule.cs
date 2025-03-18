@@ -2,6 +2,7 @@
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Services;
+using Mummybot.Services.Logging;
 using Qmmands;
 using System;
 using System.Collections.Generic;

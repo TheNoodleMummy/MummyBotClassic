@@ -7,6 +7,7 @@ using Mummybot.Commands.TypeReaders;
 using Mummybot.Database;
 using Mummybot.Extentions;
 using Mummybot.Services;
+using Mummybot.Services.Logging;
 using Qmmands;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Victoria;
 
 namespace Mummybot
 {
@@ -61,7 +63,7 @@ namespace Mummybot
 
         private async Task DiscordClient_ReadyAsync()
         {
-            
+            await Services.UseLavaNodeAsync();
             Console.Title = DiscordClient.CurrentUser.Username;
             await Services.RunInitialisersAsync(Types);
             DiscordClient.Ready -= DiscordClient_ReadyAsync;

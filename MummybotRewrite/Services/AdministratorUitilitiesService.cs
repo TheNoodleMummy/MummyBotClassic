@@ -8,6 +8,7 @@ using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Enums;
+using Mummybot.Services.Logging;
 using Qmmands;
 using System;
 using System.Collections.Generic;

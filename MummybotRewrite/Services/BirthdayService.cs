@@ -6,6 +6,7 @@ using Mummybot.Commands;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
 using Mummybot.Interfaces;
+using Mummybot.Services.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

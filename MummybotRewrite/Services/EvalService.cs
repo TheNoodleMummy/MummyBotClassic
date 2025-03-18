@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Commands;
+using Mummybot.Services.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
