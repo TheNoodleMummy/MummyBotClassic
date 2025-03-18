@@ -36,6 +36,7 @@
     <PackageReference Include="Qmmands" Version="5.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
 	<PackageReference Include="System.Linq.Async" Version="6.0.1" ExcludeAssets="All" />
+	<PackageReference Include="Victoria" Version="7.0.5" />
   </ItemGroup>
 
   <ItemGroup>
