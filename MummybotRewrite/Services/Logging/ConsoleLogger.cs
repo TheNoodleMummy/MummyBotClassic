@@ -143,20 +143,7 @@ namespace Mummybot.Services.Logging
 
             Console.WriteLine();
 
-#if !DEBUG
-            if (!Directory.Exists(LogDirectory))
-            {
-                Directory.CreateDirectory(LogDirectory);
-            }
-            if (!File.Exists(Logfile))
-            {
-                File.Create(Logfile).Dispose();
 
-            }
-
-            string logText = $"{DateTime.UtcNow.ToString("hh:mm:ss")} [{severity}] {source}: {message} => {exception}";
-            File.AppendAllText(Logfile, logText + Environment.NewLine);  
-#endif
             ss.Release(1);
             return;
         }
