@@ -116,38 +116,38 @@ namespace Mummybot.Commands.Modules
                 hasdays = true;
                 sb.Append("in ").Append(timespan.Days);
                 if (timespan.Days == 1)
-                    sb.Append("Day, ");
+                    sb.Append(" Day");
                 else
-                    sb.Append("Days, ");
+                    sb.Append(" Days");
             }
 
             if (timespan.Hours != 0)
             {
                 hashours = true;
                 if (hasdays)
-                    sb.Append("and ").Append(timespan.Hours);
+                    sb.Append(", and ").Append(timespan.Hours);
                 else
                     sb.Append("in ").Append(timespan.Hours);
 
                 if (timespan.Hours == 1)
-                    sb.Append("Hour, ");
+                    sb.Append("Hour");
                 else
-                    sb.Append("Hours, ");
+                    sb.Append("Hours");
             }
 
             if (timespan.Minutes != 0)
             {
                 if (hashours)
-                    sb.Append("and ").Append(timespan.Minutes);
+                    sb.Append(", and ").Append(timespan.Minutes);
                 else
                     sb.Append("in ").Append(timespan.Minutes);
 
                 if (timespan.Minutes == 1)
-                    sb.Append("Minute, ");
+                    sb.Append("Minute");
                 else
-                    sb.Append("minutes, ");
+                    sb.Append("minutes");
             }
-            sb.Append("I will remind you about ").Append(reminder.Message).Append("(id: ").Append(reminder.Id).Append(")");
+            sb.Append(", I will remind you about ").Append(reminder.Message).Append(" (id: ").Append(reminder.Id).Append(")");
 
             await ReplyAsync(sb.ToString());
         }
