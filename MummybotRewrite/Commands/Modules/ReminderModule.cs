@@ -98,7 +98,7 @@ namespace Mummybot.Commands.Modules
                 GuildID = Context.Guild.Id,
                 Message = message,
                 SetAtUTC = DateTime.UtcNow,
-                ExpiresAtUTC =time,
+                ExpiresAtUTC =time.UtcDateTime,
                 Id = SnowFlakeGenerator.NextLong(),
                 UserID = Context.User.Id,
                 JumpUrl = Context.Message.GetJumpUrl()
