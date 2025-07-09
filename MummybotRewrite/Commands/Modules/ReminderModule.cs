@@ -35,7 +35,8 @@ namespace Mummybot.Commands.Modules
                 ExpiresAtUTC = DateTime.UtcNow + time,
                 Id = SnowFlakeGenerator.NextLong(),
                 UserID = Context.User.Id,
-                JumpUrl = Context.Message.GetJumpUrl()
+                JumpUrl = Context.Message.GetJumpUrl(),
+                originalMessageId = Context.Message.Id
             };
             GuildConfig.Reminders.Add(reminder);
             ReminderService.RegisterReminder(reminder, reminder.Id);
@@ -82,7 +83,7 @@ namespace Mummybot.Commands.Modules
             }
             sb.Append("I will remind you about ").Append(reminder.Message);
 
-            await ReplyAsync(sb.ToString());
+            await Context.Message.ReplyAsync(sb.ToString());
         }
 
         [Command("remind"),Priority(100000)]

@@ -422,7 +422,7 @@ namespace Mummybot.Services
         {
             if (properties.Stream is null)
             {
-                return await context.Channel.SendMessageAsync(properties.Content, embed: properties.Embed);
+                return await context.Message.ReplyAsync(properties.Content, embed: properties.Embed);
             }
 
             return await context.Channel.SendFileAsync(

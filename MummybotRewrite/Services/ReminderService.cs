@@ -1,6 +1,7 @@
 ﻿using Casino.Common;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Mummybot.Database;
 using Mummybot.Database.Entities;
@@ -57,7 +58,7 @@ namespace Mummybot.Services
                     foreach (Reminder reminder in reminders)
                     {
                         guild.Reminders.Remove(reminder);
-                        
+
                     }
                     await GuildStore.SaveChangesAsync();
                 }
@@ -81,7 +82,7 @@ namespace Mummybot.Services
             StringBuilder sb = new StringBuilder();
             var time = DateTime.UtcNow - reminder.SetAtUTC;
 
-            
+
 
 
             sb.Append("yoo ").Append(DiscordClient.GetUser(reminder.UserID).Mention).Append(", ");
@@ -152,10 +153,11 @@ namespace Mummybot.Services
                 }
                 sb.Append(" late.");
             }
-            var emb = new EmbedBuilder().WithDescription(Format.Url("jump!",reminder.JumpUrl));
-            await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString(),embed:emb.Build());
-
-
+            var emb = new EmbedBuilder().WithDescription(Format.Url("jump!", reminder.JumpUrl));
+            if (reminder.originalMessageId == null)
+                await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString(), embed: emb.Build());
+            else
+                ((await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).GetMessageAsync(reminder.originalMessageId)) as IUserMessage).ReplyAsync(sb.ToString());
 
             using var GuildStore = _services.GetRequiredService<GuildStore>();
             var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
