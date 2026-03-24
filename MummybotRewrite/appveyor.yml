@@ -10,13 +10,12 @@ init:
   - cmd: git config --global core.autocrlf true
   
   # Install repo specific stuff here
-install:
+  
+before_build:
+  # Display .NET Core version
   - ps: |
       Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile "$env:temp\dotnet-install.ps1"
       & $env:temp\dotnet-install.ps1 -Architecture x64 -Version '10.0.100' -InstallDir "$env:ProgramFiles\dotnet"
-before_build:
-  # Display .NET Core version
-  - cmd: dotnet-sdk-10.00.2001-win-x64.exe /install /quiet /norestart
   - cmd: dotnet --version
   # Display minimal restore text
 build_script:
