@@ -36,7 +36,7 @@ namespace Mummybot.Commands.Modules
                 Id = SnowFlakeGenerator.NextLong(),
                 UserID = Context.User.Id,
                 JumpUrl = Context.Message.GetJumpUrl(),
-                originalMessageId = Context.Message.Id
+                OriginalMessageId = Context.Message.Id
             };
             GuildConfig.Reminders.Add(reminder);
             ReminderService.RegisterReminder(reminder, reminder.Id);

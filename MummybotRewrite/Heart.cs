@@ -67,6 +67,7 @@ namespace MummyBot
             // using (var tokenstore = services.GetRequiredService<TokenStore>())
             using (var guildstore = services.GetRequiredService<GuildStore>())
             {
+                
                 //await tokenstore.Database.MigrateAsync();
                  guildstore.Database.Migrate();
 

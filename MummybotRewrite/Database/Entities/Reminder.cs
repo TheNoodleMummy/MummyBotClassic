@@ -16,7 +16,7 @@ namespace Mummybot.Database.Entities
         public ulong UserID { get; set; }
         public ulong ChannelID { get; set; }
         public string JumpUrl { get; set; }
-        public ulong originalMessageId { get; set; }
+        public ulong OriginalMessageId { get; set; }
 
         public override string ToString()
         {
