@@ -33,6 +33,6 @@ jobs:
     - name: Push files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: ftp.thenoodlemummy.com
+        server: thenoodlemummy.com
         username: Appveyor
         password: ${{ secrets.ftp_password }}
