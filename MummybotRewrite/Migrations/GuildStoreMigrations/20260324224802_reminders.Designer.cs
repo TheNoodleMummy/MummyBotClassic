@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mummybot.Database;
 
@@ -11,9 +12,11 @@ using Mummybot.Database;
 namespace Mummybot.Migrations.GuildStoreMigrations
 {
     [DbContext(typeof(GuildStore))]
-    partial class GuildStoreModelSnapshot : ModelSnapshot
+    [Migration("20260324224802_reminders")]
+    partial class reminders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

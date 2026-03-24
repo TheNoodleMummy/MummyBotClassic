@@ -11,6 +11,7 @@ using Mummybot.Enums;
 using Mummybot.Exceptions;
 using Mummybot.Extentions;
 using Mummybot.Services;
+using Mummybot.Services.Logging;
 using Qmmands;
 using System;
 using System.Linq;
@@ -67,7 +68,8 @@ namespace MummyBot
             // using (var tokenstore = services.GetRequiredService<TokenStore>())
             using (var guildstore = services.GetRequiredService<GuildStore>())
             {
-                
+                var logger = services.GetRequiredService<LogService>();
+                logger.LogInformation("migrating database");
                 //await tokenstore.Database.MigrateAsync();
                  guildstore.Database.Migrate();
 
