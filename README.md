@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/sc1lgd1dfu12b44m?svg=true)](https://ci.appveyor.com/project/TheNoodleMummy/mummybot)
+[![.NET build mummybot and upload](https://github.com/TheNoodleMummy/MummyBotClassic/actions/workflows/dotnet.yml/badge.svg?event=push)](https://github.com/TheNoodleMummy/MummyBotClassic/actions/workflows/dotnet.yml)
 
 # MummyBot
 Mummybot makes use of [TheCasino's](https://github.com/k-boyle) [TaskQueue](https://github.com/k-boyle/Kommon/tree/master/src/Kommon/Entities/TaskQueue)
