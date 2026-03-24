@@ -53,11 +53,11 @@ namespace Mummybot.Extentions
                         sb.AppendLine($"[{count} item{(count == 1 ? "" : "s")}]");
                         break;
 
-                    case Enum @enum:
+                    //case Enum @enum:
 
-                        sb.AppendLine($"[{@enum.Humanize()}]");
+                    //    sb.AppendLine($"[{@enum.Humanize()}]");
 
-                        break;
+                    //    break;
 
                     case string str:
 

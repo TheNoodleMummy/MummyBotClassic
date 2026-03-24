@@ -123,11 +123,11 @@ namespace Mummybot.Commands.Modules
 
                             break;
 
-                        case Enum @enum:
+                        //case Enum @enum:
 
-                            builder.AddField($"{@enum.GetType()}", $"```\n{@enum.Humanize()}\n```");
+                        //    builder.AddField($"{@enum.GetType()}", $"```\n{@enum.Humanize()}\n```");
 
-                            break;
+                        //    break;
 
                         default:
 
