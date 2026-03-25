@@ -157,7 +157,7 @@ namespace Mummybot.Services
             if (reminder.OriginalMessageId == null)
                 await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).SendMessageAsync(sb.ToString(), embed: emb.Build());
             else
-                ((await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).GetMessageAsync(reminder.OriginalMessageId)) as IUserMessage).ReplyAsync(sb.ToString());
+                await ((await DiscordClient.GetGuild(reminder.GuildID).GetTextChannel(reminder.ChannelID).GetMessageAsync(reminder.OriginalMessageId)) as IUserMessage).ReplyAsync(sb.ToString());
 
             using var GuildStore = _services.GetRequiredService<GuildStore>();
             var guildconfig = await GuildStore.GetOrCreateGuildAsync(reminder.GuildID, r => r.Reminders);
