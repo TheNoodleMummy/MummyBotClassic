@@ -33,5 +33,5 @@ jobs:
         protocol: ftp
         username: Github
         password: cookie
-        local-dir: D:\a\MummyBotClassic\MummyBotClassic\MummybotRewrite\bin\Release\net10.0\Mummybot.dll
+        local-dir: D:\a\MummyBotClassic\MummyBotClassic\MummybotRewrite\bin\Release\net10.0\
         server-dir: /MummyBotRewrite/
