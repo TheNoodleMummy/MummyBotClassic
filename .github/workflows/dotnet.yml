@@ -36,5 +36,5 @@ jobs:
         server: thenoodlemummy.com
         port: 21
         protocol: ftp
-        username: Appveyor
+        username: Github
         password: ${{ secrets.ftp_password }}
