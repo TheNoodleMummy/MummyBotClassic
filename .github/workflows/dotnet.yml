@@ -23,16 +23,8 @@ jobs:
     - name: Publish
       run: dotnet publish -c Release --output ./Release --no-self-contained
 
-
-  web-deploy:
-    name: Deploy
-    runs-on: windows-latest
-    permissions:
-      contents: read
-    steps:
     - name: Get latest code
       uses: actions/checkout@v4
-
     - name: Push files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
