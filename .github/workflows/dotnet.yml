@@ -26,6 +26,8 @@ jobs:
   web-deploy:
     name: Deploy
     runs-on: windows-latest
+    permissions:
+      contents: read
     steps:
     - name: Get latest code
       uses: actions/checkout@v4
