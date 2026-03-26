@@ -77,7 +77,11 @@ namespace MummyBot
                 await guildstore.SaveChangesAsync();
             }
             var mummybot = new BotStartup(services);
+        
+            
             await mummybot.StartAsync(types);
+
+            Console.Read();
         }
 
         public object CoolDownBucketGenerator(object bucketType, CommandContext context)
@@ -96,5 +100,6 @@ namespace MummyBot
                 };
             throw new InvalidOperationException($"cooldownbuckettype failed to parse as {typeof(CooldownBucketType)}");
         }
+        
     }
 }
