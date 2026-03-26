@@ -18,9 +18,20 @@ namespace Mummybot.Services
         public List<string> usings = JsonConvert.DeserializeObject<string[]>(File.ReadAllText("usings.json")).ToList();
         private readonly object LogSerice;
 
+        public EvalService()
+        {
+            if (!File.Exists("usings.json"))
+            {
+                File.Create("usings.json");
+            }
+        }
+
         public EvalService(LogService logs)
         {
-           
+            if (!File.Exists("usings.json"))
+            {
+                File.Create("usings.json");
+            }
             LogSerice = logs;
         }
 
